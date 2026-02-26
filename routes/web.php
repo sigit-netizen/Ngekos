@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -19,10 +20,29 @@ Route::get('/', function () {
 
 // Admin Dashboard
 Route::get('/admin', function () {
-    return view('admin.dashboard');
+    return view('admin.dashboard', ['role' => 'admin']);
 })->name('admin.dashboard');
 
-require __DIR__.'/auth.php';
+// user  Dashboard
+Route::get('/user', function () {
+    return view('user.dashboard', ['role' => 'user']);
+})->name('user.dashboard');
+
+// member  Dashboard
+Route::get('/member', function () {
+    return view('member.dashboard', ['role' => 'member']);
+})->name('member.dashboard');
+
+// superadmin  Dashboard
+Route::get('/superadmin', function () {
+    return view('superadmin.dashboard', ['role' => 'superadmin']);
+})->name('superadmin.dashboard');
+
+// User Dashboard Detail
+Route::get('/user/dashboard', function () {
+    return view('user.dashboard', ['title' => 'Dashboard User', 'role' => 'user']);
+})->name('user.dashboard.detail');
+
 
 // calender pages
 Route::get('/calendar', function () {
