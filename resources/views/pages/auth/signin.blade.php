@@ -77,7 +77,40 @@
                     </div>
                 </div>
 
-                <form>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    @if (session('success'))
+                        <div class="mb-5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 shadow-sm"
+                            x-data="{ show: true }" x-show="show" x-transition.opacity>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-semibold text-emerald-800">
+                                        {{ session('success') }}
+                                    </p>
+                                </div>
+                                <div class="ml-auto pl-3">
+                                    <div class="-mx-1.5 -my-1.5">
+                                        <button type="button" @click="show = false"
+                                            class="inline-flex rounded-md p-1.5 text-emerald-500 hover:bg-emerald-100 focus:outline-none transition-colors">
+                                            <span class="sr-only">Tutup</span>
+                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="space-y-5">
                         <!-- Email Input -->
                         <div class="group">
@@ -85,8 +118,12 @@
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Email<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="email" id="email" name="email" placeholder="contoh@mail.com"
-                                class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                            <input type="email" id="email" name="email" value="{{ old('email') }}"
+                                placeholder="contoh@mail.com" required
+                                class="h-12 w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                            @error('email')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Password Input -->
@@ -96,8 +133,9 @@
                                 Password<span class="text-red-500 ml-1">*</span>
                             </label>
                             <div x-data="{ showPassword: false }" class="relative">
-                                <input :type="showPassword ? 'text' : 'password'" placeholder="Masukkan password Anda"
-                                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                                <input :type="showPassword ? 'text' : 'password'" name="password" required
+                                    placeholder="Masukkan password Anda"
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
                                 <button type="button" @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-4 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
                                     <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -114,6 +152,9 @@
                                     </svg>
                                 </button>
                             </div>
+                            @error('password')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Checkbox & Forgot Password -->
@@ -147,7 +188,7 @@
 
                         <!-- Submit Button -->
                         <div class="pt-4">
-                            <button
+                            <button type="submit"
                                 class="w-full relative flex items-center justify-center rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] px-4 py-4 text-sm font-bold text-white shadow-lg shadow-[#36b2b2]/30 hover:shadow-[#36b2b2]/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
                                 <span class="relative z-10 flex items-center gap-2">
                                     Masuk
@@ -169,7 +210,7 @@
                 <div class="mt-8 text-center pt-6 border-t border-gray-100">
                     <p class="text-sm font-normal text-gray-500">
                         Belum punya akun?
-                        <a href="/signup"
+                        <a href="{{ route('register') }}"
                             class="font-bold text-[#36B2B2] hover:text-[#2b8f8f] transition-colors hover:underline">Daftar
                             sekarang</a>
                     </p>

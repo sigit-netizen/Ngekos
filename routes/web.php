@@ -18,30 +18,100 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Admin Dashboard
-Route::get('/admin', function () {
-    return view('admin.dashboard', ['role' => 'admin']);
-})->name('admin.dashboard');
+// Protected Admin Dashboard
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin', function () {
+        return view('admin.dashboard', ['role' => 'admin']);
+    })->name('admin.dashboard');
 
-// user  Dashboard
-Route::get('/user', function () {
-    return view('user.dashboard', ['role' => 'user']);
-})->name('user.dashboard');
+    Route::get('/admin/kamar', function () {
+        return view('member.kamar', ['title' => 'Kamar', 'role' => 'admin']);
+    })->name('admin.kamar');
 
-// member  Dashboard
-Route::get('/member', function () {
-    return view('member.dashboard', ['role' => 'member']);
-})->name('member.dashboard');
+    Route::get('/admin/data-penyewa', function () {
+        return view('member.data_penyewa', ['title' => 'Data Penyewa', 'role' => 'admin']);
+    })->name('admin.data_penyewa');
 
-// superadmin  Dashboard
-Route::get('/superadmin', function () {
-    return view('superadmin.dashboard', ['role' => 'superadmin']);
-})->name('superadmin.dashboard');
+    Route::get('/admin/cabang-kos', function () {
+        return view('member.cabang_kos', ['title' => 'Cabang Kos', 'role' => 'admin']);
+    })->name('admin.cabang_kos');
 
-// User Dashboard Detail
-Route::get('/user/dashboard', function () {
-    return view('user.dashboard', ['title' => 'Dashboard User', 'role' => 'user']);
-})->name('user.dashboard.detail');
+    Route::get('/admin/pesan-aduan', function () {
+        return view('member.pesan_aduan', ['title' => 'Pesan Aduan', 'role' => 'admin']);
+    })->name('admin.pesan_aduan');
+
+    Route::get('/admin/laporan-pembayaran', function () {
+        return view('member.laporan_pembayaran', ['title' => 'Laporan Pembayaran', 'role' => 'admin']);
+    })->name('admin.laporan_pembayaran');
+
+    Route::get('/admin/tagihan-sistem', function () {
+        return view('member.tagihan_sistem', ['title' => 'Tagihan Sistem', 'role' => 'admin']);
+    })->name('admin.tagihan_sistem');
+
+    Route::get('/admin/order', function () {
+        return view('member.order', ['title' => 'Order', 'role' => 'admin']);
+    })->name('admin.order');
+});
+
+// Protected User Dashboards (Anak Kos)
+Route::middleware(['auth', 'role:users'])->group(function () {
+    Route::get('/user', function () {
+        return view('user.dashboard', ['role' => 'user']);
+    })->name('user.dashboard');
+
+    Route::get('/user/dashboard', function () {
+        return view('user.dashboard', ['title' => 'Dashboard User', 'role' => 'user']);
+    })->name('user.dashboard.detail');
+
+    Route::get('/user/pesan', function () {
+        return view('user.pesan', ['title' => 'Pesan', 'role' => 'user']);
+    })->name('user.pesan');
+
+    Route::get('/user/order', function () {
+        return view('user.order', ['title' => 'Order', 'role' => 'user']);
+    })->name('user.order');
+
+    Route::get('/user/jatuh-tempo', function () {
+        return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);
+    })->name('user.jatuh_tempo');
+
+    Route::get('/user/aduan', function () {
+        return view('user.aduan', ['title' => 'Aduan Fasilitas', 'role' => 'user']);
+    })->name('user.aduan');
+});
+
+// Other specific dashboard roles... (assuming these exists from existing code)
+Route::middleware(['auth', 'role:member'])->group(function () {
+    Route::get('/member', function () {
+        return view('member.dashboard', ['role' => 'member']);
+    })->name('member.dashboard');
+});
+
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::get('/superadmin', function () {
+        return view('superadmin.dashboard', ['role' => 'superadmin']);
+    })->name('superadmin.dashboard');
+
+    Route::get('/superadmin/data-member', function () {
+        return view('superadmin.data_member', ['title' => 'Data Member', 'role' => 'superadmin']);
+    })->name('superadmin.data_member');
+
+    Route::get('/superadmin/data-user', function () {
+        return view('superadmin.data_user', ['title' => 'Data User', 'role' => 'superadmin']);
+    })->name('superadmin.data_user');
+
+    Route::get('/superadmin/laporan-pembayaran', function () {
+        return view('superadmin.laporan_pembayaran', ['title' => 'Laporan Pembayaran', 'role' => 'superadmin']);
+    })->name('superadmin.laporan_pembayaran');
+
+    Route::get('/superadmin/order', function () {
+        return view('superadmin.order', ['title' => 'Order', 'role' => 'superadmin']);
+    })->name('superadmin.order');
+
+    Route::get('/superadmin/permission', function () {
+        return view('superadmin.permission', ['title' => 'Permission', 'role' => 'superadmin']);
+    })->name('superadmin.permission');
+});
 
 
 // calender pages
@@ -82,15 +152,6 @@ Route::get('/line-chart', function () {
 Route::get('/bar-chart', function () {
     return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
 })->name('bar-chart');
-
-// authentication pages
-Route::get('/signin', function () {
-    return view('pages.auth.signin', ['title' => 'Sign In']);
-})->name('signin');
-
-Route::get('/signup', function () {
-    return view('pages.auth.signup', ['title' => 'Sign Up']);
-})->name('signup');
 
 // ui elements pages
 Route::get('/alerts', function () {

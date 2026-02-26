@@ -141,18 +141,11 @@
 
                 <!-- Right Menu (Auth) -->
                 <div class="hidden md:flex items-center justify-end w-56 gap-3" style="gap: 0.75rem;">
-                    @auth
-                        <a href="{{ url('/admin') }}"
-                            class="text-sm font-semibold text-[#36B2B2] hover:text-[#2b8f8f] transition px-4 py-2">
-                            Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('signin') }}"
+                        <a href="{{ route('login') }}"
                             class="inline-flex justify-center items-center px-6 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] transition">Masuk</a>
-                        <a href="{{ route('signup') }}"
+                        <a href="{{ route('register') }}"
                             class="inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-[#36B2B2] hover:bg-[#2b8f8f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] shadow-sm transition whitespace-nowrap">Coba
                             Gratis</a>
-                    @endauth
                 </div>
 
                 <!-- Mobile menu button -->
@@ -191,19 +184,13 @@
                     class="px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#36B2B2] transition">Harga</a>
 
                 <div class="border-t border-gray-100 pt-4 mt-2 px-4 flex flex-col gap-2.5">
-                    @auth
-                        <a href="{{ url('/admin') }}"
-                            class="w-full text-center px-4 py-3 rounded-xl text-[#36B2B2] border border-[#36B2B2]/30 bg-[#36B2B2]/5 font-semibold hover:bg-[#36B2B2]/10 transition">Dashboard
-                            Admin</a>
-                    @else
                         <a href="{{ route('login') }}"
                             class="w-full text-center px-4 py-3 rounded-xl text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 transition">Login</a>
-                        @if (Route::has('signup'))
-                            <a href="{{ route('signup') }}"
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}"
                                 class="w-full text-center px-4 py-3 rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white font-semibold hover:shadow-lg transition">Daftar
                                 Sekarang</a>
                         @endif
-                    @endauth
                 </div>
             </div>
         </div>
@@ -836,7 +823,7 @@
                             </li>
                         </ul>
 
-                        <a href="{{ route('signup') }}"
+                        <a href="{{ route('register') }}"
                             class="inline-flex items-center gap-2 text-[#36B2B2] font-semibold hover:gap-3 transition-all group/link">
                             Cari Kos Sekarang
                             <svg class="w-4 h-4 group-hover/link:translate-x-1 transition" fill="none"
@@ -1070,7 +1057,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="block w-full py-4 text-center rounded-xl border border-blue-500 text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm">
                         Pilih Premium Per Kamar
                     </a>
@@ -1115,7 +1102,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="block w-full py-4 text-center rounded-xl bg-white text-[#36B2B2] font-bold shadow-md hover:shadow-lg transition">
                         Pilih Pro Per Kamar
                     </a>
@@ -1163,7 +1150,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="block w-full py-3 text-center rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:border-[#36B2B2] hover:text-[#36B2B2] transition">
                         Daftar Gratis
                     </a>
@@ -1208,7 +1195,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="block w-full py-3 text-center rounded-xl bg-white text-[#36B2B2] text-sm font-bold shadow-md hover:shadow-lg transition">
                         Daftar Premium
                     </a>
@@ -1252,7 +1239,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="block w-full py-3 text-center rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-bold hover:shadow-lg transition">
                         Pilih Pro
                     </a>
@@ -1280,7 +1267,7 @@
                     sekarang. Gak pakai ribet, gak ada biaya tersembunyi.</p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-                    <a href="{{ route('signup') }}"
+                    <a href="{{ route('register') }}"
                         class="px-8 py-4 bg-[#36B2B2] hover:bg-[#2b8f8f] font-bold text-lg rounded-xl transition shadow-lg shadow-[#36b2b2]/50 hover:shadow-xl hover:-translate-y-1 transform">
                         Buat Akun Gratis
                     </a>

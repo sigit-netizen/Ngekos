@@ -58,67 +58,84 @@
                         Isi data berikut untuk mendaftar!
                     </p>
                 </div>
-                <form method="POST">
+                <form method="POST" action="{{ route('register') }}"
+                    onsubmit="if(!document.querySelector('input[name=id_plans]').value){ alert('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!'); return false; }">
                     @csrf
                     <div class="space-y-5">
 
-                        <!-- Nama Input -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Nama Lengkap<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="text" id="name" name="name" placeholder="Masukkan nama lengkap"
-                                class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300"
+                            <input type="text" id="name" name="name" value="{{ old('name') }}"
+                                placeholder="Masukkan nama lengkap"
+                                class="h-12 w-full rounded-xl border {{ $errors->has('name') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300"
                                 required />
+                            @error('name')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <!-- NIK Input -->
                             <div class="group">
                                 <label
                                     class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                     NIK<span class="text-red-500 ml-1">*</span>
                                 </label>
-                                <input type="number" id="nik" name="nik" placeholder="Masukkan NIK"
-                                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300"
+                                <input type="number" id="nik" name="nik" value="{{ old('nik') }}" placeholder="Masukkan NIK"
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('nik') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300"
                                     required />
+                                @error('nik')
+                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                                @enderror
                             </div>
 
-                            <!-- Nomor WA Input -->
                             <div class="group">
                                 <label
                                     class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                     Nomor WhatsApp<span class="text-red-500 ml-1">*</span>
                                 </label>
-                                <input type="number" id="nomor_wa" name="nomor_wa" placeholder="08..." required
-                                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                                <input type="number" id="nomor_wa" name="nomor_wa" value="{{ old('nomor_wa') }}"
+                                    placeholder="08..." required
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('nomor_wa') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                                @error('nomor_wa')
+                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
-                        <!-- Tanggal Lahir Input -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                Tanggal Lahir
+                                Tanggal Lahir<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="date" id="tanggal_lahir" name="tanggal_lahir"
-                                class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                            <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
+                                required
+                                class="h-12 w-full rounded-xl border {{ $errors->has('tanggal_lahir') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                            @error('tanggal_lahir')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
-                        <!-- Alamat Input -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                Alamat Domisili
+                                Alamat Domisili<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap"
-                                class="w-full rounded-xl border border-gray-200 bg-gray-50/50 p-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300"></textarea>
+                            <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap" required
+                                class="w-full rounded-xl border {{ $errors->has('alamat') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} p-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300">{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Role Selection (Dropdown) -->
-                        <div class="group" x-data="{ isOpen: false, selectedRole: '', roleText: 'Pilih peran...' }"
-                            @click.outside="isOpen = false">
+                        <div class="group" x-data="{ 
+                                        isOpen: false, 
+                                        selectedRole: '{{ old('id_plans') }}', 
+                                        roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}' 
+                                    }" @click.outside="isOpen = false">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Mendaftar Sebagai<span class="text-red-500 ml-1">*</span>
@@ -214,16 +231,22 @@
                                     </li>
                                 </ul>
                             </div>
+                            @error('id_plans')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
-                        <!-- Email Input -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Email<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="email" id="email" name="email" placeholder="contoh@mail.com"
-                                class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                            <input type="email" id="email" name="email" value="{{ old('email') }}"
+                                placeholder="contoh@mail.com" required
+                                class="h-12 w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                            @error('email')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Password Input -->
@@ -233,8 +256,9 @@
                                 Password<span class="text-red-500 ml-1">*</span>
                             </label>
                             <div x-data="{ showPassword: false }" class="relative">
-                                <input :type="showPassword ? 'text' : 'password'" placeholder="Minimal 8 karakter"
-                                    class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300" />
+                                <input :type="showPassword ? 'text' : 'password'" name="password" id="password" required
+                                    minlength="8" placeholder="Minimal 8 karakter"
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
                                 <button type="button" @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-4 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
                                     <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -251,6 +275,9 @@
                                     </svg>
                                 </button>
                             </div>
+                            @error('password')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Checkbox -->
@@ -258,7 +285,7 @@
                             <label for="checkboxLabelOne"
                                 class="flex cursor-pointer items-start text-sm font-normal text-gray-600 select-none group">
                                 <div class="relative mt-0.5">
-                                    <input type="checkbox" id="checkboxLabelOne" class="sr-only"
+                                    <input type="checkbox" id="checkboxLabelOne" class="sr-only" required
                                         @change="checkboxToggle = !checkboxToggle" />
                                     <div :class="checkboxToggle ? 'border-[#36B2B2] bg-[#36B2B2]' : 'bg-white border-gray-300 group-hover:border-[#36B2B2]'"
                                         class="mr-3 flex h-5 w-5 items-center justify-center rounded border transition-colors duration-200">
@@ -305,7 +332,7 @@
                 <div class="mt-8 text-center pt-6 border-t border-gray-100">
                     <p class="text-sm font-normal text-gray-500">
                         Sudah punya akun?
-                        <a href="/signin"
+                        <a href="{{ route('login') }}"
                             class="font-bold text-[#36B2B2] hover:text-[#2b8f8f] transition-colors hover:underline">Masuk
                             disini</a>
                     </p>
