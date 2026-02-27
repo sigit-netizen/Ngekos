@@ -14,12 +14,10 @@ require __DIR__ . '/auth.php';
 |
 */
 // Landing Page
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->name('home');
 
 // Protected Admin Dashboard
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin', 'check.subscription'])->group(function () {
     Route::get('/admin', function () {
         return view('admin.dashboard', ['role' => 'admin']);
     })->name('admin.dashboard');
@@ -44,17 +42,25 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         return view('member.laporan_pembayaran', ['title' => 'Laporan Pembayaran', 'role' => 'admin']);
     })->name('admin.laporan_pembayaran');
 
-    Route::get('/admin/tagihan-sistem', function () {
-        return view('member.tagihan_sistem', ['title' => 'Tagihan Sistem', 'role' => 'admin']);
-    })->name('admin.tagihan_sistem');
+    Route::get('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('admin.tagihan_sistem');
+    Route::put('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'update'])->name('admin.subscription.update');
 
     Route::get('/admin/order', function () {
         return view('member.order', ['title' => 'Order', 'role' => 'admin']);
     })->name('admin.order');
+
+    // Dynamic Route for automatically generated admin menus
+    Route::get('/admin/{page}', function ($page) {
+        if (view()->exists('member.' . $page)) {
+            $title = ucwords(str_replace(['_', '-'], ' ', $page));
+            return view('member.' . $page, ['title' => $title, 'role' => 'admin']);
+        }
+        abort(404);
+    })->name('admin.dynamic');
 });
 
 // Protected User Dashboards (Anak Kos)
-Route::middleware(['auth', 'role:users'])->group(function () {
+Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function () {
     Route::get('/user', function () {
         return view('user.dashboard', ['role' => 'user']);
     })->name('user.dashboard');
@@ -78,6 +84,15 @@ Route::middleware(['auth', 'role:users'])->group(function () {
     Route::get('/user/aduan', function () {
         return view('user.aduan', ['title' => 'Aduan Fasilitas', 'role' => 'user']);
     })->name('user.aduan');
+
+    // Dynamic Route for automatically generated user menus
+    Route::get('/user/{page}', function ($page) {
+        if (view()->exists('user.' . $page)) {
+            $title = ucwords(str_replace(['_', '-'], ' ', $page));
+            return view('user.' . $page, ['title' => $title, 'role' => 'user']);
+        }
+        abort(404);
+    })->name('user.dynamic');
 });
 
 // Other specific dashboard roles... (assuming these exists from existing code)
@@ -88,29 +103,28 @@ Route::middleware(['auth', 'role:member'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/superadmin', function () {
-        return view('superadmin.dashboard', ['role' => 'superadmin']);
-    })->name('superadmin.dashboard');
+    Route::get('/superadmin', [\App\Http\Controllers\Superadmin\DashboardController::class, 'index'])->name('superadmin.dashboard');
 
-    Route::get('/superadmin/data-member', function () {
-        return view('superadmin.data_member', ['title' => 'Data Member', 'role' => 'superadmin']);
-    })->name('superadmin.data_member');
+    Route::get('/superadmin/data-member', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'index'])->name('superadmin.data_member');
+    Route::post('/superadmin/data-member', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'store'])->name('superadmin.data_member.store');
+    Route::put('/superadmin/data-member/{user}', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'update'])->name('superadmin.data_member.update');
+    Route::delete('/superadmin/data-member/{user}', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'destroy'])->name('superadmin.data_member.destroy');
 
-    Route::get('/superadmin/data-user', function () {
-        return view('superadmin.data_user', ['title' => 'Data User', 'role' => 'superadmin']);
-    })->name('superadmin.data_user');
+    Route::get('/superadmin/data-user', [\App\Http\Controllers\Superadmin\UserManagementController::class, 'index'])->name('superadmin.data_user');
+    Route::post('/superadmin/data-user', [\App\Http\Controllers\Superadmin\UserManagementController::class, 'store'])->name('superadmin.data_user.store');
+    Route::put('/superadmin/data-user/{user}', [\App\Http\Controllers\Superadmin\UserManagementController::class, 'update'])->name('superadmin.data_user.update');
+    Route::delete('/superadmin/data-user/{user}', [\App\Http\Controllers\Superadmin\UserManagementController::class, 'destroy'])->name('superadmin.data_user.destroy');
 
-    Route::get('/superadmin/laporan-pembayaran', function () {
-        return view('superadmin.laporan_pembayaran', ['title' => 'Laporan Pembayaran', 'role' => 'superadmin']);
-    })->name('superadmin.laporan_pembayaran');
+    Route::get('/superadmin/laporan-pembayaran', [\App\Http\Controllers\Superadmin\LaporanPembayaranController::class, 'index'])->name('superadmin.laporan_pembayaran');
 
     Route::get('/superadmin/order', function () {
         return view('superadmin.order', ['title' => 'Order', 'role' => 'superadmin']);
     })->name('superadmin.order');
 
-    Route::get('/superadmin/permission', function () {
-        return view('superadmin.permission', ['title' => 'Permission', 'role' => 'superadmin']);
-    })->name('superadmin.permission');
+    Route::get('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'index'])->name('superadmin.permission');
+    Route::post('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'store'])->name('superadmin.permission.store');
+    Route::put('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'update'])->name('superadmin.permission.update');
+    Route::delete('/superadmin/permission/{permission}', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'destroy'])->name('superadmin.permission.destroy');
 });
 
 

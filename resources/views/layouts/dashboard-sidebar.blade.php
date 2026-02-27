@@ -21,6 +21,28 @@
 
     <!-- Navigation Links -->
     <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+        @php
+            $user = auth()->user();
+            $planName = $user->getPlanName();
+        @endphp
+
+        <!-- Subscription Badge (Specific for Admin) -->
+        @if (($role ?? 'user') == 'admin')
+            <div class="px-4 mb-6">
+                <div
+                    class="p-3 rounded-2xl {{ $user->isPremium() ? 'bg-amber-50 border-amber-100' : 'bg-[#36B2B2]/5 border-[#36B2B2]/10' }} border">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div
+                            class="w-2 h-2 rounded-full {{ $user->isPremium() ? 'bg-amber-500 animate-pulse' : 'bg-[#36B2B2]' }}">
+                        </div>
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider {{ $user->isPremium() ? 'text-amber-700' : 'text-[#36B2B2]' }}">
+                            {{ $planName }} Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         @if (($role ?? 'user') == 'superadmin')
             <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Super Admin</p>
@@ -42,7 +64,8 @@
             <!-- Data Member -->
             <a href="{{ route('superadmin.data_member') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/data-member*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('superadmin/data-member*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                <div
+                    class="{{ request()->is('superadmin/data-member*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
@@ -55,7 +78,8 @@
             <!-- Data User -->
             <a href="{{ route('superadmin.data_user') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/data-user*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('superadmin/data-user*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                <div
+                    class="{{ request()->is('superadmin/data-user*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
@@ -68,7 +92,8 @@
             <!-- Laporan Pembayaran -->
             <a href="{{ route('superadmin.laporan_pembayaran') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                <div
+                    class="{{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -81,7 +106,8 @@
             <!-- Order -->
             <a href="{{ route('superadmin.order') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('superadmin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                <div
+                    class="{{ request()->is('superadmin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
@@ -94,7 +120,8 @@
             <!-- Permission -->
             <a href="{{ route('superadmin.permission') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/permission*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('superadmin/permission*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                <div
+                    class="{{ request()->is('superadmin/permission*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z">
@@ -122,151 +149,242 @@
             </a>
 
             <!-- Kamar -->
-            <a href="{{ route('admin.kamar') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/kamar*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/kamar*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
-                </div>
-                Kamar
-            </a>
+            @can('menu.kamar')
+                <a href="{{ route('admin.kamar') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/kamar*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/kamar*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
+                    Kamar
+                </a>
+            @endcan
             <!-- Order -->
-            <a href="{{ route('admin.order') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
-                    </path>
-                    </svg>
-                </div>
-                Order
-            </a>
+            @can('menu.order')
+                <a href="{{ route('admin.order') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
+                            </path>
+                        </svg>
+                    </div>
+                    Order
+                </a>
+            @endcan
 
             <!-- Tambah Data Penyewa -->
-            <a href="{{ route('admin.data_penyewa') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/data-penyewa*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/data-penyewa*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
-                        </path>
-                    </svg>
-                </div>
-                Data Penyewa
-            </a>
+            @can('menu.data_penyewa')
+                <a href="{{ route('admin.data_penyewa') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/data-penyewa*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/data-penyewa*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+                            </path>
+                        </svg>
+                    </div>
+                    Data Penyewa
+                </a>
+            @endcan
 
             <!-- Cabang Kos -->
-            <a href="{{ route('admin.cabang_kos') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/cabang-kos*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/cabang-kos*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                        </path>
-                    </svg>
-                </div>
-                Cabang Kos
-            </a>
+            @can('menu.cabang_kos')
+                <a href="{{ route('admin.cabang_kos') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/cabang-kos*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/cabang-kos*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
+                    Cabang Kos
+                </a>
+            @endcan
 
             <!-- Aduan -->
-            <a href="{{ route('admin.pesan_aduan') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
-                    </svg>
-                </div>
-                Pesan Aduan
-            </a>
-            
+            @can('menu.pesan_aduan')
+                <a href="{{ route('admin.pesan_aduan') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    Pesan Aduan
+                </a>
+            @endcan
+
             <!-- Laporan Pembayaran -->
-            <a href="{{ route('admin.laporan_pembayaran') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/laporan-pembayaran*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                        </path>
-                    </svg>
-                </div>
-                Laporan Pembayaran
-            </a>
+            @can('menu.laporan_pembayaran')
+                <a href="{{ route('admin.laporan_pembayaran') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/laporan-pembayaran*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    Laporan Pembayaran
+                </a>
+            @endcan
 
 
             <!-- Tagihan App -->
-            <a href="{{ route('admin.tagihan_sistem') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div class="{{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                        </path>
-                    </svg>
-                </div>
-                Tagihan sistem
-            </a>
-            
-            @else
-            
+            @can('menu.tagihan_sistem')
+                <a href="{{ route('admin.tagihan_sistem') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    Tagihan sistem
+                </a>
+            @endcan
+
+            <!-- Menu Dinamis Admin Baru -->
+            @php
+                $adminDynamicPath = resource_path('views/member');
+                $dynamicAdminMenus = [];
+                if (\Illuminate\Support\Facades\File::exists($adminDynamicPath)) {
+                    foreach (\Illuminate\Support\Facades\File::files($adminDynamicPath) as $file) {
+                        $name = str_replace('.blade.php', '', $file->getFilename());
+                        if (!in_array($name, ['dashboard', 'kamar', 'order', 'data_penyewa', 'cabang_kos', 'pesan_aduan', 'laporan_pembayaran', 'tagihan_sistem'])) {
+                            $dynamicAdminMenus[] = $name;
+                        }
+                    }
+                }
+            @endphp
+
+            @foreach($dynamicAdminMenus as $menu)
+                @can('menu.' . $menu)
+                    <a href="{{ url('admin/' . $menu) }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/' . $menu . '*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                        <div
+                            class="{{ request()->is('admin/' . $menu . '*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        {{ ucwords(str_replace(['_', '-'], ' ', $menu)) }}
+                    </a>
+                @endcan
+            @endforeach
+
+        @else
             <!-- Dashboard -->
-            <a href="{{ route('user.dashboard') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user') || request()->is('user/dashboard') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div
-                    class="{{ request()->is('user') || request()->is('user/dashboard') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                </div>
-                Dashboard
-            </a>
+            @can('menu.dashboard')
+                <a href="{{ route('user.dashboard') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user') || request()->is('user/dashboard') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('user') || request()->is('user/dashboard') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                    </div>
+                    Dashboard
+                </a>
+            @endcan
             <!-- Order -->
-            <a href="{{ route('user.order') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div
-                    class="{{ request()->is('user/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
-                        </path>
-                    </svg>
-                </div>
-                Order
-            </a>
+            @can('menu.order')
+                <a href="{{ route('user.order') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('user/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
+                            </path>
+                        </svg>
+                    </div>
+                    Order
+                </a>
+            @endcan
 
             <!-- Jatuh Tempo -->
-            <a href="{{ route('user.jatuh_tempo') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/jatuh-tempo*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div
-                    class="{{ request()->is('user/jatuh-tempo*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                Jatuh Tempo
-            </a>
+            @can('menu.jatuh_tempo')
+                <a href="{{ route('user.jatuh_tempo') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/jatuh-tempo*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('user/jatuh-tempo*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    Jatuh Tempo
+                </a>
+            @endcan
 
             <!-- Aduan Fasilitas -->
-            <a href="{{ route('user.aduan') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div
-                    class="{{ request()->is('user/aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
-                    </svg>
-                </div>
-                Fasilitas
-            </a>
+            @can('menu.aduan')
+                <a href="{{ route('user.aduan') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('user/aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    Fasilitas
+                </a>
+            @endcan
+
+            <!-- Menu Dinamis User Baru -->
+            @php
+                $userDynamicPath = resource_path('views/user');
+                $dynamicUserMenus = [];
+                if (\Illuminate\Support\Facades\File::exists($userDynamicPath)) {
+                    foreach (\Illuminate\Support\Facades\File::files($userDynamicPath) as $file) {
+                        $name = str_replace('.blade.php', '', $file->getFilename());
+                        if (!in_array($name, ['dashboard', 'order', 'jatuh_tempo', 'aduan', 'pesan'])) {
+                            $dynamicUserMenus[] = $name;
+                        }
+                    }
+                }
+            @endphp
+
+            @foreach($dynamicUserMenus as $menu)
+                @can('menu.' . $menu)
+                    <a href="{{ url('user/' . $menu) }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/' . $menu . '*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                        <div
+                            class="{{ request()->is('user/' . $menu . '*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        {{ ucwords(str_replace(['_', '-'], ' ', $menu)) }}
+                    </a>
+                @endcan
+            @endforeach
+
         @endif
     </nav>
 

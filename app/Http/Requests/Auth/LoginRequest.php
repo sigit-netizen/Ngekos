@@ -36,7 +36,10 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = \App\Models\User::where('email', $this->email)->first();
+        $user = \App\Models\User::select('id', 'email', 'password', 'name')
+            ->with('roles')
+            ->where('email', $this->email)
+            ->first();
 
         if (!$user) {
             RateLimiter::hit($this->throttleKey());

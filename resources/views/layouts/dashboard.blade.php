@@ -43,6 +43,87 @@
         }
     </style>
 
+    <!-- ====== PAGE LOADING OVERLAY ====== -->
+    <style>
+        #page-loader {
+            position: fixed !important;
+            inset: 0;
+            background: rgba(248, 250, 252, 0.75);
+            backdrop-filter: blur(18px) saturate(1.4);
+            -webkit-backdrop-filter: blur(18px) saturate(1.4);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+        }
+
+        #page-loader.hidden-loader {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Teal underline pulse */
+        .ldr-line {
+            width: 48px;
+            height: 3px;
+            background: linear-gradient(90deg, #36B2B2, #8b5cf6);
+            border-radius: 99px;
+            margin-top: 14px;
+            animation: ldr-pulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes ldr-pulse {
+
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: scaleX(0.6);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+    </style>
+
+    <div id="page-loader">
+        <div style="display:flex; align-items:baseline; gap:0; line-height:1;">
+            <span style="font-size:30px; font-weight:900; color:#111827; letter-spacing:-1.5px;">K</span>
+            <span style="font-size:30px; font-weight:900; color:#36B2B2; letter-spacing:-1.5px;">Ngekos</span>
+            <span style="font-size:17px; font-weight:600; color:#9ca3af; margin-left:3px;">.id</span>
+        </div>
+        <div class="ldr-line"></div>
+    </div>
+
+    <script>
+        // Hide loader as soon as DOM is interactive (fast), not waiting for images/fonts
+        (function () {
+            function hideLdr() {
+                var l = document.getElementById('page-loader');
+                if (l) {
+                    l.classList.add('hidden-loader');
+                    setTimeout(function () { l.style.display = 'none'; }, 500);
+                }
+            }
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(hideLdr, 150);
+            } else {
+                document.addEventListener('DOMContentLoaded', function () { setTimeout(hideLdr, 150); });
+            }
+        })();
+    </script>
+    <!-- ====== END LOADING OVERLAY ====== -->
+
+
+
+
+
+
+
     <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-slate-50 font-inter overflow-hidden relative">
 
         <!-- Background Accents -->
@@ -71,7 +152,8 @@
 
             <!-- Scrollable Main Container -->
             <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 relative z-0">
-                @if (session('success_login'))
+                @if (session('success_login') || session('success'))
+                    @php $successMessage = session('success_login') ?? session('success'); @endphp
                     <div class="mb-6 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 shadow-sm"
                         x-data="{ show: true }" x-show="show" x-transition.opacity>
                         <div class="flex items-start">
@@ -83,7 +165,7 @@
                             </div>
                             <div class="ml-3 flex-1">
                                 <p class="text-sm font-semibold text-emerald-800">
-                                    {{ session('success_login') }}
+                                    {{ $successMessage }}
                                 </p>
                             </div>
                             <div class="ml-auto pl-3">

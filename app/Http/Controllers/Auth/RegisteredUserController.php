@@ -36,29 +36,85 @@ class RegisteredUserController extends Controller
             'nomor_wa' => ['required', 'numeric', 'unique:users,nomor_wa'],
             'tanggal_lahir' => ['required', 'date'],
             'alamat' => ['required', 'string'],
-            'id_plans' => ['required', 'integer', 'in:1,2,3,4,5,6'],
+            'id_plans' => ['required', 'integer', 'in:1,2'], // 1: Anak Kos, 2: Pemilik Kos
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            // Removed 'confirmed' because signup page doesn't have password_confirmation input
             'password' => ['required', Rules\Password::defaults()],
+            'plan_type' => ['nullable', 'string', 'required_if:id_plans,2'],
+            'package_type' => ['nullable', 'string', 'required_if:plan_type,premium'],
+            'jumlah_kamar' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'nik' => $request->nik,
-            'nomor_wa' => $request->nomor_wa,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'alamat' => $request->alamat,
-            'id_plans' => $request->id_plans,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // Password is encrypted here
-        ]);
+        $user = \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'nik' => $request->nik,
+                'nomor_wa' => $request->nomor_wa,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'alamat' => $request->alamat,
+                'id_plans' => $request->id_plans,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        // Assign Roles based on dropdown (id_plans)
-        if ($request->id_plans == 1) {
-            $user->assignRole('users');
-        } else {
-            $user->assignRole('admin');
-        }
+            // Role & Plan Logic simplified
+            if ($request->id_plans == 1) {
+                // Anak Kos
+                $user->assignRole('users'); // Match web.php role name
+            } else {
+                // Pemilik Kos (Admin)
+                $user->assignRole('admin');
+
+                // Mapping Plan Type to id_plans
+                $planType = $request->plan_type;
+
+                $map = [
+                    'pro' => 2,
+                    'premium' => 3,
+                    'premium_perkamar' => 4,
+                    'pro_perkamar' => 5
+                ];
+
+                $user->id_plans = $map[$planType] ?? 2;
+
+                // Sync with Spatie Roles (to match permission matrix)
+                // Role names in matrix: pro, premium, per_kamar_pro, per_kamar_premium
+                $roleMap = [
+                    'pro' => 'pro',
+                    'premium' => 'premium',
+                    'pro_perkamar' => 'per_kamar_pro',
+                    'premium_perkamar' => 'per_kamar_premium'
+                ];
+
+                if (isset($roleMap[$planType])) {
+                    $user->assignRole($roleMap[$planType]);
+                }
+
+                $user->save();
+
+                // Create Langganan Record for Owners
+                $langgananNames = [
+                    'pro' => 'MEMBER PRO',
+                    'premium' => 'MEMBER PREMIUM',
+                    'pro_perkamar' => 'PER KAMAR PRO',
+                    'premium_perkamar' => 'PER KAMAR PREMIUM'
+                ];
+
+                if (isset($langgananNames[$planType])) {
+                    $jenis = \App\Models\JenisLangganan::where('nama', $langgananNames[$planType])->first();
+                    if ($jenis) {
+                        \App\Models\Langganan::create([
+                            'id_user' => $user->id,
+                            'id_langganan' => $jenis->id,
+                            'jumlah_kamar' => $request->jumlah_kamar ?? 0,
+                            'status' => 'active', // Default active for trial/initial
+                            'tanggal_pembayaran' => now(),
+                        ]);
+                    }
+                }
+            }
+
+            return $user;
+        });
 
         event(new Registered($user));
 

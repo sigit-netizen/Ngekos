@@ -32,16 +32,18 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('superadmin')) {
-            return redirect()->route('superadmin.dashboard')->with('success_login', 'Berhasil Login!');
+            $route = 'superadmin.dashboard';
         } elseif ($user->hasRole('admin')) {
-            return redirect()->route('admin.dashboard')->with('success_login', 'Berhasil Login!');
-        } elseif ($user->hasRole('member')) {
-            return redirect()->route('member.dashboard')->with('success_login', 'Berhasil Login!');
+            $route = 'admin.dashboard';
         } elseif ($user->hasRole('users')) {
-            return redirect()->route('user.dashboard')->with('success_login', 'Berhasil Login!');
+            $route = 'user.dashboard';
+        } elseif ($user->hasRole('member')) {
+            $route = 'member.dashboard';
+        } else {
+            $route = 'home';
         }
 
-        return redirect()->route('home')->with('success_login', 'Berhasil Login!');
+        return redirect()->route($route)->with('success_login', 'Berhasil Login!');
     }
 
     /**

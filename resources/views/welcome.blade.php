@@ -141,11 +141,11 @@
 
                 <!-- Right Menu (Auth) -->
                 <div class="hidden md:flex items-center justify-end w-56 gap-3" style="gap: 0.75rem;">
-                        <a href="{{ route('login') }}"
-                            class="inline-flex justify-center items-center px-6 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] transition">Masuk</a>
-                        <a href="{{ route('register') }}"
-                            class="inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-[#36B2B2] hover:bg-[#2b8f8f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] shadow-sm transition whitespace-nowrap">Coba
-                            Gratis</a>
+                    <a href="{{ route('login') }}"
+                        class="inline-flex justify-center items-center px-6 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] transition">Masuk</a>
+                    <a href="{{ route('register') }}"
+                        class="inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-[#36B2B2] hover:bg-[#2b8f8f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] shadow-sm transition whitespace-nowrap">Coba
+                        Gratis</a>
                 </div>
 
                 <!-- Mobile menu button -->
@@ -184,13 +184,13 @@
                     class="px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#36B2B2] transition">Harga</a>
 
                 <div class="border-t border-gray-100 pt-4 mt-2 px-4 flex flex-col gap-2.5">
-                        <a href="{{ route('login') }}"
-                            class="w-full text-center px-4 py-3 rounded-xl text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 transition">Login</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                                class="w-full text-center px-4 py-3 rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white font-semibold hover:shadow-lg transition">Daftar
-                                Sekarang</a>
-                        @endif
+                    <a href="{{ route('login') }}"
+                        class="w-full text-center px-4 py-3 rounded-xl text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 transition">Login</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}"
+                            class="w-full text-center px-4 py-3 rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white font-semibold hover:shadow-lg transition">Daftar
+                            Sekarang</a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -952,17 +952,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @php
-                    $testimonials = [
-                        ['name' => 'Bu Sari', 'role' => '3 Kos di Jakarta', 'text' => 'Dulu stress ngecek pembayaran manual. Sekarang tinggal buka HP, langsung tau siapa yang udah bayar. Hemat waktu banget!', 'avatar' => '1'],
-                        ['name' => 'Pak Budi', 'role' => '5 Kos di Bandung', 'text' => 'Awalnya ragu. Tapi begitu coba, ternyata gampang banget. Anak kos juga seneng karena bisa bayar online.', 'avatar' => '2'],
-                        ['name' => 'Mbak Rina', 'role' => '2 Kos di Jogja', 'text' => 'Fitur komplain-nya juara! Langsung tau kalau ada yang rusak, gak perlu nunggu chat berkali-kali.', 'avatar' => '3'],
-                        ['name' => 'Pak Herman', 'role' => 'Kos Mahasiswa Depok', 'text' => 'Setup cuma 5 menit, langsung bisa pakai. Interface simpel, istri saya yang gaptek aja bisa operasikan.', 'avatar' => '4'],
-                        ['name' => 'Bu Dewi', 'role' => 'Kos Putri Surabaya', 'text' => 'Data KTP penghuni tersimpan rapi. Kalau ada apa-apa, tinggal buka aplikasi. Aman dan praktis!', 'avatar' => '5'],
-                        ['name' => 'Mas Andi', 'role' => '50+ Kamar di Malang', 'text' => 'Harga terjangkau, fitur lengkap. Dulu pakai aplikasi lain kena charge per kamar, bisa jutaan sebulan.', 'avatar' => '6']
-                    ];
-                @endphp
-
                 @foreach ($testimonials as $index => $t)
                     <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-[#36B2B2]/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                         data-aos="fade-up" data-aos-delay="{{ 100 * $index }}">
@@ -1026,7 +1015,9 @@
                     <p class="text-gray-500 text-xs mb-5">Standar kelola sistem kos</p>
 
                     <div class="mb-5">
-                        <span class="text-3xl font-extrabold text-gray-900">Rp 3k</span>
+                        <span class="text-3xl font-extrabold text-gray-900">
+                            Rp {{ number_format($pricing['perKamarPremium']?->harga ?? 0, 0, ',', '.') }}
+                        </span>
                         <span class="text-gray-500 text-sm">/kamar/bln</span>
                     </div>
 
@@ -1074,7 +1065,9 @@
                     <p class="text-white/80 text-xs mb-5">Fitur komplit bayar eceran</p>
 
                     <div class="mb-5">
-                        <span class="text-3xl font-extrabold">Rp 5k</span>
+                        <span class="text-3xl font-extrabold">
+                            Rp {{ number_format($pricing['perKamarPro']?->harga ?? 0, 0, ',', '.') }}
+                        </span>
                         <span class="text-white/80 text-sm">/kamar/bln</span>
                     </div>
 
@@ -1167,7 +1160,9 @@
                     <p class="text-white/80 text-xs mb-5">Tanpa batasan jumlah kamar</p>
 
                     <div class="mb-5">
-                        <span class="text-3xl font-extrabold">Rp 50k</span>
+                        <span class="text-3xl font-extrabold">
+                            Rp {{ number_format($pricing['premium']?->harga ?? 0, 0, ',', '.') }}
+                        </span>
                         <span class="text-white/80 text-sm">/bulan</span>
                     </div>
 
@@ -1208,7 +1203,9 @@
                     <p class="text-gray-400 text-xs mb-5">Untuk juragan banyak lokasi kos</p>
 
                     <div class="mb-5">
-                        <span class="text-3xl font-extrabold">Rp 80k</span>
+                        <span class="text-3xl font-extrabold">
+                            Rp {{ number_format($pricing['pro']?->harga ?? 0, 0, ',', '.') }}
+                        </span>
                         <span class="text-gray-400 text-sm">/bulan</span>
                     </div>
 

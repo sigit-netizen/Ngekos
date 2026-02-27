@@ -61,7 +61,17 @@
                 <form method="POST" action="{{ route('register') }}"
                     onsubmit="if(!document.querySelector('input[name=id_plans]').value){ alert('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!'); return false; }">
                     @csrf
-                    <div class="space-y-5">
+                    <div class="space-y-5" x-data="{ 
+                                        selectedRole: '{{ old('id_plans') }}',
+                                        roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
+                                        planType: '{{ old('plan_type') }}',
+                                        planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
+                                        packageType: '{{ old('package_type') }}',
+                                        packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
+                                        isOpenRole: false,
+                                        isOpenPlan: false,
+                                        isOpenPackage: false
+                                    }">
 
                         <div class="group">
                             <label
@@ -70,7 +80,7 @@
                             </label>
                             <input type="text" id="name" name="name" value="{{ old('name') }}"
                                 placeholder="Masukkan nama lengkap"
-                                class="h-12 w-full rounded-xl border {{ $errors->has('name') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300"
+                                class="h-12 w-full rounded-xl border {{ $errors->has('name') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300"
                                 required />
                             @error('name')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -84,7 +94,7 @@
                                     NIK<span class="text-red-500 ml-1">*</span>
                                 </label>
                                 <input type="number" id="nik" name="nik" value="{{ old('nik') }}" placeholder="Masukkan NIK"
-                                    class="h-12 w-full rounded-xl border {{ $errors->has('nik') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300"
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('nik') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300"
                                     required />
                                 @error('nik')
                                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -98,7 +108,7 @@
                                 </label>
                                 <input type="number" id="nomor_wa" name="nomor_wa" value="{{ old('nomor_wa') }}"
                                     placeholder="08..." required
-                                    class="h-12 w-full rounded-xl border {{ $errors->has('nomor_wa') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('nomor_wa') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                                 @error('nomor_wa')
                                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
@@ -112,7 +122,7 @@
                             </label>
                             <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
                                 required
-                                class="h-12 w-full rounded-xl border {{ $errors->has('tanggal_lahir') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                                class="h-12 w-full rounded-xl border {{ $errors->has('tanggal_lahir') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                             @error('tanggal_lahir')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
@@ -124,18 +134,14 @@
                                 Alamat Domisili<span class="text-red-500 ml-1">*</span>
                             </label>
                             <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap" required
-                                class="w-full rounded-xl border {{ $errors->has('alamat') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} p-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300">{{ old('alamat') }}</textarea>
+                                class="w-full rounded-xl border {{ $errors->has('alamat') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} p-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300">{{ old('alamat') }}</textarea>
                             @error('alamat')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Role Selection (Dropdown) -->
-                        <div class="group" x-data="{ 
-                                        isOpen: false, 
-                                        selectedRole: '{{ old('id_plans') }}', 
-                                        roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}' 
-                                    }" @click.outside="isOpen = false">
+                        <div class="group" @click.outside="isOpenRole = false">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Mendaftar Sebagai<span class="text-red-500 ml-1">*</span>
@@ -146,13 +152,13 @@
                                 <input type="hidden" name="id_plans" x-model="selectedRole" required>
 
                                 <!-- Custom Select Button -->
-                                <button type="button" @click="isOpen = !isOpen"
+                                <button type="button" @click="isOpenRole = !isOpenRole"
                                     class="relative h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-left text-sm text-gray-800 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300 shadow-sm"
-                                    :class="{ 'text-gray-800': selectedRole, 'text-gray-400': !selectedRole, 'bg-white border-[#36B2B2] ring-4 ring-[#36B2B2]/10': isOpen }">
+                                    :class="{ 'text-gray-800': selectedRole, 'text-gray-400': !selectedRole, 'bg-white border-[#36B2B2] ring-4 ring-[#36B2B2]/10': isOpenRole }">
                                     <span x-text="roleText" class="block truncate"></span>
                                     <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
                                         <svg class="h-5 w-5 text-gray-400 transition-transform duration-300"
-                                            :class="{ 'rotate-180': isOpen }" xmlns="http://www.w3.org/2000/svg"
+                                            :class="{ 'rotate-180': isOpenRole }" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                             <path fill-rule="evenodd"
                                                 d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
@@ -162,7 +168,7 @@
                                 </button>
 
                                 <!-- Dropdown Options -->
-                                <ul x-show="isOpen" x-transition:enter="transition ease-out duration-200"
+                                <ul x-show="isOpenRole" x-transition:enter="transition ease-out duration-200"
                                     x-transition:enter-start="opacity-0 translate-y-2"
                                     x-transition:enter-end="opacity-100 translate-y-0"
                                     x-transition:leave="transition ease-in duration-150"
@@ -171,8 +177,7 @@
                                     class="absolute z-20 mt-1 w-full rounded-xl bg-white/95 backdrop-blur-xl shadow-lg border border-gray-100 py-2 text-sm text-gray-700 max-h-60 overflow-auto focus:outline-none ring-1 ring-black ring-opacity-5"
                                     style="display: none;">
 
-                                    <!-- Options mapping roughly to 'id_plans' conceptually -->
-                                    <li @click="selectedRole = '1'; roleText = 'Anak Kos'; isOpen = false"
+                                    <li @click="selectedRole = '1'; roleText = 'Anak Kos'; isOpenRole = false; planType = ''; packageType = ''"
                                         class="group relative cursor-pointer select-none py-3 pl-4 pr-9 hover:bg-gray-50 hover:text-[#36B2B2] transition-colors"
                                         :class="{ 'bg-gray-50 text-[#36B2B2] font-medium': selectedRole === '1' }">
                                         <div class="flex items-center gap-3">
@@ -202,7 +207,7 @@
 
                                     <div class="border-t border-gray-100 my-1"></div>
 
-                                    <li @click="selectedRole = '2'; roleText = 'Pemilik Kos'; isOpen = false"
+                                    <li @click="selectedRole = '2'; roleText = 'Pemilik Kos'; isOpenRole = false"
                                         class="group relative cursor-pointer select-none py-3 pl-4 pr-9 hover:bg-gray-50 hover:text-[#36B2B2] transition-colors"
                                         :class="{ 'bg-gray-50 text-[#36B2B2] font-medium': selectedRole === '2' }">
                                         <div class="flex items-center gap-3">
@@ -231,6 +236,89 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            <!-- Additional Fields for Pemilik Kos -->
+                            <div x-show="selectedRole === '2'" x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform -translate-y-4"
+                                x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-4 space-y-4">
+
+                                <!-- Plan Type Dropdown -->
+                                <div class="group" @click.outside="isOpenPlan = false">
+                                    <label class="mb-2 block text-sm font-semibold text-[#36B2B2]">
+                                        Tipe Plan (Subscription)<span class="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="hidden" name="plan_type" x-model="planType">
+                                        <button type="button" @click="isOpenPlan = !isOpenPlan"
+                                            class="relative h-12 w-full rounded-xl border border-[#36B2B2]/30 bg-[#36B2B2]/5 px-4 text-left text-sm text-gray-800 transition-all duration-300">
+                                            <span x-text="planText"></span>
+                                            <span
+                                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                                <svg class="h-5 w-5 text-[#36B2B2]" :class="{ 'rotate-180': isOpenPlan }"
+                                                    fill="currentColor" viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
+                                                </svg>
+                                            </span>
+                                        </button>
+                                        <ul x-show="isOpenPlan"
+                                            class="absolute z-30 mt-1 w-full rounded-xl bg-white shadow-lg border border-gray-100 py-2 text-sm overflow-hidden min-w-[250px]">
+                                            <li @click="planType = 'pro'; planText = 'Pro Plan'; isOpenPlan = false"
+                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
+                                                <div class="font-bold text-gray-900 text-sm">Pro Plan</div>
+                                                <div class="text-[10px] text-gray-500 italic">Standar pengelolaan kos daring
+                                                </div>
+                                            </li>
+                                            <li @click="planType = 'premium'; planText = 'Premium Plan'; isOpenPlan = false"
+                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
+                                                <div class="font-bold text-amber-600 text-sm">Premium Plan</div>
+                                                <div class="text-[10px] text-gray-500 italic">Laporan keuangan & tagihan
+                                                    sistem</div>
+                                            </li>
+                                            <li @click="planType = 'pro_perkamar'; planText = 'Pro Per Kamar'; isOpenPlan = false"
+                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
+                                                <div class="font-bold text-gray-900 text-sm">Pro Per Kamar</div>
+                                                <div class="text-[10px] text-gray-500 italic">Optimasi pengelolaan unit
+                                                    kamar</div>
+                                            </li>
+                                            <li @click="planType = 'premium_perkamar'; planText = 'Premium Per Kamar'; isOpenPlan = false"
+                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors">
+                                                <div class="font-bold text-amber-600 text-sm">Premium Per Kamar</div>
+                                                <div class="text-[10px] text-gray-500 italic">Manajemen unit premium
+                                                    terlengkap</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Field Jumlah Kamar (Muncul jika pilih Per Kamar) -->
+                                <div x-show="planType === 'pro_perkamar' || planType === 'premium_perkamar'"
+                                    x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                    x-transition:enter-end="opacity-100 transform translate-y-0" class="group">
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
+                                        Jumlah Kamar<span class="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="number" name="jumlah_kamar" min="1"
+                                            placeholder="Masukkan jumlah unit kamar"
+                                            class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 pl-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:outline-none transition-all duration-300"
+                                            :required="planType === 'pro_perkamar' || planType === 'premium_perkamar'" />
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <p class="mt-1 text-[10px] text-gray-400 italic">Harga akan dikalikan dengan jumlah
+                                        kamar yang Anda kelola.</p>
+                                </div>
+
+
+                            </div>
                             @error('id_plans')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
@@ -243,7 +331,7 @@
                             </label>
                             <input type="email" id="email" name="email" value="{{ old('email') }}"
                                 placeholder="contoh@mail.com" required
-                                class="h-12 w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                                class="h-12 w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                             @error('email')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
@@ -258,7 +346,7 @@
                             <div x-data="{ showPassword: false }" class="relative">
                                 <input :type="showPassword ? 'text' : 'password'" name="password" id="password" required
                                     minlength="8" placeholder="Minimal 8 karakter"
-                                    class="h-12 w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500 bg-red-50/50 focus:ring-red-500/10' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:outline-none transition-all duration-300" />
+                                    class="h-12 w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                                 <button type="button" @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-4 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
                                     <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24"

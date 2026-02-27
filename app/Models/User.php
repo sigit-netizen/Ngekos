@@ -47,4 +47,31 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get plan name based on id_plans mapping
+     */
+    public function getPlanName()
+    {
+        $plans = [
+            1 => 'Anak Kos',
+            2 => 'Pro',
+            3 => 'Premium',
+            4 => 'Premium Per Kamar',
+            5 => 'Pro Per Kamar',
+            6 => 'Superadmin',
+        ];
+
+        return $plans[$this->id_plans] ?? 'None';
+    }
+
+    public function isPremium()
+    {
+        return in_array($this->id_plans, [3, 4]);
+    }
+
+    public function isPro()
+    {
+        return in_array($this->id_plans, [2, 5]);
+    }
 }
