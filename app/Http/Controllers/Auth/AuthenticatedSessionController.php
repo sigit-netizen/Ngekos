@@ -25,6 +25,19 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Check if user's registration is still in the staging area (pending_users)
+        $pendingUser = \App\Models\PendingUser::where('email', $request->email)->first();
+
+        if ($pendingUser) {
+            if ($pendingUser->status === 'pending') {
+                return redirect()->route('registration.pending', ['email' => $pendingUser->email]);
+            }
+
+            if ($pendingUser->status === 'rejected') {
+                return redirect()->route('registration.rejected', ['email' => $pendingUser->email]);
+            }
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();

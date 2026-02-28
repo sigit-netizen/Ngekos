@@ -16,10 +16,18 @@ require __DIR__ . '/auth.php';
 // Landing Page
 Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->name('home');
 
+// Pending Verification Page
+Route::get('/pending', function () {
+    if (auth()->user()->status === 'active') {
+        return redirect()->route(auth()->user()->hasRole('superadmin') ? 'superadmin.dashboard' : 'admin.dashboard');
+    }
+    return view('pending.dashboard');
+})->middleware('auth')->name('pending.dashboard');
+
 // Protected Admin Dashboard
 Route::middleware(['auth', 'role:admin', 'check.subscription'])->group(function () {
     Route::get('/admin', function () {
-        return view('admin.dashboard', ['role' => 'admin']);
+        return view('member.dashboard', ['role' => 'admin']);
     })->name('admin.dashboard');
 
     Route::get('/admin/kamar', function () {
@@ -117,77 +125,53 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     Route::get('/superadmin/laporan-pembayaran', [\App\Http\Controllers\Superadmin\LaporanPembayaranController::class, 'index'])->name('superadmin.laporan_pembayaran');
 
-    Route::get('/superadmin/order', function () {
-        return view('superadmin.order', ['title' => 'Order', 'role' => 'superadmin']);
-    })->name('superadmin.order');
+    Route::get('/superadmin/order', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'index'])->name('superadmin.order');
+    Route::post('/superadmin/order/user/{pendingUser}/verify', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'verifyUser'])->name('superadmin.order.user.verify');
+    Route::post('/superadmin/order/user/{pendingUser}/reject', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'rejectUser'])->name('superadmin.order.user.reject');
+    Route::post('/superadmin/order/packet/{subscription}/verify', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'verifyPacket'])->name('superadmin.order.verify');
+    Route::post('/superadmin/order/packet/{subscription}/reject', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'rejectPacket'])->name('superadmin.order.reject');
 
     Route::get('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'index'])->name('superadmin.permission');
     Route::post('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'store'])->name('superadmin.permission.store');
     Route::put('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'update'])->name('superadmin.permission.update');
     Route::delete('/superadmin/permission/{permission}', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'destroy'])->name('superadmin.permission.destroy');
+
+    // Aduan Routes
+    Route::get('/superadmin/aduan/member', function () {
+        return view('superadmin.aduanMemeber', ['role' => 'superadmin', 'title' => 'Aduan Member']);
+    })->name('superadmin.aduan.member');
+
+    Route::get('/superadmin/aduan/user', function () {
+        return view('superadmin.aduanUser', ['role' => 'superadmin', 'title' => 'Aduan User']);
+    })->name('superadmin.aduan.user');
+
+    Route::get('/superadmin/aduan/publik', function () {
+        return view('superadmin.aduanPublik', ['role' => 'superadmin', 'title' => 'Aduan Publik']);
+    })->name('superadmin.aduan.publik');
 });
 
+// Registration Pending Status Page (public, no auth required)
+Route::get('/registration/pending', function (\Illuminate\Http\Request $request) {
+    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
+        ->where('status', 'pending')
+        ->first();
 
-// calender pages
-Route::get('/calendar', function () {
-    return view('pages.calender', ['title' => 'Calendar']);
-})->name('calendar');
+    if (!$pendingUser) {
+        return redirect()->route('login');
+    }
 
-// profile pages
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
+    return view('pending.dashboardPanding', ['pendingUser' => $pendingUser]);
+})->name('registration.pending');
 
-// form pages
-Route::get('/form-elements', function () {
-    return view('pages.form.form-elements', ['title' => 'Form Elements']);
-})->name('form-elements');
+// Registration Rejected Status Page (public, no auth required)
+Route::get('/registration/rejected', function (\Illuminate\Http\Request $request) {
+    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
+        ->where('status', 'rejected')
+        ->first();
 
-// tables pages
-Route::get('/basic-tables', function () {
-    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
-})->name('basic-tables');
+    if (!$pendingUser) {
+        return redirect()->route('login')->with('error', 'Data tidak ditemukan.');
+    }
 
-// pages
-Route::get('/blank', function () {
-    return view('pages.blank', ['title' => 'Blank']);
-})->name('blank');
-
-// error pages
-Route::get('/error-404', function () {
-    return view('pages.errors.error-404', ['title' => 'Error 404']);
-})->name('error-404');
-
-// chart pages
-Route::get('/line-chart', function () {
-    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
-})->name('line-chart');
-
-Route::get('/bar-chart', function () {
-    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
-})->name('bar-chart');
-
-// ui elements pages
-Route::get('/alerts', function () {
-    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
-})->name('alerts');
-
-Route::get('/avatars', function () {
-    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
-})->name('avatars');
-
-Route::get('/badge', function () {
-    return view('pages.ui-elements.badges', ['title' => 'Badges']);
-})->name('badges');
-
-Route::get('/buttons', function () {
-    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
-})->name('buttons');
-
-Route::get('/image', function () {
-    return view('pages.ui-elements.images', ['title' => 'Images']);
-})->name('images');
-
-Route::get('/videos', function () {
-    return view('pages.ui-elements.videos', ['title' => 'Videos']);
-})->name('videos');
+    return view('pending.dashboardDitolak', ['pendingUser' => $pendingUser]);
+})->name('registration.rejected');

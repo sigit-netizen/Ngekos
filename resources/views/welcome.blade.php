@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ngekos - Cari Kos Sesuai Kebutuhanmu</title>
+    <title>Ngekos.id - Cari Kos Sesuai Kebutuhanmu</title>
+    <link rel="icon" type="image/svg+xml" href="/images/logo/logo-icon.svg?v=2">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,10 +122,8 @@
             <div :class="{'bg-white/95 backdrop-blur-md shadow-lg border border-gray-100': scrolled, 'bg-white shadow-sm border border-gray-50': !scrolled}"
                 class="flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300">
                 <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center gap-2.5 cursor-pointer w-48" @click="window.scrollTo(0,0)">
-                    <span class="font-extrabold text-2xl text-gray-900 tracking-tight">K<span
-                            class="text-[#36B2B2] ml-1 font-semibold">Ngekos</span><span
-                            class="text-gray-400 font-light text-xl">.id</span></span>
+                <div class="flex-shrink-0 flex items-center cursor-pointer w-48" @click="window.scrollTo(0,0)">
+                    <img src="/images/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
                 </div>
 
                 <!-- Desktop Menu (Centered) -->

@@ -13,8 +13,14 @@ class Langganan extends Model
         'id_user',
         'id_langganan',
         'tanggal_pembayaran',
+        'jatuh_tempo',
         'status',
         'jumlah_kamar'
+    ];
+
+    protected $casts = [
+        'tanggal_pembayaran' => 'date',
+        'jatuh_tempo' => 'date',
     ];
 
     public function jenis_langganan()

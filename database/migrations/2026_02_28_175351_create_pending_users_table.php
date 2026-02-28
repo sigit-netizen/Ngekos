@@ -10,19 +10,20 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('pending_users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('nik')->nullable();
-            $table->string('nomor_wa')->nullable();
-            $table->date('tanggal_lahir')->nullable();
-            $table->text('alamat')->nullable();
-            $table->unsignedBigInteger('id_plans')->nullable();
+            $table->string('nik');
+            $table->string('nomor_wa');
+            $table->date('tanggal_lahir');
+            $table->text('alamat');
+            $table->integer('id_plans'); // requested role (1: Anak Kos, 2: Pemilik Kos)
+            $table->string('plan_type')->nullable(); // pro, premium, etc.
+            $table->string('package_type')->nullable();
+            $table->integer('jumlah_kamar')->default(0);
             $table->string('status')->default('pending');
-            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -32,6 +33,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('pending_users');
     }
 };

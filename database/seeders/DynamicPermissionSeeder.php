@@ -67,5 +67,9 @@ class DynamicPermissionSeeder extends Seeder
             $userRole = Role::firstOrCreate(['name' => 'user']);
             $userRole->syncPermissions($permissions);
         }
+
+        // Always create 'users' and 'admin' roles (referenced by controllers)
+        Role::firstOrCreate(['name' => 'users']);
+        Role::firstOrCreate(['name' => 'admin']);
     }
 }

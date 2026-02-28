@@ -14,11 +14,8 @@
             <!-- Logo Section -->
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
-                    class="inline-flex items-center gap-2 cursor-pointer transition-transform hover:scale-105 duration-300">
-                    <span class="font-extrabold text-3xl text-gray-900 tracking-tight">
-                        K<span class="text-[#36B2B2] ml-1 font-semibold">Ngekos</span><span
-                            class="text-gray-400 font-light text-2xl">.id</span>
-                    </span>
+                    class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
+                    <img src="/images/logo/auth-logo.svg" alt="Logo" class="h-12 w-auto" />
                 </a>
                 <p class="mt-3 text-sm font-medium text-gray-500">Selamat datang kembali di Ngekos</p>
             </div>

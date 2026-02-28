@@ -90,24 +90,30 @@ class UserDummySeeder extends Seeder
 
             // Role assignment logic
             $currentRoles = [$data['role_spatie']];
-            
+
             // Add 'admin' role if it's an owner/admin plan (id_plans 2,3,4,5)
             if (in_array($data['id_plans'], [2, 3, 4, 5])) {
                 $currentRoles[] = 'admin';
             }
-            
+
             $user->syncRoles($currentRoles);
 
             // Create Langganan Record
             $jenis = JenisLangganan::where('nama', $data['langganan_nama'])->first();
             if ($jenis) {
+                // Determine initial status based on role
+                $isOwner = in_array($data['id_plans'], [2, 3, 4, 5]);
+                $initialStatus = $isOwner ? 'pending' : 'active';
+                $initialPaymentDate = $isOwner ? null : now();
+
                 Langganan::updateOrCreate(
                     ['id_user' => $user->id],
                     [
                         'id_langganan' => $jenis->id,
                         'jumlah_kamar' => $data['jumlah_kamar'],
-                        'status' => 'active',
-                        'tanggal_pembayaran' => now(),
+                        'status' => $initialStatus,
+                        'tanggal_pembayaran' => $initialPaymentDate,
+                        'jatuh_tempo' => $initialPaymentDate ? \Carbon\Carbon::parse($initialPaymentDate)->addMonth() : null,
                     ]
                 );
             }

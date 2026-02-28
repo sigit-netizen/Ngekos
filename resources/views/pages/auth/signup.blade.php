@@ -39,11 +39,8 @@
             <!-- Logo Section -->
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
-                    class="inline-flex items-center gap-2 cursor-pointer transition-transform hover:scale-105 duration-300">
-                    <span class="font-extrabold text-3xl text-gray-900 tracking-tight">
-                        K<span class="text-[#36B2B2] ml-1 font-semibold">Ngekos</span><span
-                            class="text-gray-400 font-light text-2xl">.id</span>
-                    </span>
+                    class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
+                    <img src="/images/logo/auth-logo.svg" alt="Logo" class="h-12 w-auto" />
                 </a>
                 <p class="mt-3 text-sm font-medium text-gray-500">Mulai temukan kos impianmu sekarang</p>
             </div>
@@ -62,16 +59,16 @@
                     onsubmit="if(!document.querySelector('input[name=id_plans]').value){ alert('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!'); return false; }">
                     @csrf
                     <div class="space-y-5" x-data="{ 
-                                        selectedRole: '{{ old('id_plans') }}',
-                                        roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
-                                        planType: '{{ old('plan_type') }}',
-                                        planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
-                                        packageType: '{{ old('package_type') }}',
-                                        packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
-                                        isOpenRole: false,
-                                        isOpenPlan: false,
-                                        isOpenPackage: false
-                                    }">
+                                            selectedRole: '{{ old('id_plans') }}',
+                                            roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
+                                            planType: '{{ old('plan_type') }}',
+                                            planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
+                                            packageType: '{{ old('package_type') }}',
+                                            packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
+                                            isOpenRole: false,
+                                            isOpenPlan: false,
+                                            isOpenPackage: false
+                                        }">
 
                         <div class="group">
                             <label

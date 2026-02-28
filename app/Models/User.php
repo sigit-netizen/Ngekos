@@ -27,6 +27,7 @@ class User extends Authenticatable
         'tanggal_lahir',
         'alamat',
         'id_plans',
+        'status',
     ];
 
     /**
@@ -73,5 +74,10 @@ class User extends Authenticatable
     public function isPro()
     {
         return in_array($this->id_plans, [2, 5]);
+    }
+
+    public function langganans()
+    {
+        return $this->hasMany(Langganan::class, 'id_user');
     }
 }

@@ -24,7 +24,7 @@ class DashboardController extends Controller
         // Active members = admin users who have at least one active subscription
         $activeMemberIds = Langganan::where('status', 'active')->distinct()->pluck('id_user');
         $activeMembersCount = User::role('admin')->whereIn('id', $activeMemberIds)->count();
-        $totalOverall = User::count();
+        $totalOverall = User::whereDoesntHave('roles', fn($q) => $q->where('name', 'superadmin'))->count();
 
         // ── Chart Mode ────────────────────────────────────────────────
         // month selected → daily breakdown; otherwise → monthly breakdown

@@ -3,11 +3,8 @@
 
     <!-- Logo -->
     <div class="flex items-center justify-center h-20 border-b border-gray-100 shrink-0 px-6">
-        <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <span class="font-extrabold text-2xl text-gray-900 tracking-tight">
-                K<span class="text-[#36B2B2] ml-0.5 font-semibold">Ngekos</span><span
-                    class="text-gray-400 font-light text-xl">.id</span>
-            </span>
+        <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+            <img src="/images/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
         </a>
 
         <!-- Mobile Close Button -->
@@ -90,31 +87,74 @@
             </a>
 
             <!-- Laporan Pembayaran -->
+            @php
+                $graceCount = \App\Models\Langganan::whereNotNull('tanggal_pembayaran')
+                    ->get()
+                    ->filter(function ($sub) {
+                        $expiryDate = \Carbon\Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
+                        $diff = (int) now()->diffInDays($expiryDate, false);
+                        return $diff <= 0 && $diff >= -3;
+                    })->count();
+            @endphp
             <a href="{{ route('superadmin.laporan_pembayaran') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                 <div
-                    class="{{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                    class="{{ request()->is('superadmin/laporan-pembayaran*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg relative">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
+                    @if($graceCount > 0)
+                        <span
+                            class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                            {{ $graceCount }}
+                        </span>
+                    @endif
                 </div>
-                Laporan Pembayaran
+                <div class="flex-1 flex items-center justify-between">
+                    <span>Laporan Pembayaran</span>
+                    @if($graceCount > 0)
+                        <span
+                            class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100 italic">
+                            {{ $graceCount }} Tenggang
+                        </span>
+                    @endif
+                </div>
             </a>
 
             <!-- Order -->
+            @php
+                $pendingPackets = \App\Models\Langganan::where('status', 'pending')->count();
+                // Add PendingUser counts from staging table (only status=pending)
+                $pendingRegistrations = \App\Models\PendingUser::where('status', 'pending')->count();
+                $pendingCount = $pendingPackets + $pendingRegistrations;
+            @endphp
             <a href="{{ route('superadmin.order') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                 <div
-                    class="{{ request()->is('superadmin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                    class="{{ request()->is('superadmin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg relative">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
                         </path>
                     </svg>
+                    @if($pendingCount > 0)
+                        <span
+                            class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white animate-bounce">
+                            {{ $pendingCount }}
+                        </span>
+                    @endif
                 </div>
-                Order
+                <div class="flex-1 flex items-center justify-between">
+                    <span>Order</span>
+                    @if($pendingCount > 0)
+                        <span
+                            class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 italic">
+                            {{ $pendingCount }} Pending
+                        </span>
+                    @endif
+                </div>
             </a>
 
             <!-- Permission -->
@@ -129,6 +169,66 @@
                     </svg>
                 </div>
                 Permission
+            </a>
+
+            <!-- Aduan Section -->
+            <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Aduan</p>
+
+            <!-- Aduan Member -->
+            <a href="{{ route('superadmin.aduan.member') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/aduan/member*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                <div
+                    class="{{ request()->is('superadmin/aduan/member*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="flex-1 flex items-center justify-between">
+                    <span>Aduan Member</span>
+                    <span
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">2
+                        Baru</span>
+                </div>
+            </a>
+
+            <!-- Aduan User -->
+            <a href="{{ route('superadmin.aduan.user') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/aduan/user*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                <div
+                    class="{{ request()->is('superadmin/aduan/user*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="flex-1 flex items-center justify-between">
+                    <span>Aduan User</span>
+                    <span
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">3
+                        Baru</span>
+                </div>
+            </a>
+
+            <!-- Aduan Publik -->
+            <a href="{{ route('superadmin.aduan.publik') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/aduan/publik*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                <div
+                    class="{{ request()->is('superadmin/aduan/publik*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="flex-1 flex items-center justify-between">
+                    <span>Aduan Publik</span>
+                    <span
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">2
+                        Baru</span>
+                </div>
             </a>
 
         @elseif (($role ?? 'user') == 'admin')

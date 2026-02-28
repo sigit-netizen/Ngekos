@@ -57,8 +57,19 @@
                 </select>
             </div>
 
+            <!-- Status Filter -->
+            <div class="lg:col-span-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                <select name="status" class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 h-10 cursor-pointer transition-all">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ $selectedStatus == 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="grace" {{ $selectedStatus == 'grace' ? 'selected' : '' }}>Masa Tenggang</option>
+                    <option value="inactive" {{ $selectedStatus == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
+                </select>
+            </div>
+
             <!-- Actions -->
-            <div class="lg:col-span-2 flex gap-2">
+            <div class="lg:col-span-12 xl:col-span-2 flex gap-2">
                 <button type="submit" class="flex-1 h-10 bg-[#36B2B2] text-white rounded-xl text-xs font-bold hover:bg-[#2b8f8f] transition-all shadow-sm active:scale-95">
                     Cari
                 </button>
@@ -98,6 +109,22 @@
                     <div class="flex items-baseline gap-1">
                         <span class="text-2xl font-black text-[#36B2B2]">{{ $totalActive }}</span>
                         <span class="text-[10px] text-[#36B2B2]/60 font-medium">Aktif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Masa Tenggang -->
+        <div class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Masa Tenggang</p>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-2xl font-black text-amber-600">{{ $totalGrace }}</span>
+                        <span class="text-[10px] text-amber-400 font-medium">Paket Habis</span>
                     </div>
                 </div>
             </div>
@@ -163,10 +190,15 @@
                                 {{ \Carbon\Carbon::parse($sub->tanggal_pembayaran)->translatedFormat('d M Y') }}
                             </td>
                             <td class="px-6 py-5">
-                                @if($sub->days_remaining > 0)
+                                @if($sub->computed_status == 'active')
                                     <div class="flex items-center gap-1.5">
                                         <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
                                         <span class="text-sm font-black text-blue-600">{{ $sub->days_remaining }} Hari</span>
+                                    </div>
+                                @elseif($sub->computed_status == 'grace')
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-black text-amber-600 uppercase italic">Masa Tenggang</span>
+                                        <span class="text-[9px] text-amber-500 font-bold leading-none mt-0.5">{{ abs($sub->days_remaining) }} Hari Terlewati</span>
                                     </div>
                                 @else
                                     <span class="text-[10px] font-black text-red-500 italic uppercase bg-red-50 px-2 py-0.5 rounded">Expired</span>
@@ -176,8 +208,10 @@
                                 {{ $sub->expiry_date->translatedFormat('d F Y') }}
                             </td>
                             <td class="px-8 py-5 text-center">
-                                @if($sub->days_remaining > 0)
+                                @if($sub->computed_status == 'active')
                                     <span class="px-4 py-1.5 bg-green-500 text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg shadow-green-100">AKTIF</span>
+                                @elseif($sub->computed_status == 'grace')
+                                    <span class="px-4 py-1.5 bg-amber-500 text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg shadow-amber-100">TENGGANG</span>
                                 @else
                                     <span class="px-4 py-1.5 bg-gray-400 text-white rounded-full text-[9px] font-black uppercase tracking-widest">OFF</span>
                                 @endif

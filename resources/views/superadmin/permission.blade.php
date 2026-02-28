@@ -56,13 +56,13 @@
             <div class="flex bg-gray-100 p-1 rounded-xl">
                 <!-- Tab Kategori Admin (Pro, Premium) -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'admin']) }}" class="{{ $viewGroup === 'admin' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                  px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Administrator (Pro / Premium)
                 </a>
 
                 <!-- Tab Kategori User -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'user']) }}" class="{{ $viewGroup === 'user' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                  px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Aplikasi User
                 </a>
             </div>
@@ -102,11 +102,11 @@
                                 </td>
                                 @foreach($roles as $r)
                                     <td class="py-3 px-4 text-center">
-                                        <label class="flex items-center justify-center cursor-pointer">
+                                        <label class="toggle-switch">
                                             <input type="checkbox" name="role_permissions[{{ $r->id }}][]"
                                                 value="{{ $permission->name }}"
-                                                class="w-5 h-5 text-[#36B2B2] bg-gray-100 border-gray-300 rounded focus:ring-[#36B2B2] focus:ring-2 cursor-pointer"
                                                 @checked($r->permissions->contains('name', $permission->name))>
+                                            <span class="toggle-slider"></span>
                                         </label>
                                     </td>
                                 @endforeach
@@ -134,4 +134,47 @@
             </form>
         @endforeach
     </div>
+
+    <style>
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            cursor: pointer;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background-color: #e5e7eb;
+            border-radius: 999px;
+            transition: all 0.25s ease;
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: all 0.25s ease;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #36B2B2;
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(18px);
+        }
+        .toggle-switch input:focus + .toggle-slider {
+            box-shadow: 0 0 0 3px rgba(54, 178, 178, 0.15);
+        }
+    </style>
 @endsection

@@ -17,3 +17,11 @@ yarn-error.log
 /.idea
 /.vscode
 /ailadmin-laravel-main
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore

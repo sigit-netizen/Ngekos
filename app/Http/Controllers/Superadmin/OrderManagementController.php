@@ -1,0 +1,211 @@
+<?php
+
+namespace App\Http\Controllers\Superadmin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Langganan;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class OrderManagementController extends Controller
+{
+    public function index(Request $request)
+    {
+        $activeTab = $request->get('tab', 'pending_member');
+        $statusFilter = $request->get('status', 'active');
+
+        // Counts for Pending User and Pending Member from PendingUser Table
+        $pendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'pending')->count();
+        $pendingMemberCount = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'pending')->count();
+
+        // Rejected counts from PendingUser table
+        $rejectedPendingMemberCount = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'rejected')->count();
+        $rejectedPendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->count();
+
+        // Counts for Active/Rejected from User Table
+        $userCounts = User::selectRaw("
+            SUM(CASE WHEN status = 'active' AND id_plans IN (2,3,4,5) THEN 1 ELSE 0 END) as active_member,
+            SUM(CASE WHEN status = 'rejected' AND id_plans IN (2,3,4,5) THEN 1 ELSE 0 END) as rejected_member,
+            SUM(CASE WHEN status = 'active' AND id_plans = 1 THEN 1 ELSE 0 END) as active_user,
+            SUM(CASE WHEN status = 'rejected' AND id_plans = 1 THEN 1 ELSE 0 END) as rejected_user
+        ")->first();
+
+        $packetCounts = Langganan::selectRaw("
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+        ")->first();
+
+        // 1. Pending Member (From PendingUser Table)
+        $pendingMembers = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'pending')->latest()->paginate(10, ['*'], 'member_p');
+
+        // 2. Active/Rejected Member
+        if ($statusFilter === 'rejected') {
+            // Show rejected registrations from pending_users
+            $activeMembers = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'member_a');
+        } else {
+            $activeMembers = User::role(['admin', 'pro', 'premium', 'per_kamar_pro', 'per_kamar_premium'])
+                ->where('status', $statusFilter)
+                ->latest()
+                ->paginate(10, ['*'], 'member_a');
+        }
+
+        // 3. Pending User (From PendingUser Table)
+        $pendingUsers = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'pending')->latest()->paginate(10, ['*'], 'user_p');
+
+        // 4. Active/Rejected User
+        if ($statusFilter === 'rejected') {
+            $activeUsers = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'user_a');
+        } else {
+            $activeUsers = User::role('users')->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'user_a');
+        }
+
+        // 5. Pending Paket (Eager load to avoid N+1)
+        $pendingPackets = Langganan::with(['user', 'jenis_langganan'])->where('status', 'pending')->latest()->paginate(10, ['*'], 'packet_p');
+
+        // 6. Active/Rejected Paket
+        $activePackets = Langganan::with(['user', 'jenis_langganan'])->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'packet_a');
+
+        return view('superadmin.order', [
+            'title' => 'Order & Verifikasi',
+            'role' => 'superadmin',
+            'activeTab' => $activeTab,
+            'statusFilter' => $statusFilter,
+
+            'pendingMemberCount' => $pendingMemberCount,
+            'activeMemberCount' => $userCounts->active_member ?? 0,
+            'pendingUserCount' => $pendingUserCount,
+            'activeUserCount' => $userCounts->active_user ?? 0,
+            'pendingPacketCount' => $packetCounts->pending ?? 0,
+            'activePacketCount' => $packetCounts->active ?? 0,
+
+            'rejectedMemberCount' => $rejectedPendingMemberCount + ($userCounts->rejected_member ?? 0),
+            'rejectedUserCount' => $rejectedPendingUserCount + ($userCounts->rejected_user ?? 0),
+            'rejectedPacketCount' => $packetCounts->rejected ?? 0,
+
+            'pendingMembers' => $pendingMembers,
+            'activeMembers' => $activeMembers,
+            'pendingUsers' => $pendingUsers,
+            'activeUsers' => $activeUsers,
+            'pendingPackets' => $pendingPackets,
+            'activePackets' => $activePackets,
+        ]);
+    }
+
+    public function verifyUser(\App\Models\PendingUser $pendingUser)
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
+            // 1. Create the official User
+            $user = User::create([
+                'name' => $pendingUser->name,
+                'email' => $pendingUser->email,
+                'password' => $pendingUser->password, // Password already hashed from signup
+                'nik' => $pendingUser->nik,
+                'nomor_wa' => $pendingUser->nomor_wa,
+                'tanggal_lahir' => $pendingUser->tanggal_lahir,
+                'alamat' => $pendingUser->alamat,
+                'status' => 'active',
+            ]);
+
+            // 2. Role & Plan Logic
+            if ($pendingUser->id_plans == 1) {
+                // Anak Kos
+                $user->id_plans = 1;
+                $user->assignRole('users');
+                $user->save();
+            } else {
+                // Pemilik Kos
+                $planType = $pendingUser->plan_type;
+
+                $map = [
+                    'pro' => 2,
+                    'premium' => 3,
+                    'premium_perkamar' => 4,
+                    'pro_perkamar' => 5
+                ];
+
+                $roleMap = [
+                    'pro' => 'pro',
+                    'premium' => 'premium',
+                    'pro_perkamar' => 'per_kamar_pro',
+                    'premium_perkamar' => 'per_kamar_premium'
+                ];
+
+                $user->id_plans = $map[$planType] ?? 2;
+                $user->assignRole('admin'); // General admin role
+
+                if (isset($roleMap[$planType])) {
+                    $user->assignRole($roleMap[$planType]);
+                }
+
+                $user->save();
+
+                // 3. Create active Langganan record
+                $langgananNames = [
+                    'pro' => 'MEMBER PRO',
+                    'premium' => 'MEMBER PREMIUM',
+                    'pro_perkamar' => 'PER KAMAR PRO',
+                    'premium_perkamar' => 'PER KAMAR PREMIUM'
+                ];
+
+                if (isset($langgananNames[$planType])) {
+                    $jenis = \App\Models\JenisLangganan::where('nama', $langgananNames[$planType])->first();
+                    if ($jenis) {
+                        \App\Models\Langganan::create([
+                            'id_user' => $user->id,
+                            'id_langganan' => $jenis->id,
+                            'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
+                            'status' => 'active',
+                            'tanggal_pembayaran' => now(),
+                            'jatuh_tempo' => now()->addMonth(),
+                        ]);
+                    }
+                }
+            }
+
+            // 4. Delete from staging
+            $pendingUser->delete();
+
+            return back()->with('success', 'Akun ' . $user->name . ' berhasil diverifikasi dan diaktifkan!');
+        });
+    }
+
+    public function rejectUser(\Illuminate\Http\Request $request, \App\Models\PendingUser $pendingUser)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $pendingUser->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return back()->with('success', 'Pendaftaran oleh ' . $pendingUser->name . ' berhasil ditolak!');
+    }
+
+    public function verifyPacket(Langganan $subscription)
+    {
+        $subscription->update([
+            'status' => 'active',
+            'tanggal_pembayaran' => now(),
+            'jatuh_tempo' => now()->addMonth(),
+        ]);
+
+        // Auto-verify user if packet is verified
+        if ($subscription->user && $subscription->user->status !== 'active') {
+            $subscription->user->update(['status' => 'active']);
+        }
+
+        return back()->with('success', 'Paket member berhasil diverifikasi!');
+    }
+
+    public function rejectPacket(Langganan $subscription)
+    {
+        $subscription->update([
+            'status' => 'rejected',
+        ]);
+
+        return back()->with('success', 'Transaksi paket ditolak!');
+    }
+}

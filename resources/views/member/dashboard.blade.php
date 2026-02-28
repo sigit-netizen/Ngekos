@@ -5,7 +5,7 @@
     <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-sm border border-white/50 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6"
         data-aos="fade-up" data-aos-duration="800">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Selamat datang, Member! 👋</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Selamat datang! 👋</h1>
             <p class="text-gray-500">Terima kasih telah bergabung. Segera temukan kos idamanmu di sini.</p>
         </div>
         <div class="hidden sm:block shrink-0">
