@@ -22,13 +22,14 @@ class OrderManagementController extends Controller
         $rejectedPendingMemberCount = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'rejected')->count();
         $rejectedPendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->count();
 
-        // Counts for Active/Rejected from User Table
-        $userCounts = User::selectRaw("
-            SUM(CASE WHEN status = 'active' AND id_plans IN (2,3,4,5) THEN 1 ELSE 0 END) as active_member,
-            SUM(CASE WHEN status = 'rejected' AND id_plans IN (2,3,4,5) THEN 1 ELSE 0 END) as rejected_member,
-            SUM(CASE WHEN status = 'active' AND id_plans = 1 THEN 1 ELSE 0 END) as active_user,
-            SUM(CASE WHEN status = 'rejected' AND id_plans = 1 THEN 1 ELSE 0 END) as rejected_user
-        ")->first();
+        // Counts for Active/Rejected from User Table (Role-based to match list visibility)
+        $memberRoles = ['admin', 'pro', 'premium', 'per_kamar_pro', 'per_kamar_premium'];
+        $userRoles = ['users'];
+
+        $activeMemberCount = User::role($memberRoles)->where('status', 'active')->count();
+        $rejectedMemberCountFromUser = User::role($memberRoles)->where('status', 'rejected')->count();
+        $activeUserCount = User::role($userRoles)->where('status', 'active')->count();
+        $rejectedUserCountFromUser = User::role($userRoles)->where('status', 'rejected')->count();
 
         $packetCounts = Langganan::selectRaw("
             SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
@@ -73,14 +74,14 @@ class OrderManagementController extends Controller
             'statusFilter' => $statusFilter,
 
             'pendingMemberCount' => $pendingMemberCount,
-            'activeMemberCount' => $userCounts->active_member ?? 0,
+            'activeMemberCount' => $activeMemberCount,
             'pendingUserCount' => $pendingUserCount,
-            'activeUserCount' => $userCounts->active_user ?? 0,
+            'activeUserCount' => $activeUserCount,
             'pendingPacketCount' => $packetCounts->pending ?? 0,
             'activePacketCount' => $packetCounts->active ?? 0,
 
-            'rejectedMemberCount' => $rejectedPendingMemberCount + ($userCounts->rejected_member ?? 0),
-            'rejectedUserCount' => $rejectedPendingUserCount + ($userCounts->rejected_user ?? 0),
+            'rejectedMemberCount' => $rejectedPendingMemberCount + $rejectedMemberCountFromUser,
+            'rejectedUserCount' => $rejectedPendingUserCount + $rejectedUserCountFromUser,
             'rejectedPacketCount' => $packetCounts->rejected ?? 0,
 
             'pendingMembers' => $pendingMembers,
@@ -131,13 +132,7 @@ class OrderManagementController extends Controller
                     'premium_perkamar' => 'per_kamar_premium'
                 ];
 
-                $user->id_plans = $map[$planType] ?? 2;
-                $user->assignRole('admin'); // General admin role
-
-                if (isset($roleMap[$planType])) {
-                    $user->assignRole($roleMap[$planType]);
-                }
-
+                $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
                 $user->save();
 
                 // 3. Create active Langganan record
@@ -156,8 +151,8 @@ class OrderManagementController extends Controller
                             'id_langganan' => $jenis->id,
                             'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
                             'status' => 'active',
-                            'tanggal_pembayaran' => now(),
-                            'jatuh_tempo' => now()->addMonth(),
+                            'tanggal_pembayaran' => now('Asia/Jakarta'),
+                            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
                         ]);
                     }
                 }
@@ -188,13 +183,13 @@ class OrderManagementController extends Controller
     {
         $subscription->update([
             'status' => 'active',
-            'tanggal_pembayaran' => now(),
-            'jatuh_tempo' => now()->addMonth(),
+            'tanggal_pembayaran' => now('Asia/Jakarta'),
+            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
         ]);
 
-        // Auto-verify user if packet is verified
-        if ($subscription->user && $subscription->user->status !== 'active') {
-            $subscription->user->update(['status' => 'active']);
+        // Auto-reactivate user if packet is verified
+        if ($subscription->user) {
+            $subscription->user->activateStatus();
         }
 
         return back()->with('success', 'Paket member berhasil diverifikasi!');

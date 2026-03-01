@@ -16,14 +16,18 @@
     {{--
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
 
+    <style>
+        .modal-open { overflow: hidden !important; padding-right: 15px; } /* Prevent shift on scrollbar hide */
+    </style>
+
     <!-- Theme Store -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
+                // ... (rest of theme logic remains original)
                 init() {
                     const savedTheme = localStorage.getItem('theme');
-                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' :
-                        'light';
+                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                     this.theme = savedTheme || systemTheme;
                     this.updateTheme();
                 },
@@ -43,6 +47,18 @@
                         html.classList.remove('dark');
                         body.classList.remove('dark', 'bg-gray-900');
                     }
+                }
+            });
+
+            Alpine.store('profile', {
+                isOpen: false,
+                open() { 
+                    this.isOpen = true; 
+                    document.body.classList.add('modal-open');
+                },
+                close() { 
+                    this.isOpen = false; 
+                    document.body.classList.remove('modal-open');
                 }
             });
 
@@ -112,6 +128,7 @@ window.addEventListener('resize', checkMobile);">
 
     @yield('content')
 
+    @stack('modals')
 </body>
 
 @stack('scripts')

@@ -40,6 +40,18 @@ class DynamicPermissionSeeder extends Seeder
             }
         }
 
+        // 1.5 Add Feature Permissions
+        $featurePermissions = [
+            'fitur.edit_profile'
+        ];
+
+        foreach ($featurePermissions as $fp) {
+            if (!in_array($fp, $permissions)) {
+                $permissions[] = $fp;
+                Permission::firstOrCreate(['name' => $fp]);
+            }
+        }
+
         // 2. Ambil kategori roles dari tabel `plans` (jika ada isinya, buat role darisitu)
         // Kita juga pastikan role 'superadmin' ada mutlak
         $superAdminRole = Role::firstOrCreate(['name' => 'superadmin']);

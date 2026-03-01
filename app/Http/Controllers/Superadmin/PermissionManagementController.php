@@ -39,27 +39,46 @@ class PermissionManagementController extends Controller
             }
         }
 
+        // Tampilkan Profile di kedua grup
+        if (!in_array('menu.profil', $memberPerms)) {
+            $memberPerms[] = 'menu.profil';
+        }
+        if (!in_array('menu.profil', $userPerms)) {
+            $userPerms[] = 'menu.profil';
+        }
+
         $allFilePerms = array_merge($memberPerms, $userPerms);
 
         if ($viewGroup === 'user') {
             // Tampilkan untuk tab user (termasuk role 'users' maupun 'user')
             $rolesQuery->whereIn('name', ['user', 'users']);
             // Filter hanya tabel menu.nama_file_user
-            $permissions = Permission::whereIn('name', $userPerms)->orderBy('name', 'asc')->get();
+            $permissions = Permission::whereIn('name', $userPerms)
+                ->where('name', 'not like', 'fitur.%')
+                ->orderBy('name', 'asc')->get();
         } else {
-            // Tampilkan HANYA 4 Plan ini di Tab Admin (Pilihan Pasti)
-            $rolesQuery->whereIn('name', ['pro', 'premium', 'per_kamar_pro', 'per_kamar_premium']);
+            // Tampilkan HANYA Plan ini di Tab Admin + role nonaktif
+            $rolesQuery->whereIn('name', ['pro', 'premium', 'per_kamar_pro', 'per_kamar_premium', 'nonaktif']);
 
             // Filter tabel : menu.nama_file_member + permission custom manual
-            $permissions = Permission::whereIn('name', $memberPerms)
-                ->orWhereNotIn('name', $allFilePerms)
+            $permissions = Permission::where(function ($query) use ($memberPerms, $allFilePerms) {
+                $query->whereIn('name', $memberPerms)
+                    ->orWhereNotIn('name', $allFilePerms);
+            })
+                ->where('name', 'not like', 'fitur.%')
                 ->orderBy('name', 'asc')
                 ->get();
         }
 
-        $roles = $rolesQuery->get();
+        // Force 'nonaktif' to be the first column for visibility, then other plans
+        $roles = $rolesQuery->orderByRaw("CASE WHEN name = 'nonaktif' THEN 0 ELSE 1 END")
+            ->orderBy('id', 'asc')
+            ->get();
 
-        return view('superadmin.permission', compact('roles', 'permissions', 'viewGroup'), ['role' => 'superadmin', 'title' => 'Manage Permission']);
+        // Ambil semua permission terkait 'fitur'
+        $featurePermissions = Permission::where('name', 'like', 'fitur.%')->orderBy('name', 'asc')->get();
+
+        return view('superadmin.permission', compact('roles', 'permissions', 'featurePermissions', 'viewGroup'), ['role' => 'superadmin', 'title' => 'Manage Permission']);
     }
 
     public function update(Request $request)
@@ -101,41 +120,22 @@ class PermissionManagementController extends Controller
             Permission::create(['name' => $fullPermissionName]);
         }
 
-        // 2. Buat File Blade Kosong
-        $kategori = $request->kategori;
-        $folderPath = $kategori === 'admin' ? resource_path('views/member') : resource_path('views/user');
+        // 2. Buat 4 Permission CRUD Otomatis di Database
+        $crudActions = ['create', 'read', 'update', 'delete'];
+        foreach ($crudActions as $action) {
+            $featureName = "fitur.{$action}_{$permissionName}";
+            if (!Permission::where('name', $featureName)->exists()) {
+                $createdFeature = Permission::create(['name' => $featureName]);
 
-        // Pastikan folder exist, jika belum buat otomatis
-        if (!\Illuminate\Support\Facades\File::isDirectory($folderPath)) {
-            \Illuminate\Support\Facades\File::makeDirectory($folderPath, 0755, true, true);
+                // Assign create/read/update/delete to Superadmin otomatis
+                $superadmin = Role::where('name', 'superadmin')->first();
+                if ($superadmin) {
+                    $superadmin->givePermissionTo($createdFeature->name);
+                }
+            }
         }
 
-        $filePath = $folderPath . '/' . $permissionName . '.blade.php';
-
-        // Check if file not exists, then generate boilerplate
-        if (!\Illuminate\Support\Facades\File::exists($filePath)) {
-            $uiTitle = ucwords(str_replace('_', ' ', $permissionName));
-            $layoutPath = $kategori === 'admin' ? 'layouts.dashboard' : 'layouts.dashboard-user'; // Sesuaikan layout name
-
-            $boilerplate = <<<HTML
-@extends('{$layoutPath}')
-
-@section('dashboard-content')
-<div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/50 mb-8" data-aos="fade-up">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Halaman {$uiTitle}</h1>
-    <p class="text-gray-500">File view untuk halaman ini berada di {$kategori}/{$permissionName}.blade.php</p>
-</div>
-
-<!-- Mulai Isi Konten Anda Di Sini -->
-<div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm" data-aos="fade-up" data-aos-delay="100">
-    <p class="text-gray-600">Konten kosong. Silakan edit file blade ini.</p>
-</div>
-@endsection
-HTML;
-            \Illuminate\Support\Facades\File::put($filePath, $boilerplate);
-        }
-
-        // Coba assign otomatis ke superadmin jika ada
+        // Coba assign otomatis menu base ke superadmin jika ada
         $superadmin = Role::where('name', 'superadmin')->first();
         if ($superadmin) {
             $superadmin->givePermissionTo($fullPermissionName);
@@ -143,24 +143,24 @@ HTML;
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        return redirect()->back()->with('success', "File {$permissionName}.blade.php berhasil dibuat di dalam folder {$kategori} & Akses telah ditambahkan!");
+        return redirect()->back()->with('success', "Menu {$request->name} beserta 4 Hak Akses CRUD-nya berhasil ditambahkan ke database!");
     }
 
     public function destroy(Permission $permission)
     {
         $permissionName = str_replace('menu.', '', $permission->name);
-        $memberPath = resource_path("views/member/{$permissionName}.blade.php");
-        $userPath = resource_path("views/user/{$permissionName}.blade.php");
 
-        // Hapus file blade jika ada
-        if (\Illuminate\Support\Facades\File::exists($memberPath)) {
-            \Illuminate\Support\Facades\File::delete($memberPath);
-        }
-        if (\Illuminate\Support\Facades\File::exists($userPath)) {
-            \Illuminate\Support\Facades\File::delete($userPath);
+        // Hapus juga 4 permission CRUD fiturnya
+        $crudActions = ['create', 'read', 'update', 'delete'];
+        foreach ($crudActions as $action) {
+            $featureName = "fitur.{$action}_{$permissionName}";
+            $featurePerm = Permission::where('name', $featureName)->first();
+            if ($featurePerm) {
+                $featurePerm->delete();
+            }
         }
 
-        // Hapus dari database
+        // Hapus dari database (menu base)
         $permission->delete();
 
         // Bersihkan cache

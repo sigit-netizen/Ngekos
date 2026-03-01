@@ -16,6 +16,10 @@ require __DIR__ . '/auth.php';
 // Landing Page
 Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->name('home');
 
+// Profile Routes
+Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
+Route::post('/profile/verify-password', [\App\Http\Controllers\ProfileController::class, 'verifyPassword'])->middleware('auth')->name('profile.verify-password');
+
 // Pending Verification Page
 Route::get('/pending', function () {
     if (auth()->user()->status === 'active') {
@@ -25,7 +29,7 @@ Route::get('/pending', function () {
 })->middleware('auth')->name('pending.dashboard');
 
 // Protected Admin Dashboard
-Route::middleware(['auth', 'role:admin', 'check.subscription'])->group(function () {
+Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(function () {
     Route::get('/admin', function () {
         return view('member.dashboard', ['role' => 'admin']);
     })->name('admin.dashboard');
@@ -116,6 +120,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/superadmin/data-member', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'index'])->name('superadmin.data_member');
     Route::post('/superadmin/data-member', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'store'])->name('superadmin.data_member.store');
     Route::put('/superadmin/data-member/{user}', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'update'])->name('superadmin.data_member.update');
+    Route::post('/superadmin/data-member/{user}/toggle', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'toggleStatus'])->name('superadmin.data_member.toggle');
     Route::delete('/superadmin/data-member/{user}', [\App\Http\Controllers\Superadmin\MemberManagementController::class, 'destroy'])->name('superadmin.data_member.destroy');
 
     Route::get('/superadmin/data-user', [\App\Http\Controllers\Superadmin\UserManagementController::class, 'index'])->name('superadmin.data_user');
@@ -148,6 +153,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/superadmin/aduan/publik', function () {
         return view('superadmin.aduanPublik', ['role' => 'superadmin', 'title' => 'Aduan Publik']);
     })->name('superadmin.aduan.publik');
+
+    Route::post('/superadmin/user/{user}/deactivate', [\App\Http\Controllers\Superadmin\LaporanPembayaranController::class, 'deactivateUser'])->name('superadmin.user.deactivate');
 });
 
 // Registration Pending Status Page (public, no auth required)

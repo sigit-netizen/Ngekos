@@ -44,7 +44,7 @@
 
                 <button type="submit"
                     class="bg-[#36B2B2] hover:bg-[#2b8f8f] text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors duration-300 shadow-sm h-fit whitespace-nowrap">
-                    + Buat File & Akses
+                    + Buat permission
                 </button>
             </form>
         </div>
@@ -56,13 +56,13 @@
             <div class="flex bg-gray-100 p-1 rounded-xl">
                 <!-- Tab Kategori Admin (Pro, Premium) -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'admin']) }}" class="{{ $viewGroup === 'admin' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                  px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                      px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Administrator (Pro / Premium)
                 </a>
 
                 <!-- Tab Kategori User -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'user']) }}" class="{{ $viewGroup === 'user' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                  px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                      px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Aplikasi User
                 </a>
             </div>
@@ -104,14 +104,61 @@
                                     <td class="py-3 px-4 text-center">
                                         <label class="toggle-switch">
                                             <input type="checkbox" name="role_permissions[{{ $r->id }}][]"
-                                                value="{{ $permission->name }}"
-                                                @checked($r->permissions->contains('name', $permission->name))>
+                                                value="{{ $permission->name }}" @checked($r->permissions->contains('name', $permission->name))>
                                             <span class="toggle-slider"></span>
                                         </label>
                                     </td>
                                 @endforeach
                             </tr>
                         @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Header Filter (Tabs 2 Kategori Utama) tapi untuk Fitur -->
+            <div class="mt-8 mb-6 border-b border-gray-100 pb-4 flex items-center gap-3">
+                <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                        </path>
+                    </svg>
+                </div>
+                <h4 class="text-md font-bold text-gray-800">Permission Akses Fitur Khusus</h4>
+            </div>
+
+            <div class="overflow-x-auto text-left shadow-sm rounded-xl border border-gray-100">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="py-3 px-4 font-semibold text-gray-600 w-1/4">Nama Fitur</th>
+                            @foreach($roles as $r)
+                                <th class="py-3 px-4 font-semibold text-gray-600 text-center capitalize">{{ $r->name }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse($featurePermissions as $permission)
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="py-3 px-4 text-gray-700 font-medium tracking-wide">
+                                    {{ str_replace('_', ' ', Str::title(str_replace('fitur.', '', $permission->name))) }}
+                                </td>
+                                @foreach($roles as $r)
+                                    <td class="py-3 px-4 text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" name="role_permissions[{{ $r->id }}][]"
+                                                value="{{ $permission->name }}" @checked($r->permissions->contains('name', $permission->name))>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="{{ count($roles) + 1 }}" class="py-4 text-center text-gray-500 italic">Belum ada
+                                    permission fitur yang terdaftar.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -143,11 +190,13 @@
             height: 22px;
             cursor: pointer;
         }
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .toggle-slider {
             position: absolute;
             inset: 0;
@@ -155,6 +204,7 @@
             border-radius: 999px;
             transition: all 0.25s ease;
         }
+
         .toggle-slider::before {
             content: "";
             position: absolute;
@@ -164,16 +214,19 @@
             bottom: 3px;
             background-color: white;
             border-radius: 50%;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
             transition: all 0.25s ease;
         }
-        .toggle-switch input:checked + .toggle-slider {
+
+        .toggle-switch input:checked+.toggle-slider {
             background-color: #36B2B2;
         }
-        .toggle-switch input:checked + .toggle-slider::before {
+
+        .toggle-switch input:checked+.toggle-slider::before {
             transform: translateX(18px);
         }
-        .toggle-switch input:focus + .toggle-slider {
+
+        .toggle-switch input:focus+.toggle-slider {
             box-shadow: 0 0 0 3px rgba(54, 178, 178, 0.15);
         }
     </style>

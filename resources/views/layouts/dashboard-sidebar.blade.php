@@ -21,20 +21,44 @@
         @php
             $user = auth()->user();
             $planName = $user->getPlanName();
+
+            // Calculate Status for Admin Sidebar Badge
+            $sidebarStatus = 'active';
+            $latestSub = \App\Models\Langganan::where('id_user', $user->id)->where('status', 'active')->latest()->first();
+            if ($latestSub && !($user->hasRole('superadmin') || $user->id_plans == 6)) {
+                $expiryDate = $latestSub->jatuh_tempo ? \Carbon\Carbon::parse($latestSub->jatuh_tempo) : \Carbon\Carbon::parse($latestSub->tanggal_pembayaran)->addDays(30);
+                $nowWib = now('Asia/Jakarta')->startOfDay();
+                $expiryWib = $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay();
+                $diffDays = (int) $nowWib->diffInDays($expiryWib, false);
+
+                if ($diffDays < 0) {
+                    $sidebarStatus = ($diffDays >= -3) ? 'grace' : 'inactive';
+                }
+            }
         @endphp
 
         <!-- Subscription Badge (Specific for Admin) -->
         @if (($role ?? 'user') == 'admin')
             <div class="px-4 mb-6">
-                <div
-                    class="p-3 rounded-2xl {{ $user->isPremium() ? 'bg-amber-50 border-amber-100' : 'bg-[#36B2B2]/5 border-[#36B2B2]/10' }} border">
+                <div class="p-3 rounded-2xl border transition-all duration-300
+                            @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
+                            @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
+                            @else bg-red-50 border-red-100 @endif">
+
                     <div class="flex items-center gap-2 mb-1">
-                        <div
-                            class="w-2 h-2 rounded-full {{ $user->isPremium() ? 'bg-amber-500 animate-pulse' : 'bg-[#36B2B2]' }}">
+                        <div class="w-2 h-2 rounded-full 
+                                    @if($sidebarStatus == 'active') bg-[#36B2B2] 
+                                    @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
+                                    @else bg-red-500 @endif">
                         </div>
-                        <span
-                            class="text-[10px] font-bold uppercase tracking-wider {{ $user->isPremium() ? 'text-amber-700' : 'text-[#36B2B2]' }}">
-                            {{ $planName }} Active
+                        <span class="text-[10px] font-bold uppercase tracking-wider
+                                    @if($sidebarStatus == 'active') text-[#36B2B2] 
+                                    @elseif($sidebarStatus == 'grace') text-amber-700 
+                                    @else text-red-700 @endif">
+                            {{ $planName }}
+                            @if($sidebarStatus == 'active') ACTIVE
+                            @elseif($sidebarStatus == 'grace') GRACE PERIOD
+                            @else MATI @endif
                         </span>
                     </div>
                 </div>
@@ -88,12 +112,24 @@
 
             <!-- Laporan Pembayaran -->
             @php
-                $graceCount = \App\Models\Langganan::whereNotNull('tanggal_pembayaran')
+                $inactiveCount = \App\Models\Langganan::with(['user.statusUser'])->whereNotNull('tanggal_pembayaran')
                     ->get()
                     ->filter(function ($sub) {
-                        $expiryDate = \Carbon\Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
-                        $diff = (int) now()->diffInDays($expiryDate, false);
-                        return $diff <= 0 && $diff >= -3;
+                        // Exclude users already officially deactivated
+                        if ($sub->user && $sub->user->statusUser && $sub->user->statusUser->status === 'inactive') {
+                            return false;
+                        }
+                        // Using jatuh_tempo if available, standardized to 30 days fallback
+                        $expiryDate = $sub->jatuh_tempo ? \Carbon\Carbon::parse($sub->jatuh_tempo) : \Carbon\Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
+
+                        // WIB Reset Logic
+                        $nowWib = now('Asia/Jakarta')->startOfDay();
+                        $expiryWib = $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay();
+
+                        $diff = (int) $nowWib->diffInDays($expiryWib, false);
+
+                        // "Mati" is defined as package expired for more than 3 days
+                        return $diff < -3;
                     })->count();
             @endphp
             <a href="{{ route('superadmin.laporan_pembayaran') }}"
@@ -105,19 +141,19 @@
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    @if($graceCount > 0)
+                    @if($inactiveCount > 0)
                         <span
-                            class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
-                            {{ $graceCount }}
+                            class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                            {{ $inactiveCount }}
                         </span>
                     @endif
                 </div>
                 <div class="flex-1 flex items-center justify-between">
                     <span>Laporan Pembayaran</span>
-                    @if($graceCount > 0)
+                    @if($inactiveCount > 0)
                         <span
-                            class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100 italic">
-                            {{ $graceCount }} Tenggang
+                            class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 italic">
+                            {{ $inactiveCount }} Mati
                         </span>
                     @endif
                 </div>
@@ -188,7 +224,7 @@
                 <div class="flex-1 flex items-center justify-between">
                     <span>Aduan Member</span>
                     <span
-                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">2
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">12
                         Baru</span>
                 </div>
             </a>
@@ -207,7 +243,7 @@
                 <div class="flex-1 flex items-center justify-between">
                     <span>Aduan User</span>
                     <span
-                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">3
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">11
                         Baru</span>
                 </div>
             </a>
@@ -226,27 +262,29 @@
                 <div class="flex-1 flex items-center justify-between">
                     <span>Aduan Publik</span>
                     <span
-                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">2
+                        class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100">11
                         Baru</span>
                 </div>
             </a>
 
-        @elseif (($role ?? 'user') == 'admin')
+        @elseif (($role ?? 'user') == 'admin' || Auth::user()->hasRole('nonaktif'))
             <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Admin Panel</p>
 
             <!-- Dashboard -->
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin') || request()->is('admin/dashboard') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
-                <div
-                    class="{{ request()->is('admin') || request()->is('admin/dashboard') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                </div>
-                Dashboard
-            </a>
+            @can('menu.dashboard')
+                <a href="{{ route('admin.dashboard') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin') || request()->is('admin/dashboard') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin') || request()->is('admin/dashboard') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                    </div>
+                    Dashboard
+                </a>
+            @endcan
 
             <!-- Kamar -->
             @can('menu.kamar')
@@ -346,17 +384,45 @@
 
             <!-- Tagihan App -->
             @can('menu.tagihan_sistem')
+                @php
+                    $memberSub = \App\Models\Langganan::where('id_user', Auth::id())->latest()->first();
+                    $mExpiry = $memberSub?->jatuh_tempo ? \Carbon\Carbon::parse($memberSub->jatuh_tempo) : ($memberSub?->tanggal_pembayaran ? \Carbon\Carbon::parse($memberSub->tanggal_pembayaran)->addDays(30) : null);
+                    $mNow = now('Asia/Jakarta')->startOfDay();
+                    $mExpWib = $mExpiry ? $mExpiry->copy()->timezone('Asia/Jakarta')->startOfDay() : null;
+                    $mDiff = $mExpWib ? (int) $mNow->diffInDays($mExpWib, false) : 0;
+
+                    $memberStatus = 'active';
+                    if ($mDiff < 0) {
+                        $memberStatus = ($mDiff >= -3) ? 'grace' : 'inactive';
+                    }
+                @endphp
                 <a href="{{ route('admin.tagihan_sistem') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                     <div
-                        class="{{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        class="{{ request()->is('admin/tagihan-sistem*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
                             </path>
                         </svg>
+                        @if($memberStatus == 'grace')
+                            <span
+                                class="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 border-2 border-white rounded-full animate-bounce"></span>
+                        @elseif($memberStatus == 'inactive')
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                        @endif
                     </div>
-                    Tagihan sistem
+                    <div class="flex-1 flex items-center justify-between">
+                        <span>Tagihan sistem</span>
+                        @if($memberStatus == 'grace')
+                            <span
+                                class="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tighter">Masa
+                                Tenggang</span>
+                        @elseif($memberStatus == 'inactive')
+                            <span
+                                class="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 uppercase tracking-tighter">Mati</span>
+                        @endif
+                    </div>
                 </a>
             @endcan
 

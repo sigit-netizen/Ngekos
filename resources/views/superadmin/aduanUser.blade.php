@@ -9,9 +9,19 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Aduan User 💬</h1>
                     <p class="text-gray-500">Kelola aduan dan masukan dari user (penyewa kos).</p>
                 </div>
-                <span
-                    class="bg-purple-50 text-purple-600 text-xs font-black px-3 py-1.5 rounded-full border border-purple-100"
-                    x-text="items.length + ' Aduan'"></span>
+                <div class="flex items-center gap-4">
+                    <button x-show="selectedIds.length > 0" @click="hapusTerpilih()"
+                        class="bg-red-50 text-red-600 text-[10px] font-black px-4 py-2 rounded-xl border border-red-100 hover:bg-red-100 transition-all flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Hapus Terpilih (<span x-text="selectedIds.length"></span>)
+                    </button>
+                    <span
+                        class="bg-purple-50 text-purple-600 text-[10px] font-black px-3 py-1.5 rounded-full border border-purple-100"
+                        x-text="items.length + ' Aduan'"></span>
+                </div>
             </div>
         </div>
 
@@ -22,6 +32,10 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
+                            <th class="px-6 py-4">
+                                <input type="checkbox" @click="toggleSelectAll()" :checked="allSelected"
+                                    class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                            </th>
                             <th class="px-6 py-4">#</th>
                             <th class="px-6 py-4">Nama</th>
                             <th class="px-6 py-4">Email / Akun Google</th>
@@ -32,9 +46,14 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <template x-for="(item, idx) in items" :key="item.id">
+                        <template x-for="(item, idx) in paginatedItems" :key="item.id">
                             <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4 text-xs text-gray-400 font-bold" x-text="idx + 1"></td>
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" :value="item.id" x-model="selectedIds"
+                                        class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                </td>
+                                <td class="px-6 py-4 text-xs text-gray-400 font-bold"
+                                    x-text="idx + 1 + (currentPage - 1) * perPage"></td>
                                 <td class="px-6 py-4 font-bold text-gray-800 text-sm" x-text="item.nama"></td>
                                 <td class="px-6 py-4 text-xs text-gray-500" x-text="item.email"></td>
                                 <td class="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate" x-text="item.subjek">
@@ -71,12 +90,42 @@
                                 </td>
                             </tr>
                         </template>
-                        <tr x-show="items.length === 0">
-                            <td colspan="7" class="px-6 py-16 text-center text-gray-400 italic text-sm">Tidak ada aduan.
+                        <tr x-show="paginatedItems.length === 0">
+                            <td colspan="8" class="px-6 py-16 text-center text-gray-400 italic text-sm">Tidak ada aduan.
                             </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            {{-- Pagination Controls --}}
+            <div class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                <div class="text-xs text-gray-500">
+                    Menampilkan <span class="font-bold text-gray-900" x-text="paginatedItems.length"></span> dari <span
+                        class="font-bold text-gray-900" x-text="items.length"></span> data
+                </div>
+                <div class="flex items-center gap-2">
+                    <button @click="currentPage--" :disabled="currentPage === 1"
+                        class="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center gap-1">
+                        <template x-for="p in totalPages" :key="p">
+                            <button @click="currentPage = p" class="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                                :class="currentPage === p ? 'bg-[#36B2B2] text-white shadow-lg shadow-[#36B2B2]/20' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+                                x-text="p"></button>
+                        </template>
+                    </div>
+                    <button @click="currentPage++" :disabled="currentPage === totalPages"
+                        class="p-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -137,13 +186,43 @@
             return {
                 showDetail: false,
                 detail: null,
+                currentPage: 1,
+                perPage: 10,
+                selectedIds: [],
                 items: [
                     { id: 1, nama: 'Rina Mahasiswi', email: 'rina.mhs@gmail.com', subjek: 'Kamar bocor saat hujan', tanggal: '28 Feb 2026', status: 'baru', pesan: 'Kamar saya di lantai 2 bocor setiap kali hujan deras. Sudah melapor ke pemilik kos tapi belum ada tindakan. Mohon bantuan dari pihak platform.' },
                     { id: 2, nama: 'Doni Pekerja', email: 'doni.work@gmail.com', subjek: 'WiFi sering mati', tanggal: '27 Feb 2026', status: 'baru', pesan: 'Internet di kos sering mati terutama malam hari. Ini sangat mengganggu pekerjaan saya karena saya WFH. Pemilik kos tidak responsif.' },
                     { id: 3, nama: 'Maya Karyawati', email: 'maya.office@gmail.com', subjek: 'Deposit tidak dikembalikan', tanggal: '25 Feb 2026', status: 'baru', pesan: 'Saya sudah keluar dari kos sejak 2 minggu yang lalu tapi deposit Rp 500.000 belum dikembalikan. Pemilik kos sulit dihubungi. Tolong mediasi.' },
                     { id: 4, nama: 'Fajar Mahasiswa', email: 'fajar.univ@gmail.com', subjek: 'AC tidak dingin', tanggal: '24 Feb 2026', status: 'dibaca', pesan: 'AC di kamar saya sudah tidak dingin sejak 1 bulan lalu. Pemilik kos bilang akan diperbaiki tapi sampai sekarang belum ada teknisi yang datang.' },
                     { id: 5, nama: 'Lina Perantau', email: 'lina.rantau@gmail.com', subjek: 'Penyewa lain berisik', tanggal: '23 Feb 2026', status: 'dibaca', pesan: 'Penghuni kamar sebelah sering memutar musik keras sampai larut malam. Sudah ditegur langsung tapi tidak berubah. Mohon pemilik kos diberi tahu.' },
+                    { id: 6, nama: 'Budi Santoso', email: 'budi@test.com', subjek: 'Tagihan tidak muncul', tanggal: '22 Feb 2026', status: 'baru', pesan: 'Saya sudah bayar tapi tagihan untuk bulan depan belum muncul di aplikasi.' },
+                    { id: 7, nama: 'Santi Putri', email: 'santi@test.com', subjek: 'Kunci kamar rusak', tanggal: '21 Feb 2026', status: 'dibaca', pesan: 'Kunci kamar saya doll, mohon segera diganti demi keamanan.' },
+                    { id: 8, nama: 'Rian Pratama', email: 'rian@test.com', subjek: 'Air mati', tanggal: '20 Feb 2026', status: 'baru', pesan: 'Sudah dari pagi air di kos mati total. Mohon dicek pompanya.' },
+                    { id: 9, nama: 'Dewi Lestari', email: 'dewi@test.com', subjek: 'Sampah menumpuk', tanggal: '19 Feb 2026', status: 'dibaca', pesan: 'Petugas sampah sudah 3 hari tidak datang, bau mulai menyengat.' },
+                    { id: 10, nama: 'Andik Jaya', email: 'andik@test.com', subjek: 'Parkir penuh', tanggal: '18 Feb 2026', status: 'baru', pesan: 'Area parkir motor sangat penuh, susah untuk keluar masuk.' },
+                    { id: 11, nama: 'Yulia Sari', email: 'yulia@test.com', subjek: 'Lampu koridor mati', tanggal: '17 Feb 2026', status: 'dibaca', pesan: 'Lampu di depan kamar saya mati, jadi gelap kalau malam.' },
                 ],
+                get paginatedItems() {
+                    let start = (this.currentPage - 1) * this.perPage;
+                    let end = start + this.perPage;
+                    return this.items.slice(start, end);
+                },
+                get totalPages() {
+                    return Math.ceil(this.items.length / this.perPage) || 1;
+                },
+                get allSelected() {
+                    return this.paginatedItems.length > 0 && this.paginatedItems.every(item => this.selectedIds.includes(item.id));
+                },
+                toggleSelectAll() {
+                    let currentPageIds = this.paginatedItems.map(item => item.id);
+                    if (this.allSelected) {
+                        this.selectedIds = this.selectedIds.filter(id => !currentPageIds.includes(id));
+                    } else {
+                        currentPageIds.forEach(id => {
+                            if (!this.selectedIds.includes(id)) this.selectedIds.push(id);
+                        });
+                    }
+                },
                 openDetail(item) {
                     this.detail = item;
                     item.status = 'dibaca';
@@ -152,6 +231,16 @@
                 hapus(id) {
                     if (confirm('Yakin ingin menghapus aduan ini?')) {
                         this.items = this.items.filter(i => i.id !== id);
+                        this.selectedIds = this.selectedIds.filter(i => i !== id);
+                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+                    }
+                },
+                hapusTerpilih() {
+                    if (this.selectedIds.length === 0) return;
+                    if (confirm(`Yakin ingin menghapus ${this.selectedIds.length} aduan terpilih?`)) {
+                        this.items = this.items.filter(i => !this.selectedIds.includes(i.id));
+                        this.selectedIds = [];
+                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
                     }
                 }
             }

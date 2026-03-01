@@ -80,4 +80,66 @@ class User extends Authenticatable
     {
         return $this->hasMany(Langganan::class, 'id_user');
     }
+
+    public function statusUser()
+    {
+        return $this->hasOne(StatusUser::class, 'id_user');
+    }
+
+    /**
+     * Restore user roles based on their current plan ID.
+     */
+    public function syncPlanRole()
+    {
+        // Remove 'nonaktif' if present
+        if ($this->hasRole('nonaktif')) {
+            $this->removeRole('nonaktif');
+        }
+
+        // Ensure base admin role
+        if (!$this->hasRole('admin')) {
+            $this->assignRole('admin');
+        }
+
+        // Map plan IDs to roles
+        $roleMap = [
+            2 => 'pro',
+            3 => 'premium',
+            4 => 'per_kamar_premium',
+            5 => 'per_kamar_pro'
+        ];
+
+        if (isset($roleMap[$this->id_plans])) {
+            $targetRole = $roleMap[$this->id_plans];
+            if (!$this->hasRole($targetRole)) {
+                $this->assignRole($targetRole);
+            }
+        }
+    }
+
+    /**
+     * Set user status to 'aktif' in status_users table and restore roles.
+     */
+    public function activateStatus()
+    {
+        \App\Models\StatusUser::updateOrCreate(
+            ['id_user' => $this->id],
+            ['status' => 'aktif']
+        );
+
+        $this->syncPlanRole();
+    }
+
+    /**
+     * Set user status to 'inactive' in status_users table and assign 'nonaktif' role.
+     */
+    public function deactivateStatus()
+    {
+        \App\Models\StatusUser::updateOrCreate(
+            ['id_user' => $this->id],
+            ['status' => 'inactive']
+        );
+
+        $this->syncRoles(['nonaktif']);
+    }
 }

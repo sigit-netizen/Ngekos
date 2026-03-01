@@ -83,6 +83,7 @@
                         <th class="px-6 py-4">NIK & WA</th>
                         <th class="px-6 py-4">Paket Aktif</th>
                         <th class="px-6 py-4">Tgl Daftar</th>
+                        <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -102,8 +103,16 @@
                                     {{ $member->getPlanName() }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
+                             <td class="px-6 py-4 text-sm text-gray-500">
                                 {{ $member->created_at->format('d M Y') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                @php $currentStatus = $member->statusUser ? $member->statusUser->status : 'aktif'; @endphp
+                                @if($currentStatus === 'inactive')
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100 uppercase">Nonaktif</span>
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 uppercase">Aktif</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
@@ -115,6 +124,25 @@
                                             </path>
                                         </svg>
                                     </button>
+
+                                    {{-- Toggle Status Button --}}
+                                    <form action="{{ route('superadmin.data_member.toggle', $member->id) }}" method="POST"
+                                        onsubmit="return confirm('{{ $currentStatus === 'inactive' ? 'Aktifkan kembali member ini?' : 'Nonaktifkan member ini? (Akses akan dicabut)' }}')">
+                                        @csrf
+                                        <button type="submit"
+                                            class="p-2 {{ $currentStatus === 'inactive' ? 'text-green-500 hover:bg-green-50' : 'text-slate-400 hover:bg-slate-50' }} rounded-lg transition-colors"
+                                            title="{{ $currentStatus === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}">
+                                            @if($currentStatus === 'inactive')
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                            @else
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                </svg>
+                                            @endif
+                                        </button>
+                                    </form>
                                     <form action="{{ route('superadmin.data_member.destroy', $member->id) }}" method="POST"
                                         onsubmit="return confirm('Hapus member ini?')">
                                         @csrf
@@ -138,6 +166,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="mt-6">
+            {{ $members->appends(request()->query())->links() }}
         </div>
     </div>
 

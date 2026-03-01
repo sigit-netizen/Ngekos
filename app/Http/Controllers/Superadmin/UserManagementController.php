@@ -26,7 +26,7 @@ class UserManagementController extends Controller
             });
         }
 
-        $users = $query->get();
+        $users = $query->latest()->paginate(10);
 
         return view('superadmin.data_user', [
             'title' => 'Manajemen User (Anak Kos)',

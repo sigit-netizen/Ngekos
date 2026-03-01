@@ -101,6 +101,9 @@
                 </tbody>
             </table>
         </div>
+        <div class="mt-6">
+            {{ $users->appends(request()->query())->links() }}
+        </div>
     </div>
 
 

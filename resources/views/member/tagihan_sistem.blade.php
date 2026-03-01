@@ -6,6 +6,45 @@
         <p class="text-gray-500">Lihat faktur masa aktif sewa sistem aplikasi Ngekos Anda atau beli paket baru.</p>
     </div>
 
+    {{-- Notification Banner --}}
+    @if($subscription?->status == 'active')
+        @if($computedStatus == 'grace')
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-r-xl shadow-sm" data-aos="fade-down">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-amber-800 font-medium font-inter">
+                            <span class="font-black text-amber-900">MASA TENGGANG!</span> 
+                            Paket Anda sudah habis. Anda memiliki sisa toleransi <span class="bg-amber-200 px-2 py-0.5 rounded font-black text-amber-900">{{ $graceDaysRemaining }} Hari</span> sebelum akses dibatasi.
+                            <br>
+                            <span class="text-xs opacity-80 italic italic-inter">Segera perbarui paket untuk tetap dapat mengelola kos Anda.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @elseif($computedStatus == 'inactive')
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-xl shadow-sm" data-aos="fade-down">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-800 font-medium">
+                            <span class="font-bold">AKUN MATI!</span> Masa aktif paket Anda telah habis lebih dari 3 hari. 
+                            Akses fitur akan segera dibatasi. Silakan lakukan pembayaran paket baru sekarang!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="100">
         <!-- Active Package Card -->
         <div class="lg:col-span-2 space-y-6">
@@ -21,11 +60,21 @@
                         Paket Aktif Saat Ini
                     </h3>
                     @if($subscription?->status == 'active')
-                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-green-50 text-green-600 border border-green-100 uppercase tracking-tighter">
-                            Sistem Aktif
-                        </span>
+                        @if($computedStatus == 'active')
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-green-50 text-green-600 border border-green-100 uppercase tracking-tighter">
+                                Sistem Aktif
+                            </span>
+                        @elseif($computedStatus == 'grace')
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tighter">
+                                Masa Tenggang
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-red-50 text-red-600 border border-red-100 uppercase tracking-tighter">
+                                Akun Mati
+                            </span>
+                        @endif
                     @else
-                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tighter">
+                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-tighter">
                             Menunggu Aktivasi
                         </span>
                     @endif
@@ -66,12 +115,37 @@
                     </div>
 
                     <!-- Countdown Info -->
-                    <div class="bg-[#36B2B2]/5 rounded-2xl p-6 flex flex-col items-center justify-center border border-[#36B2B2]/10">
-                        <p class="text-[10px] font-bold text-[#36B2B2] uppercase tracking-widest mb-2">Sisa Masa Aktif</p>
+                    @php
+                        $statusColors = [
+                            'active' => 'bg-[#36B2B2]/5 border-[#36B2B2]/10 text-[#36B2B2]',
+                            'grace' => 'bg-amber-50 border-amber-100 text-amber-600',
+                            'inactive' => 'bg-red-50 border-red-100 text-red-600'
+                        ];
+                        $currentColor = $statusColors[$computedStatus] ?? $statusColors['active'];
+                    @endphp
+                    <div class="{{ $currentColor }} rounded-2xl p-6 flex flex-col items-center justify-center border">
+                        <p class="text-[10px] font-bold opacity-60 uppercase tracking-widest mb-2">
+                            @if($computedStatus == 'grace')
+                                Masa Tenggang
+                            @elseif($computedStatus == 'inactive')
+                                Masa Mati
+                            @else
+                                Sisa Masa Aktif
+                            @endif
+                        </p>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-black text-[#36B2B2]">{{ $daysRemaining }}</span>
-                            <span class="text-sm font-bold text-[#36B2B2]/60">Hari</span>
+                            @if($computedStatus == 'grace')
+                                <span class="text-4xl font-black">{{ $graceDaysRemaining }}</span>
+                            @elseif($computedStatus == 'inactive')
+                                <span class="text-4xl font-black">{{ $matiDaysCount }}</span>
+                            @else
+                                <span class="text-4xl font-black">{{ abs($daysRemaining) }}</span>
+                            @endif
+                            <span class="text-sm font-bold opacity-60">Hari</span>
                         </div>
+                        @if($computedStatus == 'grace')
+                            <p class="text-[9px] font-bold mt-2 uppercase">Sisa Toleransi</p>
+                        @endif
                     </div>
                 </div>
 
@@ -118,6 +192,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-4">
+                    {{ $history->links() }}
                 </div>
             </div>
         </div>

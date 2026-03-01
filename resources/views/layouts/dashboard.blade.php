@@ -43,14 +43,6 @@
         }
     </style>
 
-    {{-- The preloader is already handled globally in fullscreen-layout.blade.php which this layout extends --}}
-
-
-
-
-
-
-
     <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-slate-50 font-inter overflow-hidden relative">
 
         <!-- Background Accents -->

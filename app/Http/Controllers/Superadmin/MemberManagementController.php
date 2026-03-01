@@ -13,10 +13,10 @@ class MemberManagementController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $paket  = $request->get('paket');
+        $paket = $request->get('paket');
 
-        // Only get users with 'admin' role (The Owners)
-        $query = User::role('admin');
+        // Get users with 'admin' role (The Owners) and 'nonaktif' role
+        $query = User::role(['admin', 'nonaktif']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -31,14 +31,14 @@ class MemberManagementController extends Controller
             $query->where('id_plans', $paket);
         }
 
-        $members = $query->get();
+        $members = $query->with('statusUser')->latest()->paginate(10);
 
         return view('superadmin.data_member', [
-            'title'   => 'Manajemen Member (Pemilik Kos)',
+            'title' => 'Manajemen Member (Pemilik Kos)',
             'members' => $members,
-            'role'    => 'superadmin',
-            'search'  => $search,
-            'paket'   => $paket,
+            'role' => 'superadmin',
+            'search' => $search,
+            'paket' => $paket,
         ]);
     }
 
@@ -109,6 +109,24 @@ class MemberManagementController extends Controller
         }
 
         return back()->with('success', 'Data member berhasil diperbarui!');
+    }
+
+    public function toggleStatus(User $user)
+    {
+        // Get current status from the statusUser relationship (default to 'aktif' if no record exists)
+        $currentStatus = $user->statusUser ? $user->statusUser->status : 'aktif';
+
+        if ($currentStatus === 'inactive') {
+            // Activate using model helper (updates DB and restores roles)
+            $user->activateStatus();
+            $message = "Member {$user->name} berhasil diaktifkan kembali!";
+        } else {
+            // Deactivate using model helper
+            $user->deactivateStatus();
+            $message = "Member {$user->name} telah dinonaktifkan!";
+        }
+
+        return back()->with('success', $message);
     }
 
     public function destroy(User $user)
