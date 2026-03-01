@@ -35,7 +35,7 @@ class SubscriptionManagementController extends Controller
 
         // 4. Calculate metrics (securely in controller)
         // Primary truth is jatuh_tempo, fallback to specialized 30-day calculation if missing
-        $expiryDate = $subscription?->jatuh_tempo ? \Carbon\Carbon::parse($subscription->jatuh_tempo) : ($subscription?->tanggal_pembayaran ? \Carbon\Carbon::parse($subscription->tanggal_pembayaran)->addDays(30) : null);
+        $expiryDate = $subscription?->jatuh_tempo ? \Carbon\Carbon::parse($subscription->jatuh_tempo) : ($subscription?->tanggal_pembayaran ? \Carbon\Carbon::parse($subscription->tanggal_pembayaran)->addDays(28) : null);
 
         // Use Asia/Jakarta for comparison
         $nowWib = now('Asia/Jakarta')->startOfDay();

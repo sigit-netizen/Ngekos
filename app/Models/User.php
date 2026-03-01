@@ -27,6 +27,8 @@ class User extends Authenticatable
         'tanggal_lahir',
         'alamat',
         'id_plans',
+        'id_kos',
+        'id_kamar',
         'status',
     ];
 
@@ -74,6 +76,29 @@ class User extends Authenticatable
     public function isPro()
     {
         return in_array($this->id_plans, [2, 5]);
+    }
+
+    public function kos()
+    {
+        return $this->hasMany(Kos::class, 'id_user');
+    }
+
+    public function kosAnak()
+    {
+        return $this->belongsTo(Kos::class, 'id_kos');
+    }
+
+    public function kamar()
+    {
+        return $this->belongsTo(Kamar::class, 'id_kamar');
+    }
+
+    /**
+     * Check if user is a verified tenant (penyewa).
+     */
+    public function isPenyewa()
+    {
+        return !is_null($this->id_kos) && !is_null($this->id_kamar);
     }
 
     public function langganans()

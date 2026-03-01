@@ -22,7 +22,7 @@ class LaporanPembayaranController extends Controller
             ->whereHas('user', function ($q) use ($search) {
                 $q->role(['admin', 'nonaktif'])->with('statusUser');
                 if ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%' . $search . '%');
                 }
             })
             ->whereNotNull('tanggal_pembayaran')
@@ -42,7 +42,7 @@ class LaporanPembayaranController extends Controller
                 $userOfficialStatus = $sub->user->statusUser ? $sub->user->statusUser->status : 'aktif';
 
                 // Use the persistent jatuh_tempo column or fallback if NULL (for old data)
-                $expiryDate = $sub->jatuh_tempo ? Carbon::parse($sub->jatuh_tempo) : Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
+                $expiryDate = $sub->jatuh_tempo ? Carbon::parse($sub->jatuh_tempo) : Carbon::parse($sub->tanggal_pembayaran)->addDays(28);
 
                 // WIB Reset: Use Asia/Jakarta and compare pure dates (startOfDay)
                 $nowWib = now('Asia/Jakarta')->startOfDay();

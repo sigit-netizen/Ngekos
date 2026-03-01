@@ -94,41 +94,41 @@
 @push('modals')
     <!-- Global Profile Modal (Root Level) -->
     <div x-cloak x-data="{ 
-                verifyPassword: '', 
-                isVerifying: false, 
-                errorMsg: '',
-                mode: 'verify', // 'verify' or 'profile'
-                async handleVerify() {
-                    this.isVerifying = true;
-                    this.errorMsg = '';
-                    try {
-                        const response = await fetch('{{ route('profile.verify-password') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({ password: this.verifyPassword })
-                        });
-                        const data = await response.json();
-                        if (data.success) {
-                            this.mode = 'profile';
-                            this.verifyPassword = '';
-                        } else {
-                            this.errorMsg = data.message;
+                    verifyPassword: '', 
+                    isVerifying: false, 
+                    errorMsg: '',
+                    mode: 'verify', // 'verify' or 'profile'
+                    async handleVerify() {
+                        this.isVerifying = true;
+                        this.errorMsg = '';
+                        try {
+                            const response = await fetch('{{ route('profile.verify-password') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({ password: this.verifyPassword })
+                            });
+                            const data = await response.json();
+                            if (data.success) {
+                                this.mode = 'profile';
+                                this.verifyPassword = '';
+                            } else {
+                                this.errorMsg = data.message;
+                            }
+                        } catch (e) {
+                            this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
+                        } finally {
+                            this.isVerifying = false;
                         }
-                    } catch (e) {
-                        this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
-                    } finally {
-                        this.isVerifying = false;
+                    },
+                    reset() {
+                        this.mode = 'verify';
+                        this.verifyPassword = '';
+                        this.errorMsg = '';
                     }
-                },
-                reset() {
-                    this.mode = 'verify';
-                    this.verifyPassword = '';
-                    this.errorMsg = '';
-                }
-            }" x-show="$store.profile.isOpen"
+                }" x-show="$store.profile.isOpen"
         x-init="document.body.appendChild($el); $watch('$store.profile.isOpen', value => { if(!value) reset() })"
         x-effect="document.body.style.overflow = $store.profile.isOpen ? 'hidden' : ''"
         style="position: fixed; z-index: 2147483647;" x-transition:enter="transition ease-out duration-300"

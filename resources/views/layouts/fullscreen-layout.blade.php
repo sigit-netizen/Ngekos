@@ -13,11 +13,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js -->
-    {{--
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
-        .modal-open { overflow: hidden !important; padding-right: 15px; } /* Prevent shift on scrollbar hide */
+        .modal-open {
+            overflow: hidden !important;
+            padding-right: 15px;
+        }
+
+        /* Prevent shift on scrollbar hide */
     </style>
 
     <!-- Theme Store -->
@@ -52,12 +56,12 @@
 
             Alpine.store('profile', {
                 isOpen: false,
-                open() { 
-                    this.isOpen = true; 
+                open() {
+                    this.isOpen = true;
                     document.body.classList.add('modal-open');
                 },
-                close() { 
-                    this.isOpen = false; 
+                close() {
+                    this.isOpen = false;
                     document.body.classList.remove('modal-open');
                 }
             });

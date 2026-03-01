@@ -59,16 +59,16 @@
                     onsubmit="if(!document.querySelector('input[name=id_plans]').value){ alert('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!'); return false; }">
                     @csrf
                     <div class="space-y-5" x-data="{ 
-                                            selectedRole: '{{ old('id_plans') }}',
-                                            roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
-                                            planType: '{{ old('plan_type') }}',
-                                            planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
-                                            packageType: '{{ old('package_type') }}',
-                                            packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
-                                            isOpenRole: false,
-                                            isOpenPlan: false,
-                                            isOpenPackage: false
-                                        }">
+                                                selectedRole: '{{ old('id_plans') }}',
+                                                roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
+                                                planType: '{{ old('plan_type') }}',
+                                                planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
+                                                packageType: '{{ old('package_type') }}',
+                                                packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
+                                                isOpenRole: false,
+                                                isOpenPlan: false,
+                                                isOpenPackage: false
+                                            }">
 
                         <div class="group">
                             <label
@@ -232,6 +232,25 @@
                                         </span>
                                     </li>
                                 </ul>
+                            </div>
+
+                            <!-- Kode Kos Input for Anak Kos -->
+                            <div x-show="selectedRole === '1'" x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform -translate-y-4"
+                                x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-4">
+                                <div class="group">
+                                    <label class="mb-2 block text-sm font-semibold text-[#36B2B2]">
+                                        Kode Kos<span class="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <p class="text-xs text-gray-500 mb-2">Masukkan kode kos yang diberikan oleh pemilik kos
+                                        Anda.</p>
+                                    <input type="number" name="kode_kos" value="{{ old('kode_kos') }}"
+                                        placeholder="Contoh: 1234"
+                                        class="h-12 w-full rounded-xl border {{ $errors->has('kode_kos') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-[#36B2B2]/30 bg-[#36B2B2]/5 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 font-mono font-bold tracking-widest placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
+                                    @error('kode_kos')
+                                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
 
                             <!-- Additional Fields for Pemilik Kos -->

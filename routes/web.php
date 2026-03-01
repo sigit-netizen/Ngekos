@@ -14,7 +14,11 @@ require __DIR__ . '/auth.php';
 |
 */
 // Landing Page
+// Landing Page
 Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->name('home');
+
+// Kos Management
+Route::put('/admin/kos/{kos}', [\App\Http\Controllers\KosController::class, 'update'])->middleware('auth')->name('admin.kos.update');
 
 // Profile Routes
 Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
@@ -34,13 +38,14 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
         return view('member.dashboard', ['role' => 'admin']);
     })->name('admin.dashboard');
 
-    Route::get('/admin/kamar', function () {
-        return view('member.kamar', ['title' => 'Kamar', 'role' => 'admin']);
-    })->name('admin.kamar');
+    // Kamar Management
+    Route::get('/admin/kamar', [\App\Http\Controllers\Admin\KamarController::class, 'index'])->name('admin.kamar');
+    Route::post('/admin/kamar', [\App\Http\Controllers\Admin\KamarController::class, 'store'])->name('admin.kamar.store');
+    Route::put('/admin/kamar/{kamar}', [\App\Http\Controllers\Admin\KamarController::class, 'update'])->name('admin.kamar.update');
+    Route::put('/admin/kamar/{kamar}/fasilitas', [\App\Http\Controllers\Admin\KamarController::class, 'updateFasilitas'])->name('admin.kamar.updateFasilitas');
+    Route::delete('/admin/kamar/{kamar}', [\App\Http\Controllers\Admin\KamarController::class, 'destroy'])->name('admin.kamar.destroy');
 
-    Route::get('/admin/data-penyewa', function () {
-        return view('member.data_penyewa', ['title' => 'Data Penyewa', 'role' => 'admin']);
-    })->name('admin.data_penyewa');
+    Route::get('/admin/data-penyewa', [\App\Http\Controllers\Admin\PenyewaController::class, 'index'])->name('admin.data_penyewa');
 
     Route::get('/admin/cabang-kos', function () {
         return view('member.cabang_kos', ['title' => 'Cabang Kos', 'role' => 'admin']);
@@ -57,9 +62,9 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::get('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('admin.tagihan_sistem');
     Route::put('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'update'])->name('admin.subscription.update');
 
-    Route::get('/admin/order', function () {
-        return view('member.order', ['title' => 'Order', 'role' => 'admin']);
-    })->name('admin.order');
+    Route::get('/admin/order', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.order');
+    Route::post('/admin/order/{transaksi}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
+    Route::post('/admin/order/{transaksi}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
 
     // Dynamic Route for automatically generated admin menus
     Route::get('/admin/{page}', function ($page) {
@@ -85,9 +90,9 @@ Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function 
         return view('user.pesan', ['title' => 'Pesan', 'role' => 'user']);
     })->name('user.pesan');
 
-    Route::get('/user/order', function () {
-        return view('user.order', ['title' => 'Order', 'role' => 'user']);
-    })->name('user.order');
+    Route::get('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'index'])->name('user.order');
+    Route::post('/user/order/search', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('user.order.search');
+    Route::post('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'store'])->name('user.order.store');
 
     Route::get('/user/jatuh-tempo', function () {
         return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);

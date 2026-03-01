@@ -113,6 +113,15 @@ class OrderManagementController extends Controller
                 // Anak Kos
                 $user->id_plans = 1;
                 $user->assignRole('users');
+
+                // Link to kos via kode_kos
+                if ($pendingUser->kode_kos) {
+                    $kos = \App\Models\Kos::where('kode_kos', $pendingUser->kode_kos)->first();
+                    if ($kos) {
+                        $user->id_kos = $kos->id;
+                    }
+                }
+
                 $user->save();
             } else {
                 // Pemilik Kos
@@ -125,12 +134,10 @@ class OrderManagementController extends Controller
                     'pro_perkamar' => 5
                 ];
 
-                $roleMap = [
-                    'pro' => 'pro',
-                    'premium' => 'premium',
-                    'pro_perkamar' => 'per_kamar_pro',
-                    'premium_perkamar' => 'per_kamar_premium'
-                ];
+                if (isset($map[$planType])) {
+                    $user->id_plans = $map[$planType];
+                }
+
 
                 $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
                 $user->save();
@@ -152,13 +159,22 @@ class OrderManagementController extends Controller
                             'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
                             'status' => 'active',
                             'tanggal_pembayaran' => now('Asia/Jakarta'),
-                            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
+                            'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
                         ]);
                     }
                 }
+
+                // 4. Automatically create a default Kos record
+                \App\Models\Kos::create([
+                    'id_user' => $user->id,
+                    'nama_kos' => 'Kos Baru ' . $user->name,
+                    'alamat' => $pendingUser->alamat ?? 'Lokasi belum ditentukan',
+                    'kode_kos' => rand(1000, 9999), // Generate a random 4-digit code
+                    'is_kode_kos_edited' => false,
+                ]);
             }
 
-            // 4. Delete from staging
+            // 5. Delete from staging
             $pendingUser->delete();
 
             return back()->with('success', 'Akun ' . $user->name . ' berhasil diverifikasi dan diaktifkan!');
@@ -184,7 +200,7 @@ class OrderManagementController extends Controller
         $subscription->update([
             'status' => 'active',
             'tanggal_pembayaran' => now('Asia/Jakarta'),
-            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
+            'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
         ]);
 
         // Auto-reactivate user if packet is verified

@@ -41,20 +41,20 @@
         @if (($role ?? 'user') == 'admin')
             <div class="px-4 mb-6">
                 <div class="p-3 rounded-2xl border transition-all duration-300
-                            @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
-                            @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
-                            @else bg-red-50 border-red-100 @endif">
+                                @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
+                                @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
+                                @else bg-red-50 border-red-100 @endif">
 
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-2 h-2 rounded-full 
-                                    @if($sidebarStatus == 'active') bg-[#36B2B2] 
-                                    @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
-                                    @else bg-red-500 @endif">
+                                        @if($sidebarStatus == 'active') bg-[#36B2B2] 
+                                        @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
+                                        @else bg-red-500 @endif">
                         </div>
                         <span class="text-[10px] font-bold uppercase tracking-wider
-                                    @if($sidebarStatus == 'active') text-[#36B2B2] 
-                                    @elseif($sidebarStatus == 'grace') text-amber-700 
-                                    @else text-red-700 @endif">
+                                        @if($sidebarStatus == 'active') text-[#36B2B2] 
+                                        @elseif($sidebarStatus == 'grace') text-amber-700 
+                                        @else text-red-700 @endif">
                             {{ $planName }}
                             @if($sidebarStatus == 'active') ACTIVE
                             @elseif($sidebarStatus == 'grace') GRACE PERIOD
@@ -303,17 +303,32 @@
             @endcan
             <!-- Order -->
             @can('menu.order')
+                @php
+                    $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
+                    $adminOrderPending = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
+                @endphp
                 <a href="{{ route('admin.order') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/order*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                     <div
-                        class="{{ request()->is('admin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        class="{{ request()->is('admin/order*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
                             </path>
                         </svg>
+                        @if($adminOrderPending > 0)
+                            <span
+                                class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white animate-bounce">{{ $adminOrderPending }}</span>
+                        @endif
                     </div>
-                    Order
+                    <div class="flex-1 flex items-center justify-between">
+                        <span>Order</span>
+                        @if($adminOrderPending > 0)
+                            <span
+                                class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 italic">{{ $adminOrderPending }}
+                                Order</span>
+                        @endif
+                    </div>
                 </a>
             @endcan
 
