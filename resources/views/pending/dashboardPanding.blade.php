@@ -77,6 +77,17 @@
                     Kembali Ke Beranda
                 </a>
 
+                <button type="button"
+                    @click="if(confirm('Apakah Anda yakin ingin membatalkan pendaftaran? Semua data Anda akan dihapus.')) { document.getElementById('cancel-form').submit(); }"
+                    class="py-4 bg-rose-50 text-rose-600 rounded-2xl font-bold border border-rose-100 hover:bg-rose-100 transition-all transform active:scale-95 text-center">
+                    Batalkan Pendaftaran
+                </button>
+
+                <form id="cancel-form" action="{{ route('registration.cancel') }}" method="POST" class="hidden">
+                    @csrf
+                    <input type="hidden" name="email" value="{{ $pendingUser->email }}">
+                </form>
+
                 <a href="{{ route('login') }}"
                     class="w-full py-4 text-emerald-600 font-bold hover:bg-emerald-50 rounded-2xl transition-all text-center block">
                     Masuk Dengan Akun Lain

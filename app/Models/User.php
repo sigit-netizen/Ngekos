@@ -30,6 +30,10 @@ class User extends Authenticatable
         'id_kos',
         'id_kamar',
         'status',
+        'instagram',
+        'twitter',
+        'youtube',
+        'tiktok',
     ];
 
     /**

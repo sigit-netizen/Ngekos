@@ -15,6 +15,7 @@ class Kamar extends Model
         'nomor_kamar',
         'status',
         'harga',
+        'foto',
         'id_kos',
     ];
 

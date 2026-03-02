@@ -89,7 +89,17 @@
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         @if($order->status === 'pending')
-                                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-600">Menunggu</span>
+                                            <div class="flex flex-col items-center gap-2">
+                                                <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-600">Menunggu</span>
+                                                <button type="button"
+                                                    @click="if(confirm('Apakah Anda yakin ingin membatalkan pesanan kamar ini?')) { document.getElementById('cancel-order-{{ $order->id }}').submit(); }"
+                                                    class="text-[10px] font-bold text-rose-500 hover:text-rose-700 hover:underline transition-colors uppercase tracking-wider">
+                                                    Batalkan
+                                                </button>
+                                                <form id="cancel-order-{{ $order->id }}" action="{{ route('user.order.cancel', $order->id) }}" method="POST" class="hidden">
+                                                    @csrf
+                                                </form>
+                                            </div>
                                         @elseif($order->status === 'verified')
                                             <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600">Diterima</span>
                                         @else

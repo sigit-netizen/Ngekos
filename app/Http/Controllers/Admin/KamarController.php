@@ -56,6 +56,7 @@ class KamarController extends Controller
                 Rule::unique('kamar')->where(fn($query) => $query->where('id_kos', $kos->id))
             ],
             'harga' => 'required|numeric|min:0',
+            'foto' => 'nullable|string|max:255',
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'nullable|string',
         ]);
@@ -74,6 +75,7 @@ class KamarController extends Controller
             'nomor_kamar' => $request->nomor_kamar,
             'harga' => $request->harga,
             'status' => 'tersedia', // Default, auto in view
+            'foto' => $request->foto,
             'id_kos' => $kos->id,
         ]);
 
@@ -111,9 +113,10 @@ class KamarController extends Controller
                 Rule::unique('kamar')->where(fn($query) => $query->where('id_kos', $kos->id))->ignore($kamar->id)
             ],
             'harga' => 'required|numeric|min:0',
+            'foto' => 'nullable|string|max:255',
         ]);
 
-        $kamar->update($request->only(['nomor_kamar', 'harga']));
+        $kamar->update($request->only(['nomor_kamar', 'harga', 'foto']));
 
         return back()->with('success', 'Data kamar berhasil diperbarui!');
     }

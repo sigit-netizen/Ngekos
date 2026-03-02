@@ -18,6 +18,7 @@ class Kos extends Model
         'kategori',
         'id_user',
         'is_kode_kos_edited',
+        'foto',
     ];
 
     public function user()

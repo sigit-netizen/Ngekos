@@ -129,17 +129,24 @@ class OrderController extends Controller
             'tanggal_pembayaran' => now(),
         ]);
 
-        // Update user: link to kos and kamar
+        // Update user: link to kos and kamar + set plan & status
         $orderUser = User::find($transaksi->id_user);
         if ($orderUser) {
             $orderUser->update([
+                'id_plans' => 1, // Set to Anak Kos
+                'status' => 'active',
                 'id_kos' => $kos->id,
                 'id_kamar' => $kamar->id,
             ]);
+
+            // Ensure role is 'users'
+            if (!$orderUser->hasRole('users')) {
+                $orderUser->assignRole('users');
+            }
         }
 
         // Update kamar status to occupied
-        $kamar->update(['status' => 'disewa']);
+        $kamar->update(['status' => 'terisi']);
 
         // Reject any other pending orders for this kamar
         Transaksi::where('id_kamar', $kamar->id)
@@ -168,5 +175,64 @@ class OrderController extends Controller
         ]);
 
         return back()->with('success', 'Order berhasil ditolak.');
+    }
+
+    /**
+     * Verify a new tenant registration (PendingUser).
+     */
+    public function verifyPenyewa($id)
+    {
+        $pendingUser = \App\Models\PendingUser::findOrFail($id);
+        $user = auth()->user();
+        $kos = Kos::where('id_user', $user->id)->first();
+
+        // Security check: ensure this pending user is for this kos
+        if (!$kos || $pendingUser->kode_kos !== $kos->kode_kos) {
+            return back()->with('error', 'Akses ditolak.');
+        }
+
+        \DB::beginTransaction();
+        try {
+            // Check if user already exists
+            $userRecord = User::where('email', $pendingUser->email)->first();
+
+            if (!$userRecord) {
+                $userRecord = new User();
+                $userRecord->name = $pendingUser->name;
+                $userRecord->email = $pendingUser->email;
+                $userRecord->password = $pendingUser->password; // Already hashed in PendingUser if registered normally
+                $userRecord->nik = $pendingUser->nik;
+                $userRecord->nomor_wa = $pendingUser->nomor_wa;
+                $userRecord->alamat = $pendingUser->alamat;
+            }
+
+            // Assign Anak Kos role and details
+            $userRecord->id_plans = 1; // Anak Kos
+            $userRecord->id_kos = $kos->id;
+            $userRecord->status = 'active';
+            $userRecord->save();
+
+            // Sync role
+            $userRecord->assignRole('users');
+
+            // Update pending status
+            $pendingUser->update(['status' => 'verified']);
+
+            \DB::commit();
+            return back()->with('success', "Akun {$userRecord->name} berhasil diverifikasi sebagai penyewa!");
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Gagal memverifikasi user: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reject a new tenant registration.
+     */
+    public function rejectPenyewa($id)
+    {
+        $pendingUser = \App\Models\PendingUser::findOrFail($id);
+        $pendingUser->update(['status' => 'rejected']);
+        return back()->with('success', 'Pendaftaran user berhasil ditolak.');
     }
 }

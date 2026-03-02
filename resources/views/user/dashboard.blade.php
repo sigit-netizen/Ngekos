@@ -1,6 +1,23 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .cursor-grabbing {
+            cursor: grabbing !important;
+            user-select: none;
+        }
+    </style>
     @php
         $user = auth()->user();
         $isPenyewa = $user->isPenyewa();
@@ -413,59 +430,104 @@
                                     </div>
                                 </template>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="flex overflow-x-auto gap-4 pb-6 snap-x hide-scrollbar"
+                                    style="scrollbar-width: thin;" x-ref="slider"
+                                    @mousedown="isDown = true; startX = $event.pageX - $refs.slider.offsetLeft; scrollLeft = $refs.slider.scrollLeft; $refs.slider.classList.add('cursor-grabbing')"
+                                    @mouseleave="isDown = false; $refs.slider.classList.remove('cursor-grabbing')"
+                                    @mouseup="isDown = false; $refs.slider.classList.remove('cursor-grabbing')"
+                                    @mousemove="if(!isDown) return; $event.preventDefault(); const x = $event.pageX - $refs.slider.offsetLeft; const walk = (x - startX) * 2; $refs.slider.scrollLeft = scrollLeft - walk;">
                                     <template x-for="kamar in kos.kamars" :key="kamar.id">
+                                        <!-- Room Card -->
                                         <div x-data="{ showDetail: false }"
-                                            class="border border-gray-100 rounded-xl p-4 hover:border-[#36B2B2]/30 hover:shadow-sm transition-all duration-300 group">
-                                            <div class="flex items-center justify-between mb-2">
-                                                <span class="text-base font-black text-gray-900">Kamar <span
-                                                        x-text="kamar.nomor_kamar"></span></span>
-                                                <span
-                                                    class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-600">Tersedia</span>
-                                            </div>
-                                            <p class="text-lg font-bold text-[#36B2B2] mb-3">
-                                                Rp <span x-text="Number(kamar.harga).toLocaleString('id-ID')"></span>
-                                                <span class="text-xs text-gray-500 font-normal">/bln</span>
-                                            </p>
-
-                                            <!-- Detail Fasilitas Toggle -->
-                                            <template x-if="kamar.fasilitas && kamar.fasilitas.length > 0">
-                                                <div class="mb-3">
-                                                    <button @click="showDetail = !showDetail" type="button"
-                                                        class="flex items-center gap-1.5 text-xs font-bold text-[#36B2B2] hover:text-[#2b8f8f] transition-colors">
-                                                        <svg class="w-4 h-4 transition-transform duration-200"
-                                                            :class="showDetail ? 'rotate-180' : ''" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                                        </svg>
-                                                        <span
-                                                            x-text="showDetail ? 'Sembunyikan Fasilitas' : 'Lihat Fasilitas (' + kamar.fasilitas.length + ')'"></span>
-                                                    </button>
-                                                    <div x-show="showDetail" x-transition.duration.200ms
-                                                        class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                                        <ul class="space-y-1.5">
-                                                            <template x-for="fas in kamar.fasilitas" :key="fas">
-                                                                <li class="flex items-center gap-2 text-xs text-gray-700">
-                                                                    <span
-                                                                        class="w-1.5 h-1.5 rounded-full bg-[#36B2B2] shrink-0"></span>
-                                                                    <span x-text="fas"></span>
-                                                                </li>
-                                                            </template>
-                                                        </ul>
-                                                    </div>
+                                            class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-gray-50/50 rounded-2xl p-4 border border-gray-100 hover:border-[#36B2B2]/30 hover:bg-white transition-all duration-300 group/room cursor-pointer">
+                                            <div class="flex flex-col gap-4">
+                                                <!-- Room Image -->
+                                                <div
+                                                    class="w-full h-32 rounded-xl overflow-hidden bg-white border border-gray-100 shrink-0 relative group-hover/room:shadow-md transition-all">
+                                                    <template x-if="kamar.foto">
+                                                        <img :src="kamar.foto.startsWith('http') ? kamar.foto : (kamar.foto.startsWith('/') ? kamar.foto : '/images/kamar/' + kamar.foto)"
+                                                            class="w-full h-full object-cover group-hover/room:scale-110 transition-transform duration-500">
+                                                    </template>
+                                                    <template x-if="!kamar.foto">
+                                                        <div
+                                                            class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
+                                                            <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="1.5"
+                                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                                </path>
+                                                            </svg>
+                                                            <span class="text-[8px] font-black uppercase tracking-widest">No
+                                                                Image</span>
+                                                        </div>
+                                                    </template>
                                                 </div>
-                                            </template>
 
-                                            <form method="POST" action="{{ route('user.order.store') }}">
-                                                @csrf
-                                                <input type="hidden" name="id_kamar" :value="kamar.id">
-                                                <input type="hidden" name="kode_kos" :value="kos.kode_kos">
-                                                <button type="submit"
-                                                    class="w-full py-2 bg-[#36B2B2] text-white font-bold text-sm rounded-xl hover:bg-[#2b8f8f] transition-all duration-300 shadow-sm hover:shadow-md active:scale-95">
-                                                    Order Kamar
-                                                </button>
-                                            </form>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span
+                                                            class="text-base font-black text-gray-900 group-hover/room:text-[#36B2B2] transition-colors truncate pr-2"
+                                                            x-text="'Kamar ' + kamar.nomor_kamar"></span>
+                                                        <span
+                                                            class="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-600">Tersedia</span>
+                                                    </div>
+
+                                                    <div class="text-right mb-3">
+                                                        <p
+                                                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">
+                                                            Per Bulan</p>
+                                                        <div class="flex items-baseline justify-end gap-1">
+                                                            <span class="text-xs font-black text-[#36B2B2]">Rp</span>
+                                                            <span class="text-xl font-black text-gray-900 tracking-tight"
+                                                                x-text="Number(kamar.harga).toLocaleString('id-ID')"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Detail Fasilitas Toggle -->
+                                                    <template x-if="kamar.fasilitas && kamar.fasilitas.length > 0">
+                                                        <div class="mb-4">
+                                                            <button @click="showDetail = !showDetail" type="button"
+                                                                class="flex items-center gap-1.5 text-xs font-bold text-[#36B2B2] hover:text-[#2b8f8f] transition-colors">
+                                                                <svg class="w-4 h-4 transition-transform duration-200"
+                                                                    :class="showDetail ? 'rotate-180' : ''" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                                </svg>
+                                                                <span
+                                                                    x-text="showDetail ? 'Sembunyikan Fasilitas' : 'Lihat Fasilitas (' + kamar.fasilitas.length + ')'"></span>
+                                                            </button>
+                                                            <div x-show="showDetail" x-transition.duration.200ms
+                                                                class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                                <ul class="space-y-1.5">
+                                                                    <template x-for="fas in kamar.fasilitas" :key="fas">
+                                                                        <li
+                                                                            class="flex items-center gap-2 text-xs text-gray-700">
+                                                                            <span
+                                                                                class="w-1.5 h-1.5 rounded-full bg-[#36B2B2] shrink-0"></span>
+                                                                            <span x-text="fas"></span>
+                                                                        </li>
+                                                                    </template>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    <button @mousedown.stop
+                                                        @click.stop="selectedKamar = kamar; selectedKos = kos; orderRoomNumber = ''; showOrderModal = true"
+                                                        class="w-full py-3 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#36B2B2] hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-[#36B2B2]/20 group/btn">
+                                                        <div class="flex items-center justify-center gap-2">
+                                                            <span>Order Kamar</span>
+                                                            <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform"
+                                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                                            </svg>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -476,61 +538,182 @@
             </template>
         </div>
 
+        <!-- Order Confirmation Modal -->
+        <div x-show="showOrderModal"
+            class="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
+
+            <!-- Modal Backdrop (Click to close) -->
+            <div class="absolute inset-0" @click="showOrderModal = false"></div>
+
+            <!-- Modal Content -->
+            <template x-if="selectedKamar">
+                <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl relative z-10 overflow-hidden"
+                    x-transition:enter="transition ease-out duration-300 transform"
+                    x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                    x-transition:leave="transition ease-in duration-200 transform"
+                    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+
+                    <!-- Header -->
+                    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                        <div>
+                            <h3 class="text-lg font-black text-gray-900 leading-tight">Konfirmasi Order</h3>
+                            <p class="text-xs font-medium text-gray-500 mt-1">Pastikan detail pesanan sudah benar</p>
+                        </div>
+                        <button @click="showOrderModal = false"
+                            class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-200 rounded-full">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('user.order.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="id_kamar" :value="selectedKamar.id">
+
+                        <!-- Body -->
+                        <div class="p-6">
+                            <!-- Room Info -->
+                            <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 mb-6">
+                                <div class="w-16 h-16 rounded-xl bg-white shrink-0 overflow-hidden shadow-sm">
+                                    <template x-if="selectedKamar.foto">
+                                        <img :src="selectedKamar.foto.startsWith('http') ? selectedKamar.foto : (selectedKamar.foto.startsWith('/') ? selectedKamar.foto : '/images/kamar/' + selectedKamar.foto)"
+                                            class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="!selectedKamar.foto">
+                                        <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-[#36B2B2] mb-1"
+                                        x-text="'Kos ' + selectedKos.nama_kos"></p>
+                                    <h4 class="text-base font-black text-gray-900"
+                                        x-text="'Kamar ' + selectedKamar.nomor_kamar"></h4>
+                                    <p class="text-sm font-bold text-gray-600 mt-1"
+                                        x-text="'Rp ' + Number(selectedKamar.harga).toLocaleString('id-ID') + ' / bulan'"></p>
+                                </div>
+                            </div>
+
+                            <!-- Security Input: Confirm Room Number -->
+                            <div class="mb-5">
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                    Konfirmasi Nomor Kamar <span class="text-rose-500">*</span>
+                                </label>
+                                <p class="text-[10px] font-medium text-gray-500 mb-2">Ketik <span
+                                        class="font-black text-gray-800" x-text="selectedKamar.nomor_kamar"></span> di bawah
+                                    untuk melanjutkan.</p>
+                                <input type="text" x-model="orderRoomNumber" required placeholder="Masukkan nomor kamar"
+                                    class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
+
+                                <template x-if="orderRoomNumber !== '' && orderRoomNumber !== selectedKamar.nomor_kamar">
+                                    <p class="text-[10px] font-bold text-rose-500 mt-2 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Nomor kamar tidak sesuai.
+                                    </p>
+                                </template>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div>
+                                <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                    Pesan / Catatan Tambahan (Opsional)
+                                </label>
+                                <textarea name="catatan" x-model="orderNote" rows="2"
+                                    placeholder="Ada request khusus atau informasi lainnya?"
+                                    class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-medium text-gray-800 resize-none"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+                            <button type="button" @click="showOrderModal = false"
+                                class="flex-1 px-4 py-3 bg-white text-gray-600 font-bold rounded-xl border border-gray-200 hover:bg-gray-50 hover:text-gray-800 transition-colors">Batal</button>
+                            <button type="submit" :disabled="orderRoomNumber !== selectedKamar.nomor_kamar"
+                                :class="orderRoomNumber === selectedKamar.nomor_kamar ? 'bg-[#36B2B2] hover:bg-[#2b8f8f] hover:-translate-y-0.5 shadow-lg hover:shadow-[#36B2B2]/30 cursor-pointer' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+                                class="flex-[1.5] px-4 py-3 text-white font-black rounded-xl transition-all">
+                                Ajukan Pesanan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </template>
+        </div>
+
         <script>
-                    function kosSearch() {
-                        return {
-                            filters: {
-                                lokasi: '',
-                                harga: '',
-                                kategori: '',
-                            },
-                            loading: false,
-                            error: null,
-                            kosList: [],
-                            resetFilters() {
-                                this.filters = { lokasi: '', harga: '', kategori: '' };
-                                this.kosList = [];
-                                this.error = null;
-                            },
-                            async search() {
-                                this.loading = true;
-                                this.error = null;
-                                this.kosList = [];
+            function kosSearch() {
+                return {
+                    filters: {
+                        lokasi: '',
+                        harga: '',
+                        kategori: '',
+                    },
+                    loading: false,
+                    error: null,
+                    kosList: [],
+                    showOrderModal: false,
+                    selectedKamar: null,
+                    selectedKos: null,
+                    orderNote: '',
+                    orderRoomNumber: '',
+                    resetFilters() {
+                        this.filters = { lokasi: '', harga: '', kategori: '' };
+                        this.kosList = [];
+                        this.error = null;
+                    },
+                    async search() {
+                        this.loading = true;
+                        this.error = null;
+                        this.kosList = [];
 
-                                // Build filter payload (only send non-empty values)
-                                const payload = {};
-                                if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
-                                if (this.filters.harga) payload.harga = this.filters.harga;
-                                if (this.filters.kategori) payload.kategori = this.filters.kategori;
+                        // Build filter payload (only send non-empty values)
+                        const payload = {};
+                        if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
+                        if (this.filters.harga) payload.harga = this.filters.harga;
+                        if (this.filters.kategori) payload.kategori = this.filters.kategori;
 
-                                try {
-                                    const res = await fetch('{{ route("user.order.search") }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Accept': 'application/json',
-                                        },
-                                        body: JSON.stringify(payload),
-                                    });
-                                    const data = await res.json();
-                                    if (data.success) {
-                                        // Add _expanded property for accordion
-                                        this.kosList = data.data.map((kos, i) => ({
-                                            ...kos,
-                                            _expanded: i === 0, // auto-expand first result
-                                        }));
-                                    } else {
-                                        this.error = data.message || 'Tidak ditemukan.';
-                                    }
-                                } catch (e) {
-                                    this.error = 'Terjadi kesalahan. Silakan coba lagi.';
-                                } finally {
-                                    this.loading = false;
-                                }
+                        try {
+                            const res = await fetch('{{ route("user.order.search") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify(payload),
+                            });
+                            const data = await res.json();
+                            if (data.success) {
+                                // Add _expanded property for accordion
+                                this.kosList = data.data.map((kos, i) => ({
+                                    ...kos,
+                                    _expanded: i === 0, // auto-expand first result
+                                }));
+                            } else {
+                                this.error = data.message || 'Tidak ditemukan.';
                             }
+                        } catch (e) {
+                            this.error = 'Terjadi kesalahan. Silakan coba lagi.';
+                        } finally {
+                            this.loading = false;
                         }
                     }
+                }
+            }
         </script>
     @endif
 

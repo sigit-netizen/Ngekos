@@ -110,6 +110,87 @@
 
                 {{-- 1. Order Kamar --}}
                 <div x-show="activeTab === 'order'">
+                    
+                    {{-- Section 1: Pendaftaran Akun Baru (PendingUser) --}}
+                    @if(isset($pendingPenyewa) && count($pendingPenyewa) > 0)
+                    <div class="px-8 py-5 bg-amber-50/50 border-b border-amber-100/50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-black text-amber-900 leading-none">Pendaftaran Akun Baru</h4>
+                                <p class="text-[10px] text-amber-600 font-bold uppercase tracking-wider mt-1">User mendaftar menggunakan Kode Kos Anda</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-200">{{ count($pendingPenyewa) }} Menunggu</span>
+                    </div>
+                    <div class="overflow-x-auto mb-8">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead>
+                                <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
+                                    <th class="px-8 py-5">Calon Penyewa</th>
+                                    <th class="px-8 py-5">WhatsApp</th>
+                                    <th class="px-8 py-5">Alamat</th>
+                                    <th class="px-8 py-5">Tanggal Daftar</th>
+                                    <th class="px-8 py-5 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @foreach($pendingPenyewa as $pending)
+                                    <tr class="group hover:bg-amber-50/30 transition-colors border-l-4 border-transparent hover:border-amber-400">
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-black text-sm">{{ substr($pending->name, 0, 1) }}</div>
+                                                <div>
+                                                    <div class="font-bold text-gray-900">{{ $pending->name }}</div>
+                                                    <div class="text-[10px] text-gray-400 font-medium">{{ $pending->email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6"><span class="font-bold text-gray-700 text-sm">{{ $pending->nomor_wa }}</span></td>
+                                        <td class="px-8 py-6"><span class="text-xs font-medium text-gray-500 max-w-[150px] truncate block">{{ $pending->alamat ?? '-' }}</span></td>
+                                        <td class="px-8 py-6"><span class="text-xs font-bold text-gray-500">{{ $pending->created_at->format('d M Y') }}</span></td>
+                                        <td class="px-8 py-6 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <form method="POST" action="{{ route('admin.penyewa.verify', $pending->id) }}" onsubmit="return confirm('Terima pendaftaran ini? User akan otomatis aktif sebagai penyewa di kos Anda.')">
+                                                    @csrf
+                                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-black bg-amber-500 text-white hover:bg-amber-600 transition-all shadow-sm">
+                                                        ✓ Terima
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('admin.penyewa.reject', $pending->id) }}" onsubmit="return confirm('Tolak pendaftaran ini?')">
+                                                    @csrf
+                                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-black bg-gray-200 text-gray-600 hover:bg-gray-300 transition-all">
+                                                        ✗ Tolak
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @endif
+
+                    {{-- Section 2: Order Kamar (Transaksi) --}}
+                    <div class="px-8 py-5 bg-blue-50/50 border-y border-blue-100/50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-black text-blue-900 leading-none">Order Kamar</h4>
+                                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider mt-1">User memesan kamar tertentu melalui aplikasi</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-200">{{ count($orderTransaksi ?? []) }} Order</span>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left whitespace-nowrap">
                             <thead>

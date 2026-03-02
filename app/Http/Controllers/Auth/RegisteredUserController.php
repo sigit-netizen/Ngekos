@@ -42,9 +42,8 @@ class RegisteredUserController extends Controller
             'plan_type' => ['nullable', 'string', 'required_if:id_plans,2'],
             'package_type' => ['nullable', 'string', 'required_if:plan_type,premium'],
             'jumlah_kamar' => ['nullable', 'integer', 'min:1'],
-            'kode_kos' => ['nullable', 'required_if:id_plans,1', 'numeric', 'exists:kos,kode_kos'],
+            'kode_kos' => ['nullable', 'numeric', 'exists:kos,kode_kos'],
         ], [
-            'kode_kos.required_if' => 'Kode kos wajib diisi untuk pendaftaran anak kos.',
             'kode_kos.exists' => 'Kode kos tidak ditemukan. Pastikan kode kos yang Anda masukkan benar.',
         ]);
 

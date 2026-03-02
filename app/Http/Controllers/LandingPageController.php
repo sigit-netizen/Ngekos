@@ -34,6 +34,13 @@ class LandingPageController extends Controller
             ['name' => 'Mas Andi', 'role' => '50+ Kamar di Malang', 'text' => 'Harga terjangkau, fitur lengkap. Dulu pakai aplikasi lain kena charge per kamar, bisa jutaan sebulan.', 'avatar' => '6']
         ];
 
-        return view('welcome', compact('pricing', 'testimonials'));
+        // Fetch real kos for recommendations
+        $highlightKos = \App\Models\Kos::with(['kamars'])
+            ->has('kamars')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('welcome', compact('pricing', 'testimonials', 'highlightKos'));
     }
 }

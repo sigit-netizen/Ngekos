@@ -26,6 +26,10 @@ class ProfileController extends Controller
             'nik' => 'nullable|string|max:20',
             'nomor_wa' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
+            'instagram' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'youtube' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
@@ -34,6 +38,10 @@ class ProfileController extends Controller
         $user->nik = $request->nik;
         $user->nomor_wa = $request->nomor_wa;
         $user->alamat = $request->alamat;
+        $user->instagram = $request->instagram;
+        $user->twitter = $request->twitter;
+        $user->youtube = $request->youtube;
+        $user->tiktok = $request->tiktok;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

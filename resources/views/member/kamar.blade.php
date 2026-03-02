@@ -2,90 +2,94 @@
 
 @section('dashboard-content')
     <div x-data="{ 
-                        showAddModal: false, 
-                        showEditModal: false,
-                        showFasilitasModal: false,
-                        activeKamar: null,
-                        search: '',
-                        filterStatus: 'all',
-                        formData: {
-                            nomor_kamar: '',
-                            harga: '',
-                            fasilitas: ['']
-                        },
-                        editFormData: {
-                            nomor_kamar: '',
-                            harga: ''
-                        },
-                        fasilitasData: {
-                            items: []
-                        },
-                        formatCurrency(value) {
-                            if (!value) return '';
-                            let val = value.toString().replace(/\D/g, '');
-                            return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                        },
-                        updateHarga(e, target) {
-                            let rawValue = e.target.value.replace(/\D/g, '');
-                            this[target].harga = this.formatCurrency(rawValue);
-                        },
-                        openEditModal(kamar) {
-                            this.activeKamar = kamar;
-                            this.editFormData = {
-                                nomor_kamar: kamar.nomor_kamar,
-                                harga: this.formatCurrency(Math.round(kamar.harga))
-                            };
-                            this.showEditModal = true;
-                        },
-                        openFasilitasModal(kamar) {
-                            this.activeKamar = kamar;
-                            this.fasilitasData.items = kamar.fasilitas.length > 0 
-                                ? kamar.fasilitas.map(f => f.nama_fasilitas) 
-                                : [''];
-                            this.showFasilitasModal = true;
-                        },
-                        addFasilitasRow() {
-                            this.fasilitasData.items.push('');
-                        },
-                        removeFasilitasRow(index) {
-                            this.fasilitasData.items.splice(index, 1);
-                            if (this.fasilitasData.items.length === 0) {
-                                this.fasilitasData.items.push('');
-                            }
-                        },
-                        addFasilitasRowNew() {
-                            this.formData.fasilitas.push('');
-                        },
-                        removeFasilitasRowNew(index) {
-                            this.formData.fasilitas.splice(index, 1);
-                            if (this.formData.fasilitas.length === 0) {
-                                this.formData.fasilitas.push('');
-                            }
-                        },
-                        currentPage: 1,
-                        itemsPerPage: 10,
-                        get filteredKamars() {
-                            if (!window.existingKamars) return [];
-                            return window.existingKamars.filter(kamar => {
-                                const matchSearch = this.search === '' || 
-                                                   kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
-                                const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
+                                                    showAddModal: false,
+                                                    showEditModal: false,
+                                                    showFasilitasModal: false,
+                                                    activeKamar: null,
+                                                    search: '',
+                                                    filterStatus: 'all',
+                                                    formData: {
+                                                        nomor_kamar: '',
+                                                        harga: '',
+                                                        foto: '',
+                                                        fasilitas: ['']
+                                                    },
+                                                    editFormData: {
+                                                        nomor_kamar: '',
+                                                        harga: '',
+                                                        foto: ''
+                                                    },
+                                                    fasilitasData: {
+                                                        items: []
+                                                    },
+                                                    formatCurrency(value) {
+                                                        if (!value) return '';
+                                                        let val = value.toString().replace(/\D/g, '');
+                                                        return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                                    },
+                                                    updateHarga(e, target) {
+                                                        let rawValue = e.target.value.replace(/\D/g, '');
+                                                        this[target].harga = this.formatCurrency(rawValue);
+                                                    },
+                                                    openEditModal(kamar) {
+                                                        this.activeKamar = kamar;
+                                                        this.editFormData = {
+                                                            nomor_kamar: kamar.nomor_kamar,
+                                                            harga: this.formatCurrency(Math.round(kamar.harga)),
+                                                            foto: kamar.foto || ''
+                                                        };
+                                                        this.showEditModal = true;
+                                                    },
+                                                    openFasilitasModal(kamar) {
+                                                        this.activeKamar = kamar;
+                                                        this.fasilitasData.items = kamar.fasilitas.length > 0
+                                                            ? kamar.fasilitas.map(f => f.nama_fasilitas)
+                                                            : [''];
+                                                        this.showFasilitasModal = true;
+                                                    },
+                                                    addFasilitasRow() {
+                                                        this.fasilitasData.items.push('');
+                                                    },
+                                                    removeFasilitasRow(index) {
+                                                        this.fasilitasData.items.splice(index, 1);
+                                                        if (this.fasilitasData.items.length === 0) {
+                                                            this.fasilitasData.items.push('');
+                                                        }
+                                                    },
+                                                    addFasilitasRowNew() {
+                                                        this.formData.fasilitas.push('');
+                                                    },
+                                                    removeFasilitasRowNew(index) {
+                                                        this.formData.fasilitas.splice(index, 1);
+                                                        if (this.formData.fasilitas.length === 0) {
+                                                            this.formData.fasilitas.push('');
+                                                        }
+                                                    },
+                                                    currentPage: 1,
+                                                    itemsPerPage: 10,
+                                                    get filteredKamars() {
+                                                        if (!window.existingKamars) return [];
+                                                        return window.existingKamars.filter(kamar => {
+                                                            const matchSearch = this.search === '' ||
+                                                                               kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
+                                                            const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
 
-                                return matchSearch && matchStatus;
-                            });
-                        },
-                        get pagedKamars() {
-                            const start = (this.currentPage - 1) * this.itemsPerPage;
-                            return this.filteredKamars.slice(start, start + this.itemsPerPage);
-                        },
-                        get totalPages() {
-                            return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
-                        },
-                        get isNomorKamarDuplicate() {
-                            if (!this.formData.nomor_kamar) return false;
-                            return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
-                        }
-                    }" x-init="$watch('search', () => currentPage = 1); $watch('filterStatus', () => currentPage = 1);"
+                                                            return matchSearch && matchStatus;
+                                                        });
+                                                    },
+                                                    get pagedKamars() {
+                                                        const start = (this.currentPage - 1) * this.itemsPerPage;
+                                                        return this.filteredKamars.slice(start, start + this.itemsPerPage);
+                                                    },
+                                                    get totalPages() {
+                                                        return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
+                                                    },
+                                                    get isNomorKamarDuplicate() {
+                                                        if (!this.formData.nomor_kamar) return false;
+                                                        return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
+                                                    }
+                                                }"
+        x-init="$watch('search', () => currentPage = 1); $watch('filterStatus', () => currentPage = 1);"
         class="pb-12 text-gray-800">
 
         <!-- Header Section -->
@@ -215,27 +219,27 @@
                     </div>
 
                     <!-- Status Filter Chips -->
-                    <div class="flex bg-gray-100/50 p-1.5 rounded-3xl items-center border border-gray-100">
+                    <div class="flex bg-gray-200/50 p-1.5 rounded-3xl items-center border border-gray-200 shadow-sm">
                         <button @click="filterStatus = 'all'"
-                            :class="filterStatus === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'"
+                            :class="filterStatus === 'all' ? 'bg-white text-gray-900 shadow-md' : 'text-gray-500 hover:text-gray-700'"
                             class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">Semua</button>
                         <button @click="filterStatus = 'tersedia'"
-                            :class="filterStatus === 'tersedia' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-gray-400 hover:text-emerald-600'"
+                            :class="filterStatus === 'tersedia' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'text-gray-500 hover:text-emerald-600'"
                             class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">Kosong</button>
-                        <button @click="filterStatus = 'disewa'"
-                            :class="filterStatus === 'disewa' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'text-gray-400 hover:text-rose-600'"
-                            class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">Disewa</button>
+                        <button @click="filterStatus = 'terisi'"
+                            :class="filterStatus === 'terisi' ? 'bg-red-500 text-white shadow-lg shadow-rose-500/30' : 'text-gray-500 hover:text-red-600'"
+                            class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">Terisi</button>
                     </div>
                 </div>
                 <div @click="filterStatus = 'tersedia'"
-                    class="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 flex items-center justify-between cursor-pointer hover:scale-[1.02] transition-transform">
+                    class="bg-emerald-100/40 border-2 border-emerald-200/60 rounded-3xl p-5 flex items-center justify-between cursor-pointer hover:scale-[1.02] transition-transform shadow-sm hover:shadow-emerald-100">
                     <div>
-                        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Kosong</p>
+                        <p class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">Kosong</p>
                         <p class="text-2xl font-black text-emerald-900 leading-none">
                             {{ $kamars->where('status', 'tersedia')->count() }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                    <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -243,14 +247,14 @@
                     </div>
                 </div>
                 <div @click="filterStatus = 'terisi'"
-                    class="bg-rose-50 border border-rose-100 rounded-3xl p-5 flex items-center justify-between cursor-pointer hover:scale-[1.02] transition-transform">
+                    class="bg-rose-100/40 border-2 border-rose-200/60 rounded-3xl p-5 flex items-center justify-between cursor-pointer hover:scale-[1.02] transition-transform shadow-sm hover:shadow-rose-100">
                     <div>
-                        <p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">Terisi</p>
+                        <p class="text-[10px] font-black text-rose-700 uppercase tracking-widest mb-1">Terisi</p>
                         <p class="text-2xl font-black text-rose-900 leading-none">
-                            {{ $kamars->where('status', 'disewa')->count() }}
+                            {{ $kamars->where('status', 'terisi')->count() }}
                         </p>
                     </div>
-                    <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-500">
+                    <div class="w-10 h-10 bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -294,6 +298,23 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-6">
+                                        <div
+                                            class="w-16 h-16 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center">
+                                            <template x-if="kamar.foto">
+                                                <img :src="kamar.foto.startsWith('http') ? kamar.foto : (kamar.foto.startsWith('/') ? kamar.foto : '/images/kamar/' + kamar.foto)"
+                                                    class="w-full h-full object-cover">
+                                            </template>
+                                            <template x-if="!kamar.foto">
+                                                <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
                                         <div class="flex items-baseline gap-1">
                                             <span class="text-[10px] font-black text-gray-400">Rp</span>
                                             <span class="text-lg font-black text-gray-900 tracking-tight"
@@ -333,9 +354,9 @@
                                                 <span
                                                     class="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">Kosong</span>
                                             </template>
-                                            <template x-if="kamar.status === 'disewa'">
+                                            <template x-if="kamar.status === 'terisi'">
                                                 <span
-                                                    class="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-rose-100">Disewa</span>
+                                                    class="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-rose-100">Terisi</span>
                                             </template>
                                         </div>
                                     </td>
@@ -453,6 +474,16 @@
                         </div>
 
                         <div>
+                            <label
+                                class="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Nama
+                                File Foto (Opsional)</label>
+                            <input type="text" name="foto" x-model="formData.foto" placeholder="Misal: room1.png"
+                                class="w-full px-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-[#36B2B2] outline-none transition-all font-bold text-gray-800">
+                            <p class="text-[9px] text-gray-400 mt-2 ml-1 italic font-medium uppercase tracking-tight">
+                                *Simpan file di folder public/images/kamar/</p>
+                        </div>
+
+                        <div>
                             <div class="flex items-center justify-between mb-3 ml-1">
                                 <label class="text-[11px] font-black uppercase tracking-widest text-gray-400">Daftar
                                     Fasilitas</label>
@@ -533,6 +564,17 @@
                                 @input="updateHarga($event, 'editFormData')" required
                                 class="w-full px-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-indigo-600 outline-none transition-all font-black text-gray-800 text-lg">
                         </div>
+
+                        <div>
+                            <label
+                                class="block text-[11px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Nama
+                                File Foto (Opsional)</label>
+                            <input type="text" name="foto" x-model="editFormData.foto" placeholder="Misal: room1.png"
+                                class="w-full px-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-indigo-600 outline-none transition-all font-bold text-gray-800">
+                            <p class="text-[9px] text-gray-400 mt-2 ml-1 italic font-medium uppercase tracking-tight">
+                                *Kosongkan jika tidak ingin mengubah foto</p>
+                        </div>
+
 
                         <div class="pt-2 flex gap-3">
                             <button type="button" @click="showEditModal = false"

@@ -142,7 +142,7 @@
                 <div class="hidden md:flex items-center justify-end w-56 gap-3" style="gap: 0.75rem;">
                     <a href="{{ route('login') }}"
                         class="inline-flex justify-center items-center px-6 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] transition">Masuk</a>
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full text-white bg-[#36B2B2] hover:bg-[#2b8f8f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#36B2B2] shadow-sm transition whitespace-nowrap">Coba
                         Gratis</a>
                 </div>
@@ -186,7 +186,7 @@
                     <a href="{{ route('login') }}"
                         class="w-full text-center px-4 py-3 rounded-xl text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 transition">Login</a>
                     @if (Route::has('register'))
-                        <a href="{{ route('register') }}"
+                        <a href="{{ route('login') }}"
                             class="w-full text-center px-4 py-3 rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white font-semibold hover:shadow-lg transition">Daftar
                             Sekarang</a>
                     @endif
@@ -228,7 +228,7 @@
                     </p>
 
                     <!-- Search & Recommendations Widget -->
-                    <div
+                    <div x-data="kosSearch()"
                         class="bg-white rounded-[2rem] shadow-2xl shadow-gray-200/60 border border-gray-100 mb-12 overflow-hidden relative z-20 flex flex-col w-screen -mx-4 xs:w-full xs:mx-0 max-w-4xl mx-auto transform hover:scale-[1.005] transition-transform duration-500">
 
                         <!-- Top Search Bar -->
@@ -243,27 +243,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <input type="text" placeholder="Ketik lokasi atau nama kos..."
+                                <input type="text" x-model="filters.lokasi" placeholder="Ketik lokasi atau nama kos..."
                                     class="bg-transparent w-full text-sm outline-none text-gray-700 placeholder-gray-400">
                             </div>
 
                             <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto flex-1">
                                 <!-- Modern Type Selector (Alpine.js) -->
-                                <div class="flex-1 relative" x-data="{ 
-                                    open: false, 
-                                    selected: '', 
-                                    label: 'Tipe Kos',
-                                    options: [
-                                        { value: 'putra', label: 'Putra' },
-                                        { value: 'putri', label: 'Putri' },
-                                        { value: 'campur', label: 'Campur' }
-                                    ],
-                                    select(opt) {
-                                        this.selected = opt.value;
-                                        this.label = opt.label;
-                                        this.open = false;
-                                    }
-                                }">
+                                <div class="flex-1 relative" x-data="{ open: false }">
                                     <button @click="open = !open" type="button"
                                         class="w-full flex items-center bg-gray-50 rounded-xl px-4 py-3.5 border focus:ring-2 focus:ring-[#36B2B2]/50 focus:border-[#36B2B2] transition border-transparent group">
                                         <svg class="w-5 h-5 text-gray-400 group-focus:text-[#36B2B2] mr-2.5 shrink-0 transition-colors"
@@ -271,7 +257,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                         </svg>
-                                        <span class="text-sm text-gray-700" x-text="label"></span>
+                                        <span class="text-sm text-gray-700"
+                                            x-text="filters.kategori_label || 'Tipe Kos'"></span>
                                         <svg class="ml-auto w-4 h-4 text-gray-400 transition-transform duration-300"
                                             :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -279,7 +266,6 @@
                                                 d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
-                                    <input type="hidden" name="type" x-model="selected">
 
                                     <!-- Dropdown Menu -->
                                     <div x-show="open" @click.away="open = false"
@@ -291,12 +277,15 @@
                                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
                                         class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden"
                                         style="display: none;">
-                                        <template x-for="opt in options" :key="opt.value">
-                                            <button @click="select(opt)" type="button"
+                                        <template x-for="opt in options.kategori" :key="opt.value">
+                                            <button
+                                                @click="filters.kategori = opt.value; filters.kategori_label = opt.label; open = false"
+                                                type="button"
                                                 class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#36B2B2]/5 hover:text-[#36B2B2] transition-colors flex items-center justify-between">
                                                 <span x-text="opt.label"></span>
-                                                <svg x-show="selected === opt.value" class="w-4 h-4 text-[#36B2B2]"
-                                                    fill="currentColor" viewBox="0 0 20 20">
+                                                <svg x-show="filters.kategori === opt.value"
+                                                    class="w-4 h-4 text-[#36B2B2]" fill="currentColor"
+                                                    viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                                                         clip-rule="evenodd" />
@@ -307,22 +296,7 @@
                                 </div>
 
                                 <!-- Modern Price Selector (Alpine.js) -->
-                                <div class="flex-1 relative" x-data="{ 
-                                    open: false, 
-                                    selected: '', 
-                                    label: 'Rentang Harga',
-                                    options: [
-                                        { value: '500k', label: '< 500rb' },
-                                        { value: '500k-1m', label: '500rb - 1Jt' },
-                                        { value: '1m-2m', label: '1Jt - 2Jt' },
-                                        { value: '2m', label: '> 2Jt' }
-                                    ],
-                                    select(opt) {
-                                        this.selected = opt.value;
-                                        this.label = opt.label;
-                                        this.open = false;
-                                    }
-                                }">
+                                <div class="flex-1 relative" x-data="{ open: false }">
                                     <button @click="open = !open" type="button"
                                         class="w-full flex items-center bg-gray-50 rounded-xl px-4 py-3.5 border focus:ring-2 focus:ring-[#36B2B2]/50 focus:border-[#36B2B2] transition border-transparent group">
                                         <svg class="w-5 h-5 text-gray-400 group-focus:text-[#36B2B2] mr-2.5 shrink-0 transition-colors"
@@ -330,7 +304,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <span class="text-sm text-gray-700" x-text="label"></span>
+                                        <span class="text-sm text-gray-700"
+                                            x-text="filters.harga_label || 'Rentang Harga'"></span>
                                         <svg class="ml-auto w-4 h-4 text-gray-400 transition-transform duration-300"
                                             :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -338,7 +313,6 @@
                                                 d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
-                                    <input type="hidden" name="price" x-model="selected">
 
                                     <!-- Dropdown Menu -->
                                     <div x-show="open" @click.away="open = false"
@@ -350,11 +324,13 @@
                                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
                                         class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden"
                                         style="display: none;">
-                                        <template x-for="opt in options" :key="opt.value">
-                                            <button @click="select(opt)" type="button"
+                                        <template x-for="opt in options.harga" :key="opt.value">
+                                            <button
+                                                @click="filters.harga = opt.value; filters.harga_label = opt.label; open = false"
+                                                type="button"
                                                 class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#36B2B2]/5 hover:text-[#36B2B2] transition-colors flex items-center justify-between">
                                                 <span x-text="opt.label"></span>
-                                                <svg x-show="selected === opt.value" class="w-4 h-4 text-[#36B2B2]"
+                                                <svg x-show="filters.harga === opt.value" class="w-4 h-4 text-[#36B2B2]"
                                                     fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd"
                                                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -367,19 +343,92 @@
                             </div>
 
                             <!-- Search Button -->
-                            <button
-                                class="w-full lg:w-48 bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-[#36b2b2]/40 hover:-translate-y-0.5 transition-all text-sm whitespace-nowrap flex items-center justify-center gap-2 group/btn">
-                                <svg class="w-5 h-5 group-hover/btn:scale-110 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                            <button @click="search()" :disabled="loading"
+                                class="w-full lg:w-48 bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] text-white px-8 py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-[#36b2b2]/40 hover:-translate-y-0.5 transition-all text-sm whitespace-nowrap flex items-center justify-center gap-2 group/btn disabled:opacity-50">
+                                <svg x-show="!loading" class="w-5 h-5 group-hover/btn:scale-110 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                                <span>Cari Sekarang</span>
+                                <svg x-show="loading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                <span x-text="loading ? 'Mencari...' : 'Cari Sekarang'"></span>
                             </button>
                         </div>
 
+                        <!-- Search Results Section -->
+                        <div x-show="kosList.length > 0" x-transition
+                            class="px-5 py-6 bg-gray-50/50 border-b border-gray-100">
+                            <h3 class="text-sm font-black text-gray-900 mb-4 flex items-center gap-2">
+                                <span class="w-2 h-5 bg-[#36B2B2] rounded-full"></span>
+                                Hasil Pencarian
+                            </h3>
+                            <div class="flex gap-4 overflow-x-auto pb-4 -mx-5 px-5 custom-scrollbar-x relative select-none"
+                                 x-data="{
+                                     isDown: false,
+                                     startX: 0,
+                                     scrollLeft: 0,
+                                     startDrag(e) {
+                                         this.isDown = true;
+                                         this.$el.classList.add('cursor-grabbing');
+                                         this.startX = e.pageX - this.$el.offsetLeft;
+                                         this.scrollLeft = this.$el.scrollLeft;
+                                     },
+                                     stopDrag() {
+                                         this.isDown = false;
+                                         this.$el.classList.remove('cursor-grabbing');
+                                     },
+                                     doDrag(e) {
+                                         if(!this.isDown) return;
+                                         e.preventDefault();
+                                         const x = e.pageX - this.$el.offsetLeft;
+                                         const walk = (x - this.startX) * 2;
+                                         this.$el.scrollLeft = this.scrollLeft - walk;
+                                     }
+                                 }" x-on:mousedown="startDrag($event)" x-on:mouseleave="stopDrag()"
+                                 x-on:mouseup="stopDrag()" x-on:mousemove="doDrag($event)">
+                                <template x-for="kos in kosList" :key="kos.id">
+                                    <div class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col h-full snap-start">
+                                        <div class="relative w-full overflow-hidden aspect-[4/3]">
+                                            <img :src="kos.foto ? '/images/kos/' + kos.foto : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'"
+                                                :alt="kos.nama_kos"
+                                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                            <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-black text-[#36B2B2] shadow-sm uppercase tracking-wide z-10"
+                                                x-text="kos.kategori">
+                                            </div>
+                                        </div>
+                                        <div class="p-4 flex flex-col flex-grow">
+                                            <h4 class="font-bold text-gray-900 group-hover:text-[#36B2B2] transition-colors mb-1 text-sm truncate"
+                                                x-text="kos.nama_kos"></h4>
+                                            <p class="text-[10px] text-gray-500 mb-4 flex items-center gap-1">
+                                                <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                </svg>
+                                                <span x-text="kos.alamat" class="truncate"></span>
+                                            </p>
+                                            <div class="mt-auto flex items-center justify-between">
+                                                <span class="text-xs font-bold text-[#36B2B2]"
+                                                    x-text="kos.kamars.length + ' Kamar tersedia'"></span>
+                                                <a :href="'{{ route('login') }}?kode_kos=' + kos.kode_kos"
+                                                    class="text-[10px] font-black text-white bg-[#36B2B2] px-3 py-1.5 rounded-lg hover:bg-[#2b8f8f] transition-all">Lihat Detail</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- No Results / Error Message -->
+                        <div x-show="error" x-transition
+                            class="px-5 py-4 bg-red-50 text-red-600 text-xs font-bold text-center border-b border-red-100"
+                            x-text="error"></div>
+
                         <!-- Bottom Recommendations (Horizontal Scroll) -->
-                        <div class="px-5 pt-4 pb-5 bg-white relative">
+                        <div class="px-5 pt-4 pb-5 bg-white relative" x-show="kosList.length === 0" x-transition>
                             <div class="flex items-center justify-between mb-4">
                                 <h3
                                     class="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
@@ -439,251 +488,79 @@
                                     }
                                 </style>
 
-                                <!-- Card 1 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-[#36B2B2] shadow-sm uppercase tracking-wide">
-                                            Putri</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.8
-                                        </div>
+                                @forelse($highlightKos ?? [] as $index => $kos)
+                                    @php
+                                        $images = [
+                                            'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                            'https://images.unsplash.com/photo-1598928506311-c55dd10a5682?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                            'https://images.unsplash.com/photo-1595521634842-7db518da0b16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                            'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                            'https://images.unsplash.com/photo-1554995207-c18c20360a59?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                            'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                                        ];
+                                        $minHarga = $kos->kamars->min('harga');
+                                    @endphp
+                                    <div class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden snap-start flex flex-col h-full">
+                                         <div class="relative w-full overflow-hidden aspect-[4/3]">
+                                             <img src="{{ $kos->foto ? asset('images/kos/' . $kos->foto) : $images[$index % count($images)] }}" alt="{{ $kos->nama_kos }}"
+                                                 draggable="false"
+                                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
+                                             <div
+                                                 class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-bold text-[#36B2B2] shadow-sm uppercase tracking-wide z-10">
+                                                 {{ ucfirst($kos->kategori) }}
+                                             </div>
+                                             <div
+                                                 class="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1 z-10">
+                                                 <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
+                                                     viewBox="0 0 20 20">
+                                                     <path
+                                                         d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                 </svg>
+                                                 4.{{ rand(5, 9) }}
+                                             </div>
+                                         </div>
+                                         <div class="p-4 flex flex-col flex-grow">
+                                             <h4
+                                                 class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
+                                                 {{ $kos->nama_kos }}
+                                             </h4>
+                                             <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-4">
+                                                 <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                 </svg>
+                                                 <span class="truncate">{{ $kos->alamat }}</span>
+                                             </p>
+                                             <div class="mt-auto flex items-center justify-between">
+                                                 <div class="text-[#36B2B2] font-extrabold text-sm">
+                                                     @if($minHarga)
+                                                         Rp {{ number_format($minHarga / 1000, 0) }}rb<span
+                                                             class="text-[9px] text-gray-400 font-normal">/bln</span>
+                                                     @else
+                                                         N/A
+                                                     @endif
+                                                 </div>
+                                                 <div @click="window.location.href='{{ route('login') }}?kode_kos={{ $kos->kode_kos }}'"
+                                                      class="text-[10px] font-black text-white bg-[#36B2B2] px-3 py-1.5 rounded-lg hover:bg-[#2b8f8f] transition-all cursor-pointer">
+                                                     Lihat Detail
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                @empty
+                                    <div class="flex flex-col items-center justify-center w-full py-10 text-gray-400">
+                                        <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        <p class="text-xs font-bold uppercase tracking-widest">Belum ada data kos</p>
                                     </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Mawar Indah</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Setiabudi, Jakarta</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 1.5Jt<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforelse
 
-                                <!-- Card 2 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1598928506311-c55dd10a5682?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-gray-900/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm uppercase tracking-wide">
-                                            Putra</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.6
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Mahasiswa Tipe A</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Depok, Jabar</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 900rb<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card 3 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1595521634842-7db518da0b16?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-blue-500/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm uppercase tracking-wide">
-                                            Campur</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.9
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Eks. Sudirman</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Jaksel, Jakarta</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 2.8Jt<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card 4 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-[#36B2B2] shadow-sm uppercase tracking-wide">
-                                            Putri</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.7
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Bunga Desa</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Sleman, Yogyakarta</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 800rb<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card 5 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-gray-900/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm uppercase tracking-wide">
-                                            Putra</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.5
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Putra Jaya</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Malang, Jatim</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 1.2Jt<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card 6 -->
-                                <div
-                                    class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer overflow-hidden snap-start">
-                                    <div class="relative h-[160px] overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                                            alt="Kos" draggable="false"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
-                                        <div
-                                            class="absolute top-2 left-2 bg-blue-500/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm uppercase tracking-wide">
-                                            Campur</div>
-                                        <div
-                                            class="absolute top-2 right-2 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm flex items-center gap-1">
-                                            <svg class="w-2.5 h-2.5 text-amber-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            4.8
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <h4
-                                            class="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#36B2B2] transition-colors truncate">
-                                            Kos Harmony</h4>
-                                        <p class="text-[10px] text-gray-500 flex items-center gap-1 mb-2">
-                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="truncate">Bandung, Jabar</span>
-                                        </p>
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-[#36B2B2] font-extrabold text-sm">Rp 2.1Jt<span
-                                                    class="text-[9px] text-gray-400 font-normal">/bln</span></div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Gradient fade effect untuk indikasi scroll -->
@@ -822,7 +699,7 @@
                             </li>
                         </ul>
 
-                        <a href="{{ route('register') }}"
+                        <a href="{{ route('login') }}"
                             class="inline-flex items-center gap-2 text-[#36B2B2] font-semibold hover:gap-3 transition-all group/link">
                             Cari Kos Sekarang
                             <svg class="w-4 h-4 group-hover/link:translate-x-1 transition" fill="none"
@@ -1047,7 +924,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="block w-full py-4 text-center rounded-xl border border-blue-500 text-blue-600 font-bold hover:bg-blue-50 transition shadow-sm">
                         Pilih Premium Per Kamar
                     </a>
@@ -1094,7 +971,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="block w-full py-4 text-center rounded-xl bg-white text-[#36B2B2] font-bold shadow-md hover:shadow-lg transition">
                         Pilih Pro Per Kamar
                     </a>
@@ -1142,7 +1019,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="block w-full py-3 text-center rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:border-[#36B2B2] hover:text-[#36B2B2] transition">
                         Daftar Gratis
                     </a>
@@ -1189,7 +1066,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="block w-full py-3 text-center rounded-xl bg-white text-[#36B2B2] text-sm font-bold shadow-md hover:shadow-lg transition">
                         Daftar Premium
                     </a>
@@ -1235,7 +1112,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="block w-full py-3 text-center rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-bold hover:shadow-lg transition">
                         Pilih Pro
                     </a>
@@ -1263,7 +1140,7 @@
                     sekarang. Gak pakai ribet, gak ada biaya tersembunyi.</p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-                    <a href="{{ route('register') }}"
+                    <a href="{{ route('login') }}"
                         class="px-8 py-4 bg-[#36B2B2] hover:bg-[#2b8f8f] font-bold text-lg rounded-xl transition shadow-lg shadow-[#36b2b2]/50 hover:shadow-xl hover:-translate-y-1 transform">
                         Buat Akun Gratis
                     </a>
@@ -1296,26 +1173,40 @@
                     </div>
                     <p class="text-gray-500 max-w-sm leading-relaxed mb-5">Platform cerdas penemuan & manajemen kos
                         terpadu, membantu koneksi penyewa dan pemilik properti secara instan.</p>
-                    <div class="flex gap-3">
-                        <a href="#"
-                            class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition"><svg
-                                class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                            </svg></a>
-                        <a href="#"
-                            class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition"><svg
-                                class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                            </svg></a>
-                        <a href="#"
-                            class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition"><svg
-                                class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
-                            </svg></a>
-                    </div>
+                    @php
+                        $superadmin = \App\Models\User::where('id_plans', 6)->first();
+                    @endphp
+                    @if($superadmin)
+                        <div class="flex gap-3">
+                            @if($superadmin->twitter)
+                                <a href="{{ str_starts_with($superadmin->twitter, 'http') ? $superadmin->twitter : 'https://x.com/' . ltrim($superadmin->twitter, '@') }}"
+                                    target="_blank"
+                                    class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                    </svg>
+                                </a>
+                            @endif
+                            @if($superadmin->instagram)
+                                <a href="{{ str_starts_with($superadmin->instagram, 'http') ? $superadmin->instagram : 'https://instagram.com/' . ltrim($superadmin->instagram, '@') }}"
+                                    target="_blank"
+                                    class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                    </svg>
+                                </a>
+                            @endif
+                            @if($superadmin->youtube)
+                                <a href="{{ str_starts_with($superadmin->youtube, 'http') ? $superadmin->youtube : 'https://youtube.com/' . ltrim($superadmin->youtube, '@') }}"
+                                    target="_blank"
+                                    class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-[#36B2B2] hover:text-white transition">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                                    </svg>
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Links -->
@@ -1377,6 +1268,70 @@
                 easing: 'ease-out-cubic', // default easing for AOS animations
             });
         });
+    </script>
+    <script>
+        function kosSearch() {
+            return {
+                filters: {
+                    lokasi: '',
+                    kategori: '',
+                    kategori_label: '',
+                    harga: '',
+                    harga_label: '',
+                },
+                options: {
+                    kategori: [
+                        { value: 'putra', label: 'Putra' },
+                        { value: 'putri', label: 'Putri' },
+                        { value: 'campur', label: 'Campur' }
+                    ],
+                    harga: [
+                        { value: '0-500000', label: '< 500rb' },
+                        { value: '500000-1000000', label: '500rb - 1Jt' },
+                        { value: '1000000-2000000', label: '1Jt - 2Jt' },
+                        { value: '2000000-99999999', label: '> 2Jt' }
+                    ]
+                },
+                loading: false,
+                error: null,
+                kosList: [],
+                async search() {
+                    this.loading = true;
+                    this.error = null;
+                    this.kosList = [];
+
+                    const payload = {};
+                    if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
+                    if (this.filters.harga) payload.harga = this.filters.harga;
+                    if (this.filters.kategori) payload.kategori = this.filters.kategori;
+
+                    try {
+                        const res = await fetch('{{ route("kos.search") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify(payload),
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            this.kosList = data.data;
+                            if (this.kosList.length === 0) {
+                                this.error = 'Tidak ada kos yang sesuai dengan kriteria Anda.';
+                            }
+                        } else {
+                            this.error = data.message || 'Pencarian gagal.';
+                        }
+                    } catch (e) {
+                        this.error = 'Terjadi kesalahan teknis.';
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
     </script>
 </body>
 

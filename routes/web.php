@@ -19,6 +19,7 @@ Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->
 
 // Kos Management
 Route::put('/admin/kos/{kos}', [\App\Http\Controllers\KosController::class, 'update'])->middleware('auth')->name('admin.kos.update');
+Route::post('/search-kos', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('kos.search');
 
 // Profile Routes
 Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
@@ -66,6 +67,10 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::post('/admin/order/{transaksi}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
     Route::post('/admin/order/{transaksi}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
 
+    // Penyewa (PendingUser) Verification
+    Route::post('/admin/penyewa/{pendingUser}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyPenyewa'])->name('admin.penyewa.verify');
+    Route::post('/admin/penyewa/{pendingUser}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectPenyewa'])->name('admin.penyewa.reject');
+
     // Dynamic Route for automatically generated admin menus
     Route::get('/admin/{page}', function ($page) {
         if (view()->exists('member.' . $page)) {
@@ -93,6 +98,7 @@ Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function 
     Route::get('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'index'])->name('user.order');
     Route::post('/user/order/search', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('user.order.search');
     Route::post('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'store'])->name('user.order.store');
+    Route::post('/user/order/{transaksi}/cancel', [\App\Http\Controllers\User\UserOrderController::class, 'cancelOrder'])->name('user.order.cancel');
 
     Route::get('/user/jatuh-tempo', function () {
         return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);
@@ -174,6 +180,18 @@ Route::get('/registration/pending', function (\Illuminate\Http\Request $request)
 
     return view('pending.dashboardPanding', ['pendingUser' => $pendingUser]);
 })->name('registration.pending');
+
+Route::post('/registration/cancel', function (\Illuminate\Http\Request $request) {
+    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
+        ->where('status', 'pending')
+        ->first();
+
+    if ($pendingUser) {
+        $pendingUser->delete();
+        return redirect('/')->with('success', 'Pendaftaran Anda telah dibatalkan.');
+    }
+    return redirect()->route('login');
+})->name('registration.cancel');
 
 // Registration Rejected Status Page (public, no auth required)
 Route::get('/registration/rejected', function (\Illuminate\Http\Request $request) {

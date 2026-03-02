@@ -234,24 +234,7 @@
                                 </ul>
                             </div>
 
-                            <!-- Kode Kos Input for Anak Kos -->
-                            <div x-show="selectedRole === '1'" x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform -translate-y-4"
-                                x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-4">
-                                <div class="group">
-                                    <label class="mb-2 block text-sm font-semibold text-[#36B2B2]">
-                                        Kode Kos<span class="text-red-500 ml-1">*</span>
-                                    </label>
-                                    <p class="text-xs text-gray-500 mb-2">Masukkan kode kos yang diberikan oleh pemilik kos
-                                        Anda.</p>
-                                    <input type="number" name="kode_kos" value="{{ old('kode_kos') }}"
-                                        placeholder="Contoh: 1234"
-                                        class="h-12 w-full rounded-xl border {{ $errors->has('kode_kos') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-[#36B2B2]/30 bg-[#36B2B2]/5 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 font-mono font-bold tracking-widest placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
-                                    @error('kode_kos')
-                                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
+
 
                             <!-- Additional Fields for Pemilik Kos -->
                             <div x-show="selectedRole === '2'" x-transition:enter="transition ease-out duration-300"
