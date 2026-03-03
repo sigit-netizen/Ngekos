@@ -10,14 +10,16 @@
                     <p class="text-gray-500">Kelola aduan dan masukan dari member (pemilik kos).</p>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button x-show="selectedIds.length > 0" @click="hapusTerpilih()" 
+                    <button x-show="selectedIds.length > 0" @click="hapusTerpilih()"
                         class="bg-red-50 text-red-600 text-[10px] font-black px-4 py-2 rounded-xl border border-red-100 hover:bg-red-100 transition-all flex items-center gap-2">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                         Hapus Terpilih (<span x-text="selectedIds.length"></span>)
                     </button>
-                    <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1.5 rounded-full border border-blue-100"
+                    <span
+                        class="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1.5 rounded-full border border-blue-100"
                         x-text="items.length + ' Aduan'"></span>
                 </div>
             </div>
@@ -228,19 +230,23 @@
                     this.showDetail = true;
                 },
                 hapus(id) {
-                    if (confirm('Yakin ingin menghapus aduan ini?')) {
-                        this.items = this.items.filter(i => i.id !== id);
-                        this.selectedIds = this.selectedIds.filter(i => i !== id);
-                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
-                    }
+                    window.swalConfirm('Hapus Aduan?', 'Aduan ini akan dihapus permanen.', 'warning').then(res => {
+                        if (res.isConfirmed) {
+                            this.items = this.items.filter(i => i.id !== id);
+                            this.selectedIds = this.selectedIds.filter(i => i !== id);
+                            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+                        }
+                    });
                 },
                 hapusTerpilih() {
                     if (this.selectedIds.length === 0) return;
-                    if (confirm(`Yakin ingin menghapus ${this.selectedIds.length} aduan terpilih?`)) {
-                        this.items = this.items.filter(i => !this.selectedIds.includes(i.id));
-                        this.selectedIds = [];
-                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
-                    }
+                    window.swalConfirm('Hapus Terpilih?', `Yakin ingin menghapus ${this.selectedIds.length} aduan terpilih?`, 'warning').then(res => {
+                        if (res.isConfirmed) {
+                            this.items = this.items.filter(i => !this.selectedIds.includes(i.id));
+                            this.selectedIds = [];
+                            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+                        }
+                    });
                 }
             }
         }

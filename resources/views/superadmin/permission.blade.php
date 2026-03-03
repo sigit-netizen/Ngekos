@@ -56,13 +56,13 @@
             <div class="flex bg-gray-100 p-1 rounded-xl">
                 <!-- Tab Kategori Admin (Pro, Premium) -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'admin']) }}" class="{{ $viewGroup === 'admin' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                      px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Administrator (Pro / Premium)
                 </a>
 
                 <!-- Tab Kategori User -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'user']) }}" class="{{ $viewGroup === 'user' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                      px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Aplikasi User
                 </a>
             </div>
@@ -90,7 +90,8 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="py-3 px-4 text-gray-700 font-medium tracking-wide flex items-center justify-between">
                                     <span>{{ str_replace('_', ' ', Str::title(str_replace('menu.', '', $permission->name))) }}</span>
-                                    <button type="submit" form="delete-form-{{ $permission->id }}"
+                                    <button type="button"
+                                        @click="window.swalConfirm('Hapus Akses?', 'Halaman ini dan aksesnya akan dihapus permanen.', 'warning').then(res => res.isConfirmed && document.getElementById('delete-form-{{ $permission->id }}').submit())"
                                         class="text-red-500 hover:text-red-700 p-1.5 rounded-md hover:bg-red-50 transition-colors"
                                         title="Hapus Akses & Hapus File">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,8 +175,7 @@
         <!-- Hidden Delete Forms for Permissions -->
         @foreach($permissions as $permission)
             <form id="delete-form-{{ $permission->id }}" action="{{ route('superadmin.permission.destroy', $permission->id) }}"
-                method="POST" class="hidden"
-                onsubmit="return confirm('Apakah Anda yakin ingin menghapus akses {{ $permission->name }} sepenuhnya? File views/ halamannya (jika ada) juga akan dihapus dan tidak dapat dikembalikan.');">
+                method="POST" class="hidden">
                 @csrf
                 @method('DELETE')
             </form>

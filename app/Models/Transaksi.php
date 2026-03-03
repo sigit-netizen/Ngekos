@@ -21,6 +21,14 @@ class Transaksi extends Model
         'id_kamar',
         'kode_kos',
         'catatan',
+        'metode_pembayaran',
+        'batas_bayar',
+        'bukti_pembayaran',
+    ];
+
+    protected $casts = [
+        'batas_bayar' => 'datetime',
+        'tanggal_pembayaran' => 'datetime',
     ];
 
     public function user()

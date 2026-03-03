@@ -15,6 +15,7 @@ class Kos extends Model
         'kode_kos',
         'nama_kos',
         'alamat',
+        'no_rekening',
         'kategori',
         'id_user',
         'is_kode_kos_edited',

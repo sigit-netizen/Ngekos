@@ -229,19 +229,23 @@
                     this.showDetail = true;
                 },
                 hapus(id) {
-                    if (confirm('Yakin ingin menghapus aduan ini?')) {
-                        this.items = this.items.filter(i => i.id !== id);
-                        this.selectedIds = this.selectedIds.filter(i => i !== id);
-                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
-                    }
+                    window.swalConfirm('Hapus Aduan?', 'Aduan ini akan dihapus permanen.', 'warning').then(res => {
+                        if (res.isConfirmed) {
+                            this.items = this.items.filter(i => i.id !== id);
+                            this.selectedIds = this.selectedIds.filter(i => i !== id);
+                            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+                        }
+                    });
                 },
                 hapusTerpilih() {
                     if (this.selectedIds.length === 0) return;
-                    if (confirm(`Yakin ingin menghapus ${this.selectedIds.length} aduan terpilih?`)) {
-                        this.items = this.items.filter(i => !this.selectedIds.includes(i.id));
-                        this.selectedIds = [];
-                        if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
-                    }
+                    window.swalConfirm('Hapus Terpilih?', `Yakin ingin menghapus ${this.selectedIds.length} aduan terpilih?`, 'warning').then(res => {
+                        if (res.isConfirmed) {
+                            this.items = this.items.filter(i => !this.selectedIds.includes(i.id));
+                            this.selectedIds = [];
+                            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+                        }
+                    });
                 }
             }
         }

@@ -2,93 +2,93 @@
 
 @section('dashboard-content')
     <div x-data="{ 
-                                                    showAddModal: false,
-                                                    showEditModal: false,
-                                                    showFasilitasModal: false,
-                                                    activeKamar: null,
-                                                    search: '',
-                                                    filterStatus: 'all',
-                                                    formData: {
-                                                        nomor_kamar: '',
-                                                        harga: '',
-                                                        foto: '',
-                                                        fasilitas: ['']
-                                                    },
-                                                    editFormData: {
-                                                        nomor_kamar: '',
-                                                        harga: '',
-                                                        foto: ''
-                                                    },
-                                                    fasilitasData: {
-                                                        items: []
-                                                    },
-                                                    formatCurrency(value) {
-                                                        if (!value) return '';
-                                                        let val = value.toString().replace(/\D/g, '');
-                                                        return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                                                    },
-                                                    updateHarga(e, target) {
-                                                        let rawValue = e.target.value.replace(/\D/g, '');
-                                                        this[target].harga = this.formatCurrency(rawValue);
-                                                    },
-                                                    openEditModal(kamar) {
-                                                        this.activeKamar = kamar;
-                                                        this.editFormData = {
-                                                            nomor_kamar: kamar.nomor_kamar,
-                                                            harga: this.formatCurrency(Math.round(kamar.harga)),
-                                                            foto: kamar.foto || ''
-                                                        };
-                                                        this.showEditModal = true;
-                                                    },
-                                                    openFasilitasModal(kamar) {
-                                                        this.activeKamar = kamar;
-                                                        this.fasilitasData.items = kamar.fasilitas.length > 0
-                                                            ? kamar.fasilitas.map(f => f.nama_fasilitas)
-                                                            : [''];
-                                                        this.showFasilitasModal = true;
-                                                    },
-                                                    addFasilitasRow() {
-                                                        this.fasilitasData.items.push('');
-                                                    },
-                                                    removeFasilitasRow(index) {
-                                                        this.fasilitasData.items.splice(index, 1);
-                                                        if (this.fasilitasData.items.length === 0) {
+                                                        showAddModal: false,
+                                                        showEditModal: false,
+                                                        showFasilitasModal: false,
+                                                        activeKamar: null,
+                                                        search: '',
+                                                        filterStatus: 'all',
+                                                        formData: {
+                                                            nomor_kamar: '',
+                                                            harga: '',
+                                                            foto: '',
+                                                            fasilitas: ['']
+                                                        },
+                                                        editFormData: {
+                                                            nomor_kamar: '',
+                                                            harga: '',
+                                                            foto: ''
+                                                        },
+                                                        fasilitasData: {
+                                                            items: []
+                                                        },
+                                                        formatCurrency(value) {
+                                                            if (!value) return '';
+                                                            let val = value.toString().replace(/\D/g, '');
+                                                            return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                                        },
+                                                        updateHarga(e, target) {
+                                                            let rawValue = e.target.value.replace(/\D/g, '');
+                                                            this[target].harga = this.formatCurrency(rawValue);
+                                                        },
+                                                        openEditModal(kamar) {
+                                                            this.activeKamar = kamar;
+                                                            this.editFormData = {
+                                                                nomor_kamar: kamar.nomor_kamar,
+                                                                harga: this.formatCurrency(Math.round(kamar.harga)),
+                                                                foto: kamar.foto || ''
+                                                            };
+                                                            this.showEditModal = true;
+                                                        },
+                                                        openFasilitasModal(kamar) {
+                                                            this.activeKamar = kamar;
+                                                            this.fasilitasData.items = kamar.fasilitas.length > 0
+                                                                ? kamar.fasilitas.map(f => f.nama_fasilitas)
+                                                                : [''];
+                                                            this.showFasilitasModal = true;
+                                                        },
+                                                        addFasilitasRow() {
                                                             this.fasilitasData.items.push('');
-                                                        }
-                                                    },
-                                                    addFasilitasRowNew() {
-                                                        this.formData.fasilitas.push('');
-                                                    },
-                                                    removeFasilitasRowNew(index) {
-                                                        this.formData.fasilitas.splice(index, 1);
-                                                        if (this.formData.fasilitas.length === 0) {
+                                                        },
+                                                        removeFasilitasRow(index) {
+                                                            this.fasilitasData.items.splice(index, 1);
+                                                            if (this.fasilitasData.items.length === 0) {
+                                                                this.fasilitasData.items.push('');
+                                                            }
+                                                        },
+                                                        addFasilitasRowNew() {
                                                             this.formData.fasilitas.push('');
-                                                        }
-                                                    },
-                                                    currentPage: 1,
-                                                    itemsPerPage: 10,
-                                                    get filteredKamars() {
-                                                        if (!window.existingKamars) return [];
-                                                        return window.existingKamars.filter(kamar => {
-                                                            const matchSearch = this.search === '' ||
-                                                                               kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
-                                                            const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
+                                                        },
+                                                        removeFasilitasRowNew(index) {
+                                                            this.formData.fasilitas.splice(index, 1);
+                                                            if (this.formData.fasilitas.length === 0) {
+                                                                this.formData.fasilitas.push('');
+                                                            }
+                                                        },
+                                                        currentPage: 1,
+                                                        itemsPerPage: 10,
+                                                        get filteredKamars() {
+                                                            if (!window.existingKamars) return [];
+                                                            return window.existingKamars.filter(kamar => {
+                                                                const matchSearch = this.search === '' ||
+                                                                                   kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
+                                                                const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
 
-                                                            return matchSearch && matchStatus;
-                                                        });
-                                                    },
-                                                    get pagedKamars() {
-                                                        const start = (this.currentPage - 1) * this.itemsPerPage;
-                                                        return this.filteredKamars.slice(start, start + this.itemsPerPage);
-                                                    },
-                                                    get totalPages() {
-                                                        return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
-                                                    },
-                                                    get isNomorKamarDuplicate() {
-                                                        if (!this.formData.nomor_kamar) return false;
-                                                        return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
-                                                    }
-                                                }"
+                                                                return matchSearch && matchStatus;
+                                                            });
+                                                        },
+                                                        get pagedKamars() {
+                                                            const start = (this.currentPage - 1) * this.itemsPerPage;
+                                                            return this.filteredKamars.slice(start, start + this.itemsPerPage);
+                                                        },
+                                                        get totalPages() {
+                                                            return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
+                                                        },
+                                                        get isNomorKamarDuplicate() {
+                                                            if (!this.formData.nomor_kamar) return false;
+                                                            return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
+                                                        }
+                                                    }"
         x-init="$watch('search', () => currentPage = 1); $watch('filterStatus', () => currentPage = 1);"
         class="pb-12 text-gray-800">
 
@@ -134,60 +134,6 @@
             </div>
         </div>
 
-        <!-- System Alerts -->
-        @if(session('success'))
-            <div class="mb-8 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500"
-                data-aos="fade-up">
-                <div
-                    class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-emerald-500/20">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <div>
-                    <p class="font-black text-emerald-900 text-sm">Berhasil!</p>
-                    <p class="text-emerald-600 text-xs font-medium">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-4" data-aos="fade-up">
-                <div
-                    class="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/20">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
-                    </svg>
-                </div>
-                <div>
-                    <p class="font-black text-rose-900 text-sm">Oops! Terjadi Kesalahan</p>
-                    <p class="text-rose-600 text-xs font-medium">{{ session('error') }}</p>
-                </div>
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="mb-8 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-4" data-aos="fade-up">
-                <div
-                    class="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/20">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                        </path>
-                    </svg>
-                </div>
-                <div>
-                    <p class="font-black text-rose-900 text-sm">Validasi Gagal</p>
-                    <ul class="list-disc list-inside text-rose-600 text-xs font-medium">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
 
         <!-- List Content -->
         @if($kamars->isEmpty())
@@ -370,11 +316,11 @@
                                                     </path>
                                                 </svg>
                                             </button>
-                                            <form :action="`/admin/kamar/${kamar.id}`" method="POST"
-                                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus kamar ini?')">
+                                            <form :action="`/admin/kamar/${kamar.id}`" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
+                                                <button type="button"
+                                                    @click="window.swalConfirm('Hapus Kamar?', 'Data kamar dan riwayat fasilitasnya akan dihapus permanen.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                     class="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all border border-rose-100/50">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"

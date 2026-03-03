@@ -78,7 +78,7 @@
                 </a>
 
                 <button type="button"
-                    @click="if(confirm('Apakah Anda yakin ingin membatalkan pendaftaran? Semua data Anda akan dihapus.')) { document.getElementById('cancel-form').submit(); }"
+                    @click="window.swalConfirm('Batalkan Pendaftaran?', 'Semua data Anda akan dihapus dan Anda harus mendaftar ulang.', 'warning').then(res => res.isConfirmed && document.getElementById('cancel-form').submit())"
                     class="py-4 bg-rose-50 text-rose-600 rounded-2xl font-bold border border-rose-100 hover:bg-rose-100 transition-all transform active:scale-95 text-center">
                     Batalkan Pendaftaran
                 </button>

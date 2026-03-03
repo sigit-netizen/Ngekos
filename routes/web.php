@@ -65,6 +65,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
 
     Route::get('/admin/order', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.order');
     Route::post('/admin/order/{transaksi}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
+    Route::post('/admin/order/{transaksi}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('admin.order.confirm');
     Route::post('/admin/order/{transaksi}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
 
     // Penyewa (PendingUser) Verification
@@ -99,6 +100,7 @@ Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function 
     Route::post('/user/order/search', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('user.order.search');
     Route::post('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'store'])->name('user.order.store');
     Route::post('/user/order/{transaksi}/cancel', [\App\Http\Controllers\User\UserOrderController::class, 'cancelOrder'])->name('user.order.cancel');
+    Route::post('/user/order/{transaksi}/upload-proof', [\App\Http\Controllers\User\UserOrderController::class, 'uploadProof'])->name('user.order.upload-proof');
 
     Route::get('/user/jatuh-tempo', function () {
         return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);

@@ -14,8 +14,13 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $tab = $request->get('tab', 'pending');
-        $statusFilter = $request->get('status', 'active');
+        $tab = $request->get('tab', 'order');
+        $statusFilter = $request->get('status');
+
+        // Set sensible defaults for statusFilter based on tab if not provided
+        if (!$statusFilter) {
+            $statusFilter = ($tab === 'order') ? 'verif' : (($tab === 'riwayat') ? 'active' : 'pending');
+        }
 
         // Get the member's kos
         $kos = Kos::where('id_user', $user->id)->first();
@@ -49,10 +54,25 @@ class OrderController extends Controller
             ->where('status', 'rejected')
             ->count();
 
-        // Count pending order transaksi for this kos
+        // Count pending order transaksi (Verifikasi)
         $orderPendingCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'pending')
             ->count();
+
+        // Count for 'Menunggu' (Diterima tapi belum upload bukti)
+        $orderMenungguCount = Transaksi::where('kode_kos', $kos->kode_kos)
+            ->where('status', 'verified')
+            ->whereNull('bukti_pembayaran')
+            ->count();
+
+        // Count for 'Konfirmasi' (Sudah upload bukti tapi belum dikonfirmasi admin)
+        $orderKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
+            ->where('status', 'verified')
+            ->whereNotNull('bukti_pembayaran')
+            ->count();
+
+        // Total verified count (Diterima)
+        $orderVerifiedCount = $orderMenungguCount + $orderKonfirmasiCount;
 
         // Pending penyewa from pending_users
         $pendingPenyewa = \App\Models\PendingUser::where('kode_kos', $kos->kode_kos)
@@ -77,10 +97,18 @@ class OrderController extends Controller
         $orderTransaksi = Transaksi::where('kode_kos', $kos->kode_kos)
             ->with(['user', 'kamar'])
             ->when($tab === 'order', function ($q) use ($statusFilter) {
-                if ($statusFilter === 'verified') {
-                    $q->where('status', 'verified');
+                if ($statusFilter === 'verif') {
+                    $q->where('status', 'pending');
+                } elseif ($statusFilter === 'menunggu') {
+                    $q->where('status', 'verified')->whereNull('bukti_pembayaran');
+                } elseif ($statusFilter === 'konfirmasi') {
+                    $q->where('status', 'verified')->whereNotNull('bukti_pembayaran');
                 } elseif ($statusFilter === 'rejected') {
                     $q->where('status', 'rejected');
+                } elseif ($statusFilter === 'paid') {
+                    $q->where('status', 'paid');
+                } elseif ($statusFilter === 'failed') {
+                    $q->where('status', 'failed');
                 } else {
                     $q->where('status', 'pending');
                 }
@@ -97,6 +125,9 @@ class OrderController extends Controller
             'activeCount' => $activeCount,
             'rejectedCount' => $rejectedCount,
             'orderPendingCount' => $orderPendingCount,
+            'orderMenungguCount' => $orderMenungguCount,
+            'orderKonfirmasiCount' => $orderKonfirmasiCount,
+            'orderVerifiedCount' => $orderVerifiedCount,
             'pendingPenyewa' => $pendingPenyewa,
             'riwayatPenyewa' => $riwayatPenyewa,
             'orderTransaksi' => $orderTransaksi,
@@ -105,7 +136,8 @@ class OrderController extends Controller
     }
 
     /**
-     * Verify an order: user becomes tenant of the kos + kamar.
+     * Verify an order: Set status to verified and start 24h timer.
+     * Also marks kamar as 'terisi' to hold reservation.
      */
     public function verifyOrder(Transaksi $transaksi)
     {
@@ -123,38 +155,98 @@ class OrderController extends Controller
             return back()->with('error', 'Kamar sudah tidak tersedia.');
         }
 
-        // Update transaksi status
-        $transaksi->update([
-            'status' => 'verified',
-            'tanggal_pembayaran' => now(),
-        ]);
-
-        // Update user: link to kos and kamar + set plan & status
-        $orderUser = User::find($transaksi->id_user);
-        if ($orderUser) {
-            $orderUser->update([
-                'id_plans' => 1, // Set to Anak Kos
-                'status' => 'active',
-                'id_kos' => $kos->id,
-                'id_kamar' => $kamar->id,
+        \DB::beginTransaction();
+        try {
+            // Update transaksi status to verified (accepted by admin)
+            // This starts the 24h window to upload proof
+            $transaksi->update([
+                'status' => 'verified',
+                'batas_bayar' => now()->addDay(),
             ]);
 
-            // Ensure role is 'users'
-            if (!$orderUser->hasRole('users')) {
-                $orderUser->assignRole('users');
-            }
+            // HOLD THE ROOM
+            $kamar->update(['status' => 'terisi']);
+
+            \DB::commit();
+            return back()->with('success', 'Order telah diterima! Kamar telah diblokir sementara. User memiliki waktu 24 jam untuk bayar.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Gagal memverifikasi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Confirm payment and activate user.
+     */
+    public function confirmPayment(Transaksi $transaksi)
+    {
+        $user = auth()->user();
+        $kos = Kos::where('id_user', $user->id)->first();
+
+        if (!$kos || $transaksi->kode_kos != $kos->kode_kos) {
+            return back()->with('error', 'Akses ditolak.');
         }
 
-        // Update kamar status to occupied
-        $kamar->update(['status' => 'terisi']);
+        if (!$transaksi->bukti_pembayaran) {
+            return back()->with('error', 'Bukti pembayaran belum diunggah.');
+        }
 
-        // Reject any other pending orders for this kamar
-        Transaksi::where('id_kamar', $kamar->id)
-            ->where('status', 'pending')
-            ->where('id', '!=', $transaksi->id)
-            ->update(['status' => 'rejected']);
+        // Check if expired
+        if ($transaksi->batas_bayar && now()->gt($transaksi->batas_bayar)) {
+            $transaksi->update(['status' => 'failed']);
+            return back()->with('error', 'Batas waktu pembayaran telah habis. Pesanan otomatis gagal.');
+        }
 
-        return back()->with('success', 'Order berhasil diverifikasi! Penyewa telah ditambahkan.');
+        \DB::beginTransaction();
+        try {
+            // Update transaksi status to success/active (using verified as final state or similar)
+            // But let's use 'verified' as the final state since it was used before.
+            // Wait, if 'verified' means "Accepted", then what is "Paid"?
+            // Let's keep 'verified' as the state where they are accepted. 
+            // Once paid, maybe status => 'active' or keep 'verified' but activate user.
+
+            // Actually, the original code used 'verified' for "successfully joined".
+            // Let's use 'paid' or just stick to 'active'.
+            // Original code: 'status' => 'verified' in transaksi, and user 'status' => 'active'.
+
+            $transaksi->update([
+                'status' => 'paid', // New state for paid
+                'tanggal_pembayaran' => now(),
+            ]);
+
+            // Update user
+            $orderUser = User::find($transaksi->id_user);
+            if ($orderUser) {
+                $orderUser->update([
+                    'id_plans' => 1,
+                    'status' => 'active',
+                    'id_kos' => $kos->id,
+                    'id_kamar' => $transaksi->id_kamar,
+                ]);
+
+                if (!$orderUser->hasRole('users')) {
+                    $orderUser->assignRole('users');
+                }
+            }
+
+            // Update kamar
+            $kamar = Kamar::find($transaksi->id_kamar);
+            if ($kamar) {
+                $kamar->update(['status' => 'terisi']);
+            }
+
+            // Reject any other pending orders for this kamar
+            Transaksi::where('id_kamar', $transaksi->id_kamar)
+                ->where('status', 'pending')
+                ->where('id', '!=', $transaksi->id)
+                ->update(['status' => 'rejected']);
+
+            \DB::commit();
+            return back()->with('success', 'Pembayaran dikonfirmasi! Penyewa sekarang aktif.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Gagal mengonfirmasi: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -170,11 +262,24 @@ class OrderController extends Controller
             return back()->with('error', 'Order tidak valid.');
         }
 
-        $transaksi->update([
-            'status' => 'rejected',
-        ]);
+        \DB::beginTransaction();
+        try {
+            $transaksi->update([
+                'status' => 'rejected',
+            ]);
 
-        return back()->with('success', 'Order berhasil ditolak.');
+            // RELEASE THE ROOM
+            $kamar = Kamar::find($transaksi->id_kamar);
+            if ($kamar) {
+                $kamar->update(['status' => 'tersedia']);
+            }
+
+            \DB::commit();
+            return back()->with('success', 'Order berhasil ditolak. Kamar sekarang tersedia kembali.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Gagal menolak order: ' . $e->getMessage());
+        }
     }
 
     /**

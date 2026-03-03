@@ -2,20 +2,34 @@
 
 @section('dashboard-content')
     <style>
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #36B2B2 #f8fafc;
         }
 
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .cursor-grabbing {
-            cursor: grabbing !important;
-            user-select: none;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #36B2B2;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2b8f8f;
+        }
+
+        .no-scroll,
+        .no-scroll body {
+            overflow: hidden !important;
+            height: 100dvh !important;
+            touch-action: none;
         }
     </style>
     @php
@@ -295,6 +309,7 @@
 
         <!-- Search Kos Section with Filters -->
         <div class="mb-10" x-data="kosSearch()" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+
             <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-100/50">
                 <h2 class="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,11 +358,12 @@
                 <div class="flex gap-3">
                     <button @click="search()" :disabled="loading"
                         class="flex-1 sm:flex-none px-6 py-3 bg-[#36B2B2] text-white font-bold text-sm rounded-xl hover:bg-[#2b8f8f] transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#36B2B2]/30">
-                        <svg x-show="loading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <svg x-show="loading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24" style="display: none;">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
-                        <span x-text="loading ? 'Mencari...' : '🔍 Cari Kos'"></span>
+                        <span x-show="!loading">Cari Kos</span>
+                        <span x-show="loading" style="display: none;">Mencari...</span>
                     </button>
                     <button @click="resetFilters()"
                         class="px-4 py-3 bg-gray-100 text-gray-600 font-bold text-sm rounded-xl hover:bg-gray-200 transition-all duration-300">
@@ -467,10 +483,10 @@
                                                 <div class="flex-1">
                                                     <div class="flex items-center justify-between mb-2">
                                                         <span
-                                                            class="text-base font-black text-gray-900 group-hover/room:text-[#36B2B2] transition-colors truncate pr-2"
+                                                            class="text-base font-black text-gray-900 group-hover/room:text-[#36B2B2] transition-colors"
                                                             x-text="'Kamar ' + kamar.nomor_kamar"></span>
                                                         <span
-                                                            class="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-600">Tersedia</span>
+                                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-600">Tersedia</span>
                                                     </div>
 
                                                     <div class="text-right mb-3">
@@ -514,8 +530,8 @@
                                                         </div>
                                                     </template>
 
-                                                    <button @mousedown.stop
-                                                        @click.stop="selectedKamar = kamar; selectedKos = kos; orderRoomNumber = ''; showOrderModal = true"
+                                                    <button
+                                                        @click="selectedKamar = kamar; selectedKos = kos; jumlahBayar = kamar.harga; paymentMethod = 'manual'; paymentDeadline = ''; showOrderModal = true"
                                                         class="w-full py-3 bg-gray-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#36B2B2] hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-[#36B2B2]/20 group/btn">
                                                         <div class="flex items-center justify-center gap-2">
                                                             <span>Order Kamar</span>
@@ -536,122 +552,195 @@
                     </template>
                 </div>
             </template>
-        </div>
 
-        <!-- Order Confirmation Modal -->
-        <div x-show="showOrderModal"
-            class="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md"
-            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
+            <!-- Order Confirmation Modal -->
+            <div x-show="showOrderModal"
+                x-effect="showOrderModal ? document.documentElement.classList.add('no-scroll') : document.documentElement.classList.remove('no-scroll')"
+                class="fixed inset-0 z-[9999] flex items-center justify-center p-8 sm:p-12 bg-black/70 backdrop-blur-sm"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
 
-            <!-- Modal Backdrop (Click to close) -->
-            <div class="absolute inset-0" @click="showOrderModal = false"></div>
+                <!-- Modal Backdrop (Click to close) -->
+                <div class="absolute inset-0" @click="showOrderModal = false"></div>
 
-            <!-- Modal Content -->
-            <template x-if="selectedKamar">
-                <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl relative z-10 overflow-hidden"
-                    x-transition:enter="transition ease-out duration-300 transform"
-                    x-transition:enter-start="opacity-0 translate-y-8 scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                    x-transition:leave="transition ease-in duration-200 transform"
-                    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-8 scale-95">
+                <!-- Modal Content -->
+                <template x-if="selectedKamar">
+                    <div class="bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl relative z-10 flex flex-col overflow-hidden"
+                        style="max-height: calc(100dvh - 80px);" x-transition:enter="transition ease-out duration-300 transform"
+                        x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave="transition ease-in duration-200 transform"
+                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-8 scale-95" @click.stop>
 
-                    <!-- Header -->
-                    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-                        <div>
-                            <h3 class="text-lg font-black text-gray-900 leading-tight">Konfirmasi Order</h3>
-                            <p class="text-xs font-medium text-gray-500 mt-1">Pastikan detail pesanan sudah benar</p>
-                        </div>
-                        <button @click="showOrderModal = false"
-                            class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-200 rounded-full">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <form action="{{ route('user.order.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="id_kamar" :value="selectedKamar.id">
-
-                        <!-- Body -->
-                        <div class="p-6">
-                            <!-- Room Info -->
-                            <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 mb-6">
-                                <div class="w-16 h-16 rounded-xl bg-white shrink-0 overflow-hidden shadow-sm">
-                                    <template x-if="selectedKamar.foto">
-                                        <img :src="selectedKamar.foto.startsWith('http') ? selectedKamar.foto : (selectedKamar.foto.startsWith('/') ? selectedKamar.foto : '/images/kamar/' + selectedKamar.foto)"
-                                            class="w-full h-full object-cover">
-                                    </template>
-                                    <template x-if="!selectedKamar.foto">
-                                        <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                                </path>
-                                            </svg>
-                                        </div>
-                                    </template>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-[#36B2B2] mb-1"
-                                        x-text="'Kos ' + selectedKos.nama_kos"></p>
-                                    <h4 class="text-base font-black text-gray-900"
-                                        x-text="'Kamar ' + selectedKamar.nomor_kamar"></h4>
-                                    <p class="text-sm font-bold text-gray-600 mt-1"
-                                        x-text="'Rp ' + Number(selectedKamar.harga).toLocaleString('id-ID') + ' / bulan'"></p>
-                                </div>
-                            </div>
-
-                            <!-- Security Input: Confirm Room Number -->
-                            <div class="mb-5">
-                                <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
-                                    Konfirmasi Nomor Kamar <span class="text-rose-500">*</span>
-                                </label>
-                                <p class="text-[10px] font-medium text-gray-500 mb-2">Ketik <span
-                                        class="font-black text-gray-800" x-text="selectedKamar.nomor_kamar"></span> di bawah
-                                    untuk melanjutkan.</p>
-                                <input type="text" x-model="orderRoomNumber" required placeholder="Masukkan nomor kamar"
-                                    class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
-
-                                <template x-if="orderRoomNumber !== '' && orderRoomNumber !== selectedKamar.nomor_kamar">
-                                    <p class="text-[10px] font-bold text-rose-500 mt-2 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Nomor kamar tidak sesuai.
-                                    </p>
-                                </template>
-                            </div>
-
-                            <!-- Additional Notes -->
+                        <!-- Header (Fixed) -->
+                        <div
+                            class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 shrink-0">
                             <div>
-                                <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
-                                    Pesan / Catatan Tambahan (Opsional)
-                                </label>
-                                <textarea name="catatan" x-model="orderNote" rows="2"
-                                    placeholder="Ada request khusus atau informasi lainnya?"
-                                    class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-medium text-gray-800 resize-none"></textarea>
+                                <h3 class="text-base font-black text-gray-900 leading-tight">Konfirmasi Order</h3>
+                                <p class="text-[9px] font-medium text-gray-500 mt-1 uppercase tracking-wider">Detail
+                                    Pesanan Kamar</p>
                             </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
-                            <button type="button" @click="showOrderModal = false"
-                                class="flex-1 px-4 py-3 bg-white text-gray-600 font-bold rounded-xl border border-gray-200 hover:bg-gray-50 hover:text-gray-800 transition-colors">Batal</button>
-                            <button type="submit" :disabled="orderRoomNumber !== selectedKamar.nomor_kamar"
-                                :class="orderRoomNumber === selectedKamar.nomor_kamar ? 'bg-[#36B2B2] hover:bg-[#2b8f8f] hover:-translate-y-0.5 shadow-lg hover:shadow-[#36B2B2]/30 cursor-pointer' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-                                class="flex-[1.5] px-4 py-3 text-white font-black rounded-xl transition-all">
-                                Ajukan Pesanan
+                            <button @click="showOrderModal = false"
+                                class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-200 rounded-full">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12">
+                                    </path>
+                                </svg>
                             </button>
                         </div>
-                    </form>
-                </div>
-            </template>
+
+                        <form action="{{ route('user.order.store') }}" method="POST"
+                            class="flex flex-col min-h-0 overflow-hidden h-full">
+                            @csrf
+                            <input type="hidden" name="id_kamar" :value="selectedKamar.id">
+                            <input type="hidden" name="kode_kos" :value="selectedKos.kode_kos">
+                            <input type="hidden" name="jumlah_bayar" :value="jumlahBayar">
+                            <input type="hidden" name="metode_pembayaran" :value="paymentMethod">
+                            <input type="hidden" name="batas_bayar" :value="paymentDeadline">
+
+                            <!-- Body (Scrollable Area) -->
+                            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 overscroll-contain">
+                                <!-- Room Info -->
+                                <div
+                                    class="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-white shrink-0 overflow-hidden shadow-sm border border-gray-100">
+                                        <template x-if="selectedKamar.foto">
+                                            <img :src="selectedKamar.foto.startsWith('http') ? selectedKamar.foto : (selectedKamar.foto.startsWith('/') ? selectedKamar.foto : '/images/kamar/' + selectedKamar.foto)"
+                                                class="w-full h-full object-cover">
+                                        </template>
+                                        <template x-if="!selectedKamar.foto">
+                                            <div
+                                                class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-[#36B2B2] mb-1"
+                                            x-text="'Kos ' + selectedKos.nama_kos"></p>
+                                        <h4 class="text-base font-black text-gray-900"
+                                            x-text="'Kamar ' + selectedKamar.nomor_kamar"></h4>
+                                        <p class="text-sm font-bold text-gray-600 mt-1"
+                                            x-text="'Rp ' + Number(selectedKamar.harga).toLocaleString('id-ID') + ' / bulan'">
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Room Price (Read-only) -->
+                                <div class="mb-5">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                        Harga Kamar (Rp)
+                                    </label>
+                                    <input type="number" :value="selectedKamar.harga" disabled
+                                        class="w-full px-5 py-3.5 bg-gray-100 border-2 border-gray-100 rounded-xl outline-none font-bold text-gray-500 cursor-not-allowed">
+                                </div>
+
+                                <!-- "Bayar Berapa" Input -->
+                                <div class="mb-5">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                        Bayar Berapa (Rp) <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="number" x-model="jumlahBayar" required
+                                        placeholder="Masukkan nominal yang akan dibayar"
+                                        class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
+                                </div>
+
+                                <!-- Payment Method Selection -->
+                                <div class="mb-5">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                        Metode Pembayaran <span class="text-rose-500">*</span>
+                                    </label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button type="button" @click="paymentMethod = 'manual'"
+                                            :class="paymentMethod === 'manual' ? 'border-[#36B2B2] bg-[#36B2B2]/5 text-[#36B2B2]' : 'border-gray-100 bg-gray-50 text-gray-500'"
+                                            class="px-4 py-3 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center gap-1">
+                                            <span>Manual</span>
+                                            <span class="text-[9px] font-medium opacity-70">Transfer/Cash</span>
+                                        </button>
+                                        <button type="button" @click="paymentMethod = 'pymen'"
+                                            :class="paymentMethod === 'pymen' ? 'border-[#36B2B2] bg-[#36B2B2]/5 text-[#36B2B2]' : 'border-gray-100 bg-gray-50 text-gray-500'"
+                                            class="px-4 py-3 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center gap-1">
+                                            <span>Py-Men</span>
+                                            <span class="text-[9px] font-medium opacity-70">Payment Portal</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Owner Bank Account (Conditional for Py-Men) -->
+                                <div class="mb-5 p-4 bg-blue-50 rounded-2xl border border-blue-100"
+                                    x-show="paymentMethod === 'pymen'" x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 -translate-y-2"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    x-transition:leave="transition ease-in duration-200"
+                                    x-transition:leave-start="opacity-100 translate-y-0"
+                                    x-transition:leave-end="opacity-0 -translate-y-2">
+                                    <label class="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">
+                                        Nomor Rekening Pemilik
+                                    </label>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-base font-black text-gray-900"
+                                            x-text="selectedKos.no_rekening || 'Belum diatur'"></span>
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-blue-100 text-blue-600">BANK</span>
+                                    </div>
+                                    <p class="text-[9px] font-medium text-gray-500 mt-2">Batas waktu pembayaran otomatis 3
+                                        hari
+                                        untuk metode Py-Men.</p>
+                                </div>
+
+                                <!-- Payment Deadline (Conditional for Manual) -->
+                                <div class="mb-5" x-show="paymentMethod === 'manual'"
+                                    x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 -translate-y-2"
+                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                    x-transition:leave="transition ease-in duration-200"
+                                    x-transition:leave-start="opacity-100 translate-y-0"
+                                    x-transition:leave-end="opacity-0 -translate-y-2">
+                                    <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                        Batas Waktu Pembayaran (Manual) <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="datetime-local" x-model="paymentDeadline"
+                                        :required="paymentMethod === 'manual'"
+                                        class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
+                                    <p class="text-[9px] font-medium text-gray-500 mt-1">Silakan pilih tanggal dan jam
+                                        sebelum
+                                        anda melakukan pembayaran.</p>
+                                </div>
+
+                                <!-- Additional Notes -->
+                                <div>
+                                    <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                        Pesan / Catatan Tambahan (Opsional)
+                                    </label>
+                                    <textarea name="catatan" x-model="orderNote" rows="2"
+                                        placeholder="Ada request khusus atau informasi lainnya?"
+                                        class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-medium text-gray-800 resize-none"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="p-5 pb-6 bg-gray-50 border-t border-gray-100 flex gap-2 shrink-0">
+                                <button type="button" @click="showOrderModal = false"
+                                    class="flex-1 px-4 py-3 bg-white text-gray-600 font-bold text-[10px] rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">Batal</button>
+                                <button type="submit"
+                                    :disabled="!jumlahBayar || (paymentMethod === 'manual' && !paymentDeadline)"
+                                    :class="jumlahBayar && (paymentMethod !== 'manual' || paymentDeadline) ? 'bg-[#36B2B2] hover:bg-[#2b8f8f] shadow-lg shadow-[#36B2B2]/30 cursor-pointer' : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
+                                    class="flex-[1.5] px-4 py-3 text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all">
+                                    Ajukan Pesanan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </template>
+            </div>
         </div>
 
         <script>
@@ -669,9 +758,15 @@
                     selectedKamar: null,
                     selectedKos: null,
                     orderNote: '',
-                    orderRoomNumber: '',
+                    jumlahBayar: 0,
+                    paymentMethod: 'manual',
+                    paymentDeadline: '',
                     resetFilters() {
-                        this.filters = { lokasi: '', harga: '', kategori: '' };
+                        this.filters = {
+                            lokasi: '',
+                            harga: '',
+                            kategori: ''
+                        };
                         this.kosList = [];
                         this.error = null;
                     },
@@ -680,14 +775,13 @@
                         this.error = null;
                         this.kosList = [];
 
-                        // Build filter payload (only send non-empty values)
                         const payload = {};
                         if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
                         if (this.filters.harga) payload.harga = this.filters.harga;
                         if (this.filters.kategori) payload.kategori = this.filters.kategori;
 
                         try {
-                            const res = await fetch('{{ route("user.order.search") }}', {
+                            const res = await fetch('{{ route('user.order.search') }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -698,10 +792,9 @@
                             });
                             const data = await res.json();
                             if (data.success) {
-                                // Add _expanded property for accordion
                                 this.kosList = data.data.map((kos, i) => ({
                                     ...kos,
-                                    _expanded: i === 0, // auto-expand first result
+                                    _expanded: i === 0,
                                 }));
                             } else {
                                 this.error = data.message || 'Tidak ditemukan.';

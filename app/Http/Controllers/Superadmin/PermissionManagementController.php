@@ -88,9 +88,21 @@ class PermissionManagementController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            $roles = Role::where('name', '!=', 'superadmin')->get();
+            $viewGroup = $request->input('active_filter', 'admin');
+
+            // Filter roles the same way the index method does to prevent wiping permissions of roles in other tabs
+            $rolesQuery = Role::where('name', '!=', 'superadmin')->where('name', '!=', 'admin');
+
+            if ($viewGroup === 'user') {
+                $rolesQuery->whereIn('name', ['user', 'users']);
+            } else {
+                $rolesQuery->whereIn('name', ['pro', 'premium', 'per_kamar_pro', 'per_kamar_premium', 'nonaktif']);
+            }
+
+            $roles = $rolesQuery->get();
 
             foreach ($roles as $role) {
+                // Only sync if the role was actually editable in this request
                 $permissions = $request->role_permissions[$role->id] ?? [];
                 $role->syncPermissions($permissions);
             }

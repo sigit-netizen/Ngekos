@@ -350,10 +350,10 @@
                                     <div class="flex flex-col items-center gap-2">
                                         <span
                                             class="px-4 py-1.5 bg-red-600 text-white rounded-full text-[9px] font-black uppercase tracking-widest animate-pulse">MATI</span>
-                                        <form action="{{ route('superadmin.user.deactivate', $sub->user->id) }}" method="POST"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menonaktifkan member ini?')">
+                                        <form action="{{ route('superadmin.user.deactivate', $sub->user->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit"
+                                            <button type="button"
+                                                @click="window.swalConfirm('Nonaktifkan Member?', 'Pemilik kos ini tidak akan bisa mengakses dasbor lagi.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                 class="text-[8px] font-black text-red-500 hover:text-red-700 uppercase tracking-tighter border-b border-red-200">Nonaktifkan
                                                 Akun</button>
                                         </form>

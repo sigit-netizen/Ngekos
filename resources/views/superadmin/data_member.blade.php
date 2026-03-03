@@ -66,12 +66,6 @@
     </div>
 
 
-    @if(session('success'))
-        <div class="mb-6 p-4 bg-green-50 border border-green-100 text-green-600 rounded-xl font-bold text-sm"
-            data-aos="fade-up">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-aos="fade-up"
         data-aos-delay="100">
@@ -126,10 +120,10 @@
                                     </button>
 
                                     {{-- Toggle Status Button --}}
-                                    <form action="{{ route('superadmin.data_member.toggle', $member->id) }}" method="POST"
-                                        onsubmit="return confirm('{{ $currentStatus === 'inactive' ? 'Aktifkan kembali member ini?' : 'Nonaktifkan member ini? (Akses akan dicabut)' }}')">
+                                    <form action="{{ route('superadmin.data_member.toggle', $member->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit"
+                                        <button type="button"
+                                            @click="window.swalConfirm('Konfirmasi', '{{ $currentStatus === 'inactive' ? 'Aktifkan kembali member ini?' : 'Nonaktifkan member ini? (Akses akan dicabut)' }}', '{{ $currentStatus === 'inactive' ? 'question' : 'warning' }}').then(res => res.isConfirmed && $el.closest('form').submit())"
                                             class="p-2 {{ $currentStatus === 'inactive' ? 'text-green-500 hover:bg-green-50' : 'text-slate-400 hover:bg-slate-50' }} rounded-lg transition-colors"
                                             title="{{ $currentStatus === 'inactive' ? 'Aktifkan' : 'Nonaktifkan' }}">
                                             @if($currentStatus === 'inactive')
@@ -143,11 +137,11 @@
                                             @endif
                                         </button>
                                     </form>
-                                    <form action="{{ route('superadmin.data_member.destroy', $member->id) }}" method="POST"
-                                        onsubmit="return confirm('Hapus member ini?')">
+                                    <form action="{{ route('superadmin.data_member.destroy', $member->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
+                                        <button type="button"
+                                            @click="window.swalConfirm('Hapus Member?', 'Data member ini akan dihapus permanen dari sistem.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                             class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -77,11 +77,11 @@
                                             </path>
                                         </svg>
                                     </button>
-                                    <form action="{{ route('superadmin.data_user.destroy', $user->id) }}" method="POST"
-                                        onsubmit="return confirm('Hapus user ini?')">
+                                    <form action="{{ route('superadmin.data_user.destroy', $user->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
+                                        <button type="button"
+                                            @click="window.swalConfirm('Hapus User?', 'Akun user ini akan dihapus permanen.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                             class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

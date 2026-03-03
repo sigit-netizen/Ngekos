@@ -61,23 +61,34 @@ class DynamicPermissionSeeder extends Seeder
             $plans = DB::table('plans')->get();
 
             foreach ($plans as $plan) {
-                // Konversi nama plan ke format slug atau lowercase untuk nama Role
                 $roleName = strtolower(str_replace(' ', '_', $plan->nama_plans));
 
                 if ($roleName !== 'superadmin') {
                     $role = Role::firstOrCreate(['name' => $roleName]);
-                    // Secara default berikan semua permission dulu agar bisa diedit di UI Superadmin
-                    // Nantinya superadmin yang akan mengatur ulang/revoking di menu "Manage Permission"
-                    $role->syncPermissions($permissions);
+                    // Only GIVE permissions, do not SYNC (wipe existing)
+                    // This ensures that user-defined permissions in the UI are preserved
+                    foreach ($permissions as $p) {
+                        if (!$role->hasPermissionTo($p)) {
+                            $role->givePermissionTo($p);
+                        }
+                    }
                 }
             }
         } else {
-            // Fallback jika tabel plans belum ada/kosong
+            // Fallback
             $memberRole = Role::firstOrCreate(['name' => 'member']);
-            $memberRole->syncPermissions($permissions);
+            foreach ($permissions as $p) {
+                if (!$memberRole->hasPermissionTo($p)) {
+                    $memberRole->givePermissionTo($p);
+                }
+            }
 
             $userRole = Role::firstOrCreate(['name' => 'user']);
-            $userRole->syncPermissions($permissions);
+            foreach ($permissions as $p) {
+                if (!$userRole->hasPermissionTo($p)) {
+                    $userRole->givePermissionTo($p);
+                }
+            }
         }
 
         // Always create 'users' and 'admin' roles (referenced by controllers)
