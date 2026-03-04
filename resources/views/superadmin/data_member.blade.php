@@ -15,7 +15,7 @@
 
                     {{-- Search Input --}}
                     <input type="text" name="search" value="{{ $search ?? '' }}"
-                        placeholder="Cari nama, email, NIK, atau WA..."
+                        placeholder="Cari nama, email, NIK, WA, atau Nama Kos..."
                         style="padding: 10px 16px; font-size:14px; border: 2px solid #e5e7eb; border-radius: 12px; outline:none; background:#fff; color:#1f2937; min-width:240px; flex:1; max-width:320px;">
 
                     {{-- Paket Dropdown --}}
@@ -90,7 +90,16 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm font-medium text-gray-700">NIK: {{ $member->nik }}</div>
-                                <div class="text-xs text-green-600 font-bold">WA: {{ $member->nomor_wa }}</div>
+                                <div class="text-xs text-green-600 font-bold mb-1">WA: {{ $member->nomor_wa }}</div>
+                                @if($member->kos->isNotEmpty())
+                                    <div class="text-[10px] font-bold text-[#36B2B2] bg-[#36B2B2]/10 px-2 py-0.5 rounded-md inline-block">
+                                        Kos: {{ $member->kos->pluck('nama_kos')->join(', ') }}
+                                    </div>
+                                @else
+                                    <div class="text-[10px] font-medium text-gray-400 italic">
+                                        Belum ada kos
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase">

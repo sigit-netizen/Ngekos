@@ -68,7 +68,7 @@
 
             <!-- Scrollable Main Container -->
             <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 relative z-0">
-                @if (session('success_login') || session('success') || session('error'))
+                @if (session('success_login') || session('success') || session('error') || $errors->any())
                     <script>
                         document.addEventListener('DOMContentLoaded', () => {
                             @if(session('success_login') || session('success'))
@@ -76,6 +76,11 @@
                             @endif
                             @if(session('error'))
                                 window.swalToast("{{ session('error') }}", 'error');
+                            @endif
+                            @if($errors->any())
+                                @foreach($errors->all() as $err)
+                                    window.swalToast("{{ $err }}", 'error');
+                                @endforeach
                             @endif
                                 });
                     </script>

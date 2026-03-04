@@ -56,13 +56,13 @@
             <div class="flex bg-gray-100 p-1 rounded-xl">
                 <!-- Tab Kategori Admin (Pro, Premium) -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'admin']) }}" class="{{ $viewGroup === 'admin' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                              px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Administrator (Pro / Premium)
                 </a>
 
                 <!-- Tab Kategori User -->
                 <a href="{{ route('superadmin.permission', ['view_group' => 'user']) }}" class="{{ $viewGroup === 'user' ? 'bg-white shadow-sm text-[#36B2B2] font-semibold' : 'text-gray-500 hover:text-gray-700 font-medium' }} 
-                                                          px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
+                                                              px-6 py-2.5 rounded-lg text-sm transition-all duration-300">
                     Aplikasi User
                 </a>
             </div>
@@ -81,7 +81,15 @@
                         <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="py-3 px-4 font-semibold text-gray-600">Menu Akses</th>
                             @foreach($roles as $r)
-                                <th class="py-3 px-4 font-semibold text-gray-600 text-center capitalize">{{ $r->name }}</th>
+                                <th class="py-3 px-4 font-semibold text-gray-600 text-center capitalize">
+                                    @if($r->name === 'users')
+                                        Penyewa
+                                    @elseif($r->name === 'user')
+                                        User Umum
+                                    @else
+                                        {{ str_replace('_', ' ', $r->name) }}
+                                    @endif
+                                </th>
                             @endforeach
                         </tr>
                     </thead>
@@ -134,7 +142,15 @@
                         <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="py-3 px-4 font-semibold text-gray-600 w-1/4">Nama Fitur</th>
                             @foreach($roles as $r)
-                                <th class="py-3 px-4 font-semibold text-gray-600 text-center capitalize">{{ $r->name }}</th>
+                                <th class="py-3 px-4 font-semibold text-gray-600 text-center capitalize">
+                                    @if($r->name === 'users')
+                                        Penyewa
+                                    @elseif($r->name === 'user')
+                                        User Umum
+                                    @else
+                                        {{ str_replace('_', ' ', $r->name) }}
+                                    @endif
+                                </th>
                             @endforeach
                         </tr>
                     </thead>

@@ -45,4 +45,17 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    /**
+     * Render an exception into an HTTP response.
+     */
+    public function render($request, Throwable $exception)
+    {
+        // Handle 419 Page Expired (TokenMismatchException)
+        if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+            return redirect()->route('login')->with('error', 'Sesi Anda telah berakhir atau akun Anda login di perangkat lain. Silakan login kembali.');
+        }
+
+        return parent::render($request, $exception);
+    }
 }

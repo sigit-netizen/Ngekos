@@ -41,20 +41,20 @@
         @if (($role ?? 'user') == 'admin')
             <div class="px-4 mb-6">
                 <div class="p-3 rounded-2xl border transition-all duration-300
-                                        @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
-                                        @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
-                                        @else bg-red-50 border-red-100 @endif">
+                                                @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
+                                                @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
+                                                @else bg-red-50 border-red-100 @endif">
 
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-2 h-2 rounded-full 
-                                                @if($sidebarStatus == 'active') bg-[#36B2B2] 
-                                                @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
-                                                @else bg-red-500 @endif">
+                                                        @if($sidebarStatus == 'active') bg-[#36B2B2] 
+                                                        @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
+                                                        @else bg-red-500 @endif">
                         </div>
                         <span class="text-[10px] font-bold uppercase tracking-wider
-                                                @if($sidebarStatus == 'active') text-[#36B2B2] 
-                                                @elseif($sidebarStatus == 'grace') text-amber-700 
-                                                @else text-red-700 @endif">
+                                                        @if($sidebarStatus == 'active') text-[#36B2B2] 
+                                                        @elseif($sidebarStatus == 'grace') text-amber-700 
+                                                        @else text-red-700 @endif">
                             {{ $planName }}
                             @if($sidebarStatus == 'active') ACTIVE
                             @elseif($sidebarStatus == 'grace') GRACE PERIOD
@@ -307,7 +307,7 @@
                     $tpOrder = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
                     $tpUser = $adminKos ? \App\Models\PendingUser::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
                     $tpReview = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'verified')->count() : 0;
-                    
+
                     // Semua yang belum jadi 'Penyewa Aktif' (status paid/active) dianggap perlu perhatian
                     $totalActionNeeded = $tpOrder + $tpUser + $tpReview;
                 @endphp
@@ -329,7 +329,9 @@
                         <span>Order</span>
                         <div class="flex gap-1">
                             @if($totalActionNeeded > 0)
-                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 italic">{{ $totalActionNeeded }} Baru</span>
+                                <span
+                                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-red-50 text-red-600 border border-red-100 italic">{{ $totalActionNeeded }}
+                                    Baru</span>
                             @endif
                         </div>
                     </div>

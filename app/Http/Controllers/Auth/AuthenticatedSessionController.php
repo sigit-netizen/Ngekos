@@ -41,13 +41,30 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $user = Auth::user();
 
+        // Check if there are active sessions on OTHER devices
+        $hasOtherSession = \Illuminate\Support\Facades\DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->where('id', '!=', session()->getId())
+            ->exists();
+
+        if ($hasOtherSession) {
+            // Temporarily log them out and save ID to session for the OTP Selection page
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            session(['pending_otp_user_id' => $user->id]);
+
+            return redirect()->route('otp.select');
+        }
+
         $request->session()->regenerate();
 
         if ($user->hasRole('superadmin')) {
             $route = 'superadmin.dashboard';
         } elseif ($user->hasRole('admin') || $user->hasRole('nonaktif')) {
             $route = 'admin.dashboard';
-        } elseif ($user->hasRole('users')) {
+        } elseif ($user->hasRole(['users', 'user'])) {
             $route = 'user.dashboard';
         } elseif ($user->hasRole('member')) {
             $route = 'member.dashboard';

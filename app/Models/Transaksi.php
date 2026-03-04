@@ -45,4 +45,54 @@ class Transaksi extends Model
     {
         return $this->belongsTo(Kos::class, 'kode_kos', 'kode_kos');
     }
+
+    /**
+     * Check and cancel expired verified transactions.
+     * Often called before listing orders to ensure up-to-date status.
+     */
+    public static function checkExpiry()
+    {
+        // 1. Handle Verified orders (Waiting for Payment) - 24h limit (batas_bayar)
+        $expiredUnpaid = self::where('status', 'verified')
+            ->whereNull('bukti_pembayaran')
+            ->where('batas_bayar', '<', now())
+            ->get();
+
+        foreach ($expiredUnpaid as $order) {
+            \DB::beginTransaction();
+            try {
+                $order->update(['status' => 'failed']);
+                if ($order->kamar) {
+                    $order->kamar->update(['status' => 'tersedia']);
+                }
+                \DB::commit();
+            } catch (\Exception $e) {
+                \DB::rollBack();
+            }
+        }
+
+        // 2. Handle Pending orders (Waiting for Admin Verification) - 24h limit
+        self::where('status', 'pending')
+            ->where('created_at', '<', now()->subDay())
+            ->update(['status' => 'rejected']);
+
+        // 3. Handle Verified orders with Proof (Waiting for Admin Confirmation) - 24h limit
+        $expiredUnconfirmed = self::where('status', 'verified')
+            ->whereNotNull('bukti_pembayaran')
+            ->where('tanggal_pembayaran', '<', now()->subDay())
+            ->get();
+
+        foreach ($expiredUnconfirmed as $order) {
+            \DB::beginTransaction();
+            try {
+                $order->update(['status' => 'failed']);
+                if ($order->kamar) {
+                    $order->kamar->update(['status' => 'tersedia']);
+                }
+                \DB::commit();
+            } catch (\Exception $e) {
+                \DB::rollBack();
+            }
+        }
+    }
 }

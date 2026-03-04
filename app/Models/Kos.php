@@ -20,7 +20,22 @@ class Kos extends Model
         'id_user',
         'is_kode_kos_edited',
         'foto',
+        'kota',
+        'nama_kota',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($kos) {
+            if ($kos->isDirty('kota') && !$kos->isDirty('nama_kota')) {
+                $kos->nama_kota = $kos->kota;
+            } elseif ($kos->isDirty('nama_kota') && !$kos->isDirty('kota')) {
+                $kos->kota = $kos->nama_kota;
+            }
+        });
+    }
 
     public function user()
     {
@@ -30,5 +45,10 @@ class Kos extends Model
     public function kamars()
     {
         return $this->hasMany(Kamar::class, 'id_kos');
+    }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorits', 'id_kos', 'id_user')->withTimestamps();
     }
 }

@@ -14,6 +14,13 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+
+        // Auto-cancel expired verified orders
+        Transaksi::checkExpiry();
+
+        // Auto-cancel expired registration requests
+        \App\Models\PendingUser::checkExpiry();
+
         $tab = $request->get('tab', 'order');
         $statusFilter = $request->get('status');
 
@@ -139,8 +146,14 @@ class OrderController extends Controller
      * Verify an order: Set status to verified and start 24h timer.
      * Also marks kamar as 'terisi' to hold reservation.
      */
-    public function verifyOrder(Transaksi $transaksi)
+    public function verifyOrder($id)
     {
+        $transaksi = Transaksi::find($id);
+
+        if (!$transaksi) {
+            return back()->with('error', 'Pesanan tidak ditemukan. Kemungkinan user telah membatalkan order ini.');
+        }
+
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
@@ -178,8 +191,14 @@ class OrderController extends Controller
     /**
      * Confirm payment and activate user.
      */
-    public function confirmPayment(Transaksi $transaksi)
+    public function confirmPayment($id)
     {
+        $transaksi = Transaksi::find($id);
+
+        if (!$transaksi) {
+            return back()->with('error', 'Pesanan tidak ditemukan. Kemungkinan user telah membatalkan order ini.');
+        }
+
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
@@ -252,8 +271,14 @@ class OrderController extends Controller
     /**
      * Reject an order.
      */
-    public function rejectOrder(Transaksi $transaksi)
+    public function rejectOrder($id)
     {
+        $transaksi = Transaksi::find($id);
+
+        if (!$transaksi) {
+            return back()->with('error', 'Pesanan tidak ditemukan. Kemungkinan user telah membatalkan order ini.');
+        }
+
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 

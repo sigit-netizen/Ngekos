@@ -209,7 +209,7 @@
             <div class="p-0" x-data="{ showProof: false, proofUrl: '' }">
                 {{-- Proof Modal --}}
                 <div x-show="showProof"
-                    class="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm"
+                    class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm"
                     @click="showProof = false" x-cloak>
                     <div class="relative max-w-2xl w-full bg-white rounded-3xl p-2 shadow-2xl overflow-hidden" @click.stop>
                         <button @click="showProof = false"
@@ -268,7 +268,35 @@
                                                         class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-black text-sm">
                                                         {{ substr($pending->name, 0, 1) }}</div>
                                                     <div>
-                                                        <div class="font-bold text-gray-900">{{ $pending->name }}</div>
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="font-bold text-gray-900">{{ $pending->name }}</div>
+                                                            {{-- Countdown Timer --}}
+                                                            <div x-data="{ 
+                                                                expiryTime: new Date('{{ $pending->created_at->addDay()->toIso8601String() }}').getTime(),
+                                                                now: new Date().getTime(),
+                                                                timer: '',
+                                                                init() {
+                                                                    this.updateTimer();
+                                                                    setInterval(() => {
+                                                                        this.now = new Date().getTime();
+                                                                        this.updateTimer();
+                                                                    }, 1000);
+                                                                },
+                                                                updateTimer() {
+                                                                    let diff = this.expiryTime - this.now;
+                                                                    if (diff <= 0) {
+                                                                        this.timer = 'EXPIRED';
+                                                                        return;
+                                                                    }
+                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                    this.timer = `${h}j ${m}m ${s}d`;
+                                                                }
+                                                            }" class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
+                                                                <span x-text="timer"></span>
+                                                            </div>
+                                                        </div>
                                                         <div class="text-[10px] text-gray-400 font-medium">{{ $pending->email }}
                                                         </div>
                                                     </div>
@@ -356,7 +384,64 @@
                                                     class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
                                                     {{ substr($order->user->name ?? '?', 0, 1) }}</div>
                                                 <div>
-                                                    <div class="font-bold text-gray-900">{{ $order->user->name ?? 'N/A' }}</div>
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="font-bold text-gray-900">{{ $order->user->name ?? 'N/A' }}</div>
+                                                        @if($order->status === 'pending')
+                                                            {{-- Countdown Timer for Owner to Verify --}}
+                                                            <div x-data="{ 
+                                                                expiryTime: new Date('{{ $order->created_at->addDay()->toIso8601String() }}').getTime(),
+                                                                now: new Date().getTime(),
+                                                                timer: '',
+                                                                init() {
+                                                                    this.updateTimer();
+                                                                    setInterval(() => {
+                                                                        this.now = new Date().getTime();
+                                                                        this.updateTimer();
+                                                                    }, 1000);
+                                                                },
+                                                                updateTimer() {
+                                                                    let diff = this.expiryTime - this.now;
+                                                                    if (diff <= 0) {
+                                                                        this.timer = 'EXPIRED';
+                                                                        return;
+                                                                    }
+                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                    this.timer = `${h}j ${m}m ${s}d`;
+                                                                }
+                                                            }" class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
+                                                                <span x-text="timer"></span>
+                                                            </div>
+                                                        @elseif($order->status === 'verified' && $order->bukti_pembayaran)
+                                                            {{-- Countdown Timer for Owner to Confirm Payment --}}
+                                                            <div x-data="{ 
+                                                                expiryTime: new Date('{{ $order->tanggal_pembayaran->addDay()->toIso8601String() }}').getTime(),
+                                                                now: new Date().getTime(),
+                                                                timer: '',
+                                                                init() {
+                                                                    this.updateTimer();
+                                                                    setInterval(() => {
+                                                                        this.now = new Date().getTime();
+                                                                        this.updateTimer();
+                                                                    }, 1000);
+                                                                },
+                                                                updateTimer() {
+                                                                    let diff = this.expiryTime - this.now;
+                                                                    if (diff <= 0) {
+                                                                        this.timer = 'EXPIRED';
+                                                                        return;
+                                                                    }
+                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                    this.timer = `${h}j ${m}m ${s}d`;
+                                                                }
+                                                            }" class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
+                                                                <span x-text="timer"></span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                     <div class="text-[10px] text-gray-400 font-medium">
                                                         {{ $order->user->email ?? '' }}</div>
                                                 </div>
@@ -400,14 +485,24 @@
                                                 @elseif($order->status === 'verified')
                                                     @if($order->bukti_pembayaran)
                                                         @if($statusFilter === 'konfirmasi')
-                                                            <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}">
-                                                                @csrf
-                                                                <button type="button"
-                                                                    @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                    class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
-                                                                    ✓ Konfirmasi
-                                                                </button>
-                                                            </form>
+                                                                <div class="flex items-center gap-2">
+                                                                    <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                            ✓ Konfirmasi
+                                                                        </button>
+                                                                    </form>
+                                                                    <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
+                                                                            Tolak
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
                                                             <button
                                                                 @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
                                                                 class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">

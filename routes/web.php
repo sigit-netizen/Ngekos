@@ -64,9 +64,9 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::put('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'update'])->name('admin.subscription.update');
 
     Route::get('/admin/order', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.order');
-    Route::post('/admin/order/{transaksi}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
-    Route::post('/admin/order/{transaksi}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('admin.order.confirm');
-    Route::post('/admin/order/{transaksi}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
+    Route::post('/admin/order/{id}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
+    Route::post('/admin/order/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('admin.order.confirm');
+    Route::post('/admin/order/{id}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
 
     // Penyewa (PendingUser) Verification
     Route::post('/admin/penyewa/{pendingUser}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyPenyewa'])->name('admin.penyewa.verify');
@@ -83,7 +83,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
 });
 
 // Protected User Dashboards (Anak Kos)
-Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function () {
+Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(function () {
     Route::get('/user', function () {
         return view('user.dashboard', ['role' => 'user']);
     })->name('user.dashboard');
@@ -101,6 +101,7 @@ Route::middleware(['auth', 'role:users', 'check.subscription'])->group(function 
     Route::post('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'store'])->name('user.order.store');
     Route::post('/user/order/{transaksi}/cancel', [\App\Http\Controllers\User\UserOrderController::class, 'cancelOrder'])->name('user.order.cancel');
     Route::post('/user/order/{transaksi}/upload-proof', [\App\Http\Controllers\User\UserOrderController::class, 'uploadProof'])->name('user.order.upload-proof');
+    Route::post('/user/kos/{id}/toggle-favorit', [\App\Http\Controllers\User\UserOrderController::class, 'toggleFavorit'])->name('user.kos.toggle-favorit');
 
     Route::get('/user/jatuh-tempo', function () {
         return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);

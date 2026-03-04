@@ -13,9 +13,21 @@ class UserManagementController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $type = $request->get('type', 'all');
 
-        // Only get users with 'users' role (Anak Kos)
-        $query = User::role('users');
+        // Exclude admin and superadmin roles
+        $query = User::whereDoesntHave('roles', function ($q) {
+            $q->whereIn('name', ['admin', 'superadmin']);
+        });
+
+        // Filter by type
+        if ($type === 'penyewa') {
+            $query->whereNotNull('id_kos')->whereNotNull('id_kamar');
+        } elseif ($type === 'user') {
+            $query->where(function ($q) {
+                $q->whereNull('id_kos')->orWhereNull('id_kamar');
+            });
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -29,10 +41,11 @@ class UserManagementController extends Controller
         $users = $query->latest()->paginate(10);
 
         return view('superadmin.data_user', [
-            'title' => 'Manajemen User (Anak Kos)',
+            'title' => 'Manajemen User',
             'users' => $users,
             'role' => 'superadmin',
-            'search' => $search
+            'search' => $search,
+            'currentType' => $type
         ]);
     }
 

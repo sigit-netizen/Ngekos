@@ -10,4 +10,14 @@ class PendingUser extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    /**
+     * Check and reject expired registration requests (older than 24h).
+     */
+    public static function checkExpiry()
+    {
+        self::where('status', 'pending')
+            ->where('created_at', '<', now()->subDay())
+            ->update(['status' => 'rejected']);
+    }
 }

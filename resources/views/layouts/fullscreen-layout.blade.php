@@ -21,10 +21,6 @@
             padding-right: 15px;
         }
 
-        [x-cloak] {
-            display: none !important;
-        }
-
         /* Modern SweetAlert2 UI - White & Gradient Border */
         .modern-swal-popup {
             background-color: transparent !important;
@@ -218,7 +214,7 @@
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 5000,
                 timerProgressBar: true,
                 customClass: {
                     popup: 'rounded-2xl shadow-xl border-none bg-white dark:bg-slate-800 p-4'

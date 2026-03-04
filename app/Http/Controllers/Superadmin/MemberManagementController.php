@@ -23,7 +23,10 @@ class MemberManagementController extends Controller
                 $q->where('name', 'ilike', "%{$search}%")
                     ->orWhere('email', 'ilike', "%{$search}%")
                     ->orWhere('nik', 'ilike', "%{$search}%")
-                    ->orWhere('nomor_wa', 'ilike', "%{$search}%");
+                    ->orWhere('nomor_wa', 'ilike', "%{$search}%")
+                    ->orWhereHas('kos', function ($kosQ) use ($search) {
+                        $kosQ->where('nama_kos', 'ilike', "%{$search}%");
+                    });
             });
         }
 
@@ -31,7 +34,7 @@ class MemberManagementController extends Controller
             $query->where('id_plans', $paket);
         }
 
-        $members = $query->with('statusUser')->latest()->paginate(10);
+        $members = $query->with(['statusUser', 'kos'])->latest()->paginate(10);
 
         return view('superadmin.data_member', [
             'title' => 'Manajemen Member (Pemilik Kos)',

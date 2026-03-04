@@ -17,6 +17,9 @@ class UserOrderController extends Controller
     {
         $user = auth()->user();
 
+        // Auto-cancel expired verified orders
+        Transaksi::checkExpiry();
+
         // Get user's order history
         $orders = Transaksi::where('id_user', $user->id)
             ->with(['kamar.kos'])
@@ -59,12 +62,18 @@ class UserOrderController extends Controller
 
         $query = Kos::query();
 
-        // 1. Filter by lokasi
+        // 1. Filter by lokasi / kota
         if ($lokasi) {
             $query->where(function ($q) use ($lokasi) {
                 $q->where('alamat', 'like', '%' . $lokasi . '%')
-                    ->orWhere('nama_kos', 'like', '%' . $lokasi . '%');
+                    ->orWhere('nama_kos', 'like', '%' . $lokasi . '%')
+                    ->orWhere('kota', 'like', '%' . $lokasi . '%')
+                    ->orWhere('nama_kota', 'like', '%' . $lokasi . '%');
             });
+        }
+
+        if ($request->filled('kota')) {
+            $query->where('kota', $request->kota);
         }
 
         // 2. Filter by kategori
@@ -74,7 +83,10 @@ class UserOrderController extends Controller
 
         // 3. Filter by availability and price (using whereHas)
         $query->whereHas('kamars', function ($q) use ($hargaMin, $hargaMax) {
-            $q->where('status', 'tersedia');
+            $q->where('status', 'tersedia')
+                ->whereDoesntHave('transaksis', function ($sub) {
+                    $sub->whereIn('status', ['pending', 'verified', 'paid']);
+                });
             if (!is_null($hargaMin)) {
                 $q->where('harga', '>=', $hargaMin);
             }
@@ -86,7 +98,10 @@ class UserOrderController extends Controller
         // 4. Eager load only the matching rooms
         $query->with([
             'kamars' => function ($q) use ($hargaMin, $hargaMax) {
-                $q->where('status', 'tersedia');
+                $q->where('status', 'tersedia')
+                    ->whereDoesntHave('transaksis', function ($sub) {
+                        $sub->whereIn('status', ['pending', 'verified', 'paid']);
+                    });
                 if (!is_null($hargaMin)) {
                     $q->where('harga', '>=', $hargaMin);
                 }
@@ -94,6 +109,9 @@ class UserOrderController extends Controller
                     $q->where('harga', '<=', $hargaMax);
                 }
                 $q->with('fasilitas');
+            },
+            'favoritedBy' => function ($q) {
+                $q->where('users.id', auth()->id());
             }
         ]);
 
@@ -160,6 +178,15 @@ class UserOrderController extends Controller
             return back()->with('error', 'Anda sudah memiliki order yang menunggu verifikasi untuk kamar ini.');
         }
 
+        // NEW: Check if the room is locked by someone else (pending, verified or paid)
+        $lockedOrder = Transaksi::where('id_kamar', $request->id_kamar)
+            ->whereIn('status', ['pending', 'verified', 'paid'])
+            ->first();
+
+        if ($lockedOrder) {
+            return back()->with('error', 'Maaf, kamar ini baru saja dibooking oleh orang lain. Silakan pilih kamar lain.');
+        }
+
         // Check if user is already a tenant
         if ($user->isPenyewa()) {
             return back()->with('error', 'Anda sudah menjadi penyewa. Tidak bisa membuat order baru.');
@@ -213,40 +240,66 @@ class UserOrderController extends Controller
         return back()->with('success', 'Order berhasil dibatalkan.');
     }
 
-    public function uploadProof(Request $request, Transaksi $transaksi)
+    public function uploadProof(Request $request, $id)
     {
-        if ($transaksi->id_user !== auth()->id()) {
-            abort(403);
-        }
+        $request->validate([
+            'bukti_pembayaran_camera' => 'nullable|image|max:10240',
+            'bukti_pembayaran_gallery' => 'nullable|image|max:10240',
+        ]);
 
-        if ($transaksi->status !== 'verified') {
+        $order = Transaksi::where('id_user', auth()->id())->findOrFail($id);
+
+        if ($order->status !== 'verified') {
             return back()->with('error', 'Silakan unggah bukti setelah pesanan disetujui.');
         }
 
         // Enforce 24h deadline
-        if ($transaksi->batas_bayar && now()->gt($transaksi->batas_bayar)) {
-            $transaksi->update(['status' => 'failed']);
+        if ($order->batas_bayar && now()->gt($order->batas_bayar)) {
+            $order->update(['status' => 'failed']);
             return back()->with('error', 'Waktu maksimal unggah bukti (1x24 jam) telah habis. Pesanan otomatis gagal.');
         }
 
-        $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        $file = $request->file('bukti_pembayaran_camera') ?: $request->file('bukti_pembayaran_gallery');
 
-        if ($request->hasFile('bukti_pembayaran')) {
-            $file = $request->file('bukti_pembayaran');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/bukti_pembayaran'), $filename);
-            $buktiPath = '/images/bukti_pembayaran/' . $filename;
-
-            $transaksi->update([
-                'bukti_pembayaran' => $buktiPath,
+        if ($file) {
+            $path = $file->store('bukti_pembayaran', 'public');
+            $order->update([
+                'bukti_pembayaran' => 'storage/' . $path,
                 'tanggal_pembayaran' => now(),
             ]);
 
-            return back()->with('success', 'Bukti pembayaran berhasil diunggah! Menunggu pengecekan admin.');
+            return back()->with('success', 'Bukti pembayaran berhasil diunggah. Mohon tunggu konfirmasi admin.');
         }
 
-        return back()->with('error', 'Gagal mengunggah bukti pembayaran.');
+        return back()->with('error', 'Silakan pilih atau ambil foto bukti pembayaran.');
+    }
+
+    /**
+     * Toggle kos favorit for the current user.
+     */
+    public function toggleFavorit(Request $request, $id)
+    {
+        $user = auth()->user();
+        $kos = Kos::findOrFail($id);
+
+        if ($user->favoritKos()->where('id_kos', $id)->exists()) {
+            $user->favoritKos()->detach($id);
+            $message = 'Berhasil dihapus dari favorit.';
+            $isFavorit = false;
+        } else {
+            $user->favoritKos()->attach($id);
+            $message = 'Berhasil ditambahkan ke favorit.';
+            $isFavorit = true;
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'is_favorit' => $isFavorit
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 }

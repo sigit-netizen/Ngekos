@@ -112,14 +112,22 @@ class OrderManagementController extends Controller
             if ($pendingUser->id_plans == 1) {
                 // Anak Kos
                 $user->id_plans = 1;
-                $user->assignRole('users');
 
                 // Link to kos via kode_kos
+                $isAssignedToKos = false;
                 if ($pendingUser->kode_kos) {
                     $kos = \App\Models\Kos::where('kode_kos', $pendingUser->kode_kos)->first();
                     if ($kos) {
                         $user->id_kos = $kos->id;
+                        $isAssignedToKos = true;
                     }
+                }
+
+                // Assign appropriate role
+                if ($isAssignedToKos) {
+                    $user->assignRole('users'); // Penyewa
+                } else {
+                    $user->assignRole('user'); // User Umum
                 }
 
                 $user->save();

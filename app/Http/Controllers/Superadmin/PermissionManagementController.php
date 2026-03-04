@@ -87,13 +87,13 @@ class PermissionManagementController extends Controller
             'role_permissions' => 'array',
         ]);
 
-        DB::transaction(function () use ($request) {
-            $viewGroup = $request->input('active_filter', 'admin');
+        $activeFilter = $request->input('active_filter', 'admin');
 
+        DB::transaction(function () use ($request, $activeFilter) {
             // Filter roles the same way the index method does to prevent wiping permissions of roles in other tabs
             $rolesQuery = Role::where('name', '!=', 'superadmin')->where('name', '!=', 'admin');
 
-            if ($viewGroup === 'user') {
+            if ($activeFilter === 'user') {
                 $rolesQuery->whereIn('name', ['user', 'users']);
             } else {
                 $rolesQuery->whereIn('name', ['pro', 'premium', 'per_kamar_pro', 'per_kamar_premium', 'nonaktif']);
@@ -110,8 +110,6 @@ class PermissionManagementController extends Controller
 
         // Hapus cache Spatie agar efek langsung dirasakan
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
-
-        $activeFilter = $request->input('active_filter', 'admin');
 
         // Redirect dengan alert sukses
         return redirect()->route('superadmin.permission', ['view_group' => $activeFilter])->with('success', 'Hak akses berhasil diperbarui!');

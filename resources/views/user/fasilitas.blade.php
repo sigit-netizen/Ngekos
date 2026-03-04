@@ -75,7 +75,7 @@
                     <p class="text-gray-500 font-medium mb-8 leading-relaxed max-w-[280px]">Laporkan kendala fasilitas kamar
                         Anda untuk penanganan cepat oleh pengelola.</p>
 
-                    <button @click.stop="showAduanModal = true"
+                    <button @click="showAduanModal = true"
                         class="inline-flex items-center gap-2 px-8 py-4 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-lg shadow-rose-500/10">
                         Buat Aduan
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,8 +229,8 @@
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-                x-cloak>
+                class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                style="display: none;">
 
                 <div @click.away="!isSubmitting && (showAduanModal = false)"
                     x-transition:enter="transition ease-out duration-300"

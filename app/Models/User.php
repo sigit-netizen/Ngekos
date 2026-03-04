@@ -34,6 +34,8 @@ class User extends Authenticatable
         'twitter',
         'youtube',
         'tiktok',
+        'otp',
+        'otp_expires_at',
     ];
 
     /**
@@ -53,6 +55,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'otp_expires_at' => 'datetime',
     ];
 
     /**
@@ -170,5 +173,10 @@ class User extends Authenticatable
         );
 
         $this->syncRoles(['nonaktif']);
+    }
+
+    public function favoritKos()
+    {
+        return $this->belongsToMany(Kos::class, 'favorits', 'id_user', 'id_kos')->withTimestamps();
     }
 }
