@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Dashboard' }} | Ngekos.id</title>
-    <link rel="icon" type="image/svg+xml" href="/images/logo/logo-icon.svg?v=2">
+    <link rel="icon" type="image/svg+xml" href="/storage/logo/logo-icon.svg?v=2">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,6 +19,10 @@
         .modal-open {
             overflow: hidden !important;
             padding-right: 15px;
+        }
+
+        [x-cloak] {
+            display: none !important;
         }
 
         /* Modern SweetAlert2 UI - White & Gradient Border */

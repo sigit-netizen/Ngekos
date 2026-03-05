@@ -69,12 +69,21 @@ class OrderController extends Controller
         // Count for 'Menunggu' (Diterima tapi belum upload bukti)
         $orderMenungguCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'verified')
+            ->where('tipe', Transaksi::TYPE_BOOKING)
             ->whereNull('bukti_pembayaran')
             ->count();
 
-        // Count for 'Konfirmasi' (Sudah upload bukti tapi belum dikonfirmasi admin)
+        // Count for 'Konfirmasi' (Sudah upload bukti tapi belum dikonfirmasi admin) - New Booking
         $orderKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'verified')
+            ->where('tipe', Transaksi::TYPE_BOOKING)
+            ->whereNotNull('bukti_pembayaran')
+            ->count();
+
+        // Count for 'Verifikasi Sewa' (Sudah upload bukti tapi belum dikonfirmasi admin) - Recurring Rent
+        $rentKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
+            ->where('status', 'pending')
+            ->where('tipe', Transaksi::TYPE_SEWA)
             ->whereNotNull('bukti_pembayaran')
             ->count();
 
@@ -105,11 +114,13 @@ class OrderController extends Controller
             ->with(['user', 'kamar'])
             ->when($tab === 'order', function ($q) use ($statusFilter) {
                 if ($statusFilter === 'verif') {
-                    $q->where('status', 'pending');
+                    $q->where('status', 'pending')->where('tipe', Transaksi::TYPE_BOOKING);
                 } elseif ($statusFilter === 'menunggu') {
-                    $q->where('status', 'verified')->whereNull('bukti_pembayaran');
+                    $q->where('status', 'verified')->where('tipe', Transaksi::TYPE_BOOKING)->whereNull('bukti_pembayaran');
                 } elseif ($statusFilter === 'konfirmasi') {
-                    $q->where('status', 'verified')->whereNotNull('bukti_pembayaran');
+                    $q->where('status', 'verified')->where('tipe', Transaksi::TYPE_BOOKING)->whereNotNull('bukti_pembayaran');
+                } elseif ($statusFilter === 'sewa') {
+                    $q->where('status', 'pending')->where('tipe', Transaksi::TYPE_SEWA)->whereNotNull('bukti_pembayaran');
                 } elseif ($statusFilter === 'rejected') {
                     $q->where('status', 'rejected');
                 } elseif ($statusFilter === 'paid') {
@@ -117,7 +128,7 @@ class OrderController extends Controller
                 } elseif ($statusFilter === 'failed') {
                     $q->where('status', 'failed');
                 } else {
-                    $q->where('status', 'pending');
+                    $q->where('status', 'pending')->where('tipe', Transaksi::TYPE_BOOKING);
                 }
             })
             ->latest()
@@ -134,6 +145,7 @@ class OrderController extends Controller
             'orderPendingCount' => $orderPendingCount,
             'orderMenungguCount' => $orderMenungguCount,
             'orderKonfirmasiCount' => $orderKonfirmasiCount,
+            'rentKonfirmasiCount' => $rentKonfirmasiCount,
             'orderVerifiedCount' => $orderVerifiedCount,
             'pendingPenyewa' => $pendingPenyewa,
             'riwayatPenyewa' => $riwayatPenyewa,
@@ -362,6 +374,14 @@ class OrderController extends Controller
     public function rejectPenyewa($id)
     {
         $pendingUser = \App\Models\PendingUser::findOrFail($id);
+        $user = auth()->user();
+        $kos = Kos::where('id_user', $user->id)->first();
+
+        // Security Check: ensure this pending user is for this kos
+        if (!$kos || $pendingUser->kode_kos !== $kos->kode_kos) {
+            return back()->with('error', 'Akses ditolak.');
+        }
+
         $pendingUser->update(['status' => 'rejected']);
         return back()->with('success', 'Pendaftaran user berhasil ditolak.');
     }

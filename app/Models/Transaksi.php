@@ -15,6 +15,7 @@ class Transaksi extends Model
         'jumlah_bayar',
         'tanggal_pembayaran',
         'status',
+        'tipe',
         'durasi_sewa',
         'tipe_durasi',
         'id_user',
@@ -25,6 +26,9 @@ class Transaksi extends Model
         'batas_bayar',
         'bukti_pembayaran',
     ];
+
+    const TYPE_BOOKING = 'booking';
+    const TYPE_SEWA = 'sewa';
 
     protected $casts = [
         'batas_bayar' => 'datetime',

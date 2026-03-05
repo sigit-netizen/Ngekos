@@ -35,9 +35,7 @@ Route::get('/pending', function () {
 
 // Protected Admin Dashboard
 Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(function () {
-    Route::get('/admin', function () {
-        return view('member.dashboard', ['role' => 'admin']);
-    })->name('admin.dashboard');
+    Route::get('/admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Kamar Management
     Route::get('/admin/kamar', [\App\Http\Controllers\Admin\KamarController::class, 'index'])->name('admin.kamar');

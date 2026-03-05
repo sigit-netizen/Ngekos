@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ngekos.id - Cari Kos Sesuai Kebutuhanmu</title>
-    <link rel="icon" type="image/svg+xml" href="/images/logo/logo-icon.svg?v=2">
+    <link rel="icon" type="image/svg+xml" href="/storage/logo/logo-icon.svg?v=2">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,7 +123,7 @@
                 class="flex items-center justify-between px-6 py-3 rounded-full transition-all duration-300">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center cursor-pointer w-48" @click="window.scrollTo(0,0)">
-                    <img src="/images/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
+                    <img src="/storage/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
                 </div>
 
                 <!-- Desktop Menu (Centered) -->
@@ -394,7 +394,7 @@
                                 <template x-for="kos in kosList" :key="kos.id">
                                     <div class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col h-full snap-start">
                                         <div class="relative w-full overflow-hidden aspect-[4/3]">
-                                            <img :src="kos.foto ? '/images/kos/' + kos.foto : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'"
+                                            <img :src="kos.foto ? (kos.foto.startsWith('http') ? kos.foto : (kos.foto.startsWith('storage/') ? '/' + kos.foto : (kos.foto.startsWith('/') ? kos.foto : '/storage/kos/' + kos.foto))) : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'"
                                                 :alt="kos.nama_kos"
                                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                             <div class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-black text-[#36B2B2] shadow-sm uppercase tracking-wide z-10"
@@ -502,7 +502,7 @@
                                     @endphp
                                     <div class="flex-none w-[280px] bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden snap-start flex flex-col h-full">
                                          <div class="relative w-full overflow-hidden aspect-[4/3]">
-                                             <img src="{{ $kos->foto ? asset('images/kos/' . $kos->foto) : $images[$index % count($images)] }}" alt="{{ $kos->nama_kos }}"
+                                             <img src="{{ $kos->foto ? (Str::startsWith($kos->foto, 'http') ? $kos->foto : (Str::startsWith($kos->foto, 'storage/') ? asset($kos->foto) : asset('storage/kos/' . $kos->foto))) : $images[$index % count($images)] }}" alt="{{ $kos->nama_kos }}"
                                                  draggable="false"
                                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 select-none">
                                              <div

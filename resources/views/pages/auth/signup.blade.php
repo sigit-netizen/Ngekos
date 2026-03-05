@@ -40,7 +40,7 @@
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
                     class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
-                    <img src="/images/logo/auth-logo.svg" alt="Logo" class="h-12 w-auto" />
+                    <img src="/storage/logo/auth-logo.svg" alt="Logo" class="h-12 w-auto" />
                 </a>
                 <p class="mt-3 text-sm font-medium text-gray-500">Mulai temukan kos impianmu sekarang</p>
             </div>

@@ -1,7 +1,7 @@
 <div id="preloader-overlay">
   <div class="loader-container">
     <div class="glowing-ring"></div>
-    <img src="{{ asset('images/logo/logo-dark.svg') }}" alt="Logo" class="logo-loader">
+    <img src="{{ asset('storage/logo/logo-dark.svg') }}" alt="Logo" class="logo-loader">
   </div>
 </div>
 
@@ -18,8 +18,8 @@
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    opacity: 0;
-    animation: preloader-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    z-index: 99999;
+    opacity: 1;
     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.1, 1), visibility 0.8s ease;
   }
 
@@ -133,7 +133,7 @@
         setTimeout(() => {
           preloader.style.display = 'none';
         }, 800);
-      }, 1200); 
+      }, 1200);
     });
   })();
 </script>

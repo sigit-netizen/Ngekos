@@ -357,26 +357,27 @@
                         </div>
                     </div>
 
+                    @php
+                        $popularCities = \App\Models\Kos::whereNotNull('kota')
+                            ->where('kota', '!=', '')
+                            ->distinct()
+                            ->pluck('kota')
+                            ->toArray();
+
+                        if (empty($popularCities)) {
+                            $popularCities = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang'];
+                        }
+                    @endphp
                     <!-- City Chips -->
                     <div class="flex flex-wrap gap-2 mb-5">
                         <p class="w-full text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Kota Populer
                         </p>
-                        <template x-for="city in ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang']"
-                            :key="city">
+                        <template x-for="city in {{ json_encode($popularCities) }}" :key="city">
                             <button @click="filters.lokasi = city; search()"
                                 :class="filters.lokasi === city ? 'bg-[#36B2B2] text-white border-[#36B2B2]' : 'bg-white text-gray-600 border-gray-200 hover:border-[#36B2B2]/50'"
                                 class="px-3 py-1.5 rounded-full border text-xs font-bold transition-all active:scale-95"
                                 x-text="city"></button>
                         </template>
-                        <button @click="filters.is_favorit_only = !filters.is_favorit_only; search()"
-                            :class="filters.is_favorit_only ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-rose-500 border-rose-200 hover:border-rose-300'"
-                            class="px-3 py-1.5 rounded-full border text-xs font-bold transition-all active:scale-95 flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                            </svg>
-                            Favorit Saya
-                        </button>
                     </div>
 
                     <!-- Action Buttons -->
@@ -429,7 +430,7 @@
                                             class="px-3 py-1 bg-[#36B2B2] text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">Featured</span>
                                     </div>
                                     <template x-if="kos.kamars && kos.kamars[0] && kos.kamars[0].foto">
-                                        <img :src="kos.kamars[0].foto.startsWith('http') ? kos.kamars[0].foto : (kos.kamars[0].foto.startsWith('/') ? kos.kamars[0].foto : '/images/kamar/' + kos.kamars[0].foto)"
+                                        <img :src="kos.kamars[0].foto.startsWith('http') ? kos.kamars[0].foto : (kos.kamars[0].foto.startsWith('storage/') ? '/' + kos.kamars[0].foto : (kos.kamars[0].foto.startsWith('/') ? kos.kamars[0].foto : '/storage/kamar/' + kos.kamars[0].foto))"
                                             class="w-full h-full object-cover group-hover/rec:scale-110 transition-transform duration-700">
                                     </template>
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent">
@@ -458,12 +459,15 @@
 
                                     <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-50">
                                         <div class="flex flex-col">
-                                            <span class="text-[9px] font-black text-gray-400 uppercase leading-none mb-1">Mulai
-                                                Dari</span>
-                                            <div class="flex items-baseline gap-0.5">
-                                                <span class="text-[10px] font-black text-[#36B2B2]">Rp</span>
-                                                <span class="text-base font-black text-gray-900 leading-none"
-                                                    x-text="(kos.kamars && kos.kamars[0] ? Number(kos.kamars[0].harga).toLocaleString('id-ID') : '0')"></span>
+                                            <span class="text-[9px] font-black text-gray-400 uppercase leading-none mb-1">Rentang
+                                                Harga</span>
+                                            <div class="flex items-baseline gap-1">
+                                                <span class="text-[10px] font-black text-gray-900"
+                                                    x-text="'Rp' + Number(kos.harga_termurah).toLocaleString('id-ID')"></span>
+                                                <template x-if="kos.harga_termahal && kos.harga_termurah !== kos.harga_termahal">
+                                                    <span class="text-[10px] font-black text-gray-900"
+                                                        x-text="' - ' + Number(kos.harga_termahal).toLocaleString('id-ID')"></span>
+                                                </template>
                                             </div>
                                         </div>
                                         <button
@@ -494,53 +498,160 @@
                                 <div
                                     class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300">
                                     <!-- Kos Header -->
-                                    <div class="p-5 bg-gradient-to-r from-[#36B2B2]/5 to-emerald-50/50 border-b border-gray-100 cursor-pointer"
-                                        @click="kos._expanded = !kos._expanded">
-                                        <div class="flex items-center justify-between">
+                                    <div class="p-5 bg-gradient-to-r from-[#36B2B2]/5 to-emerald-50/50 border-b border-gray-100">
+                                        <div class="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
                                             <div class="flex items-center gap-4">
                                                 <div
-                                                    class="h-12 w-12 rounded-xl bg-[#36B2B2] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#36B2B2]/30 shrink-0">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                                        </path>
-                                                    </svg>
+                                                    class="h-20 w-20 sm:h-24 sm:w-24 rounded-xl bg-[#36B2B2] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#36B2B2]/30 shrink-0 overflow-hidden relative">
+                                                    <template x-if="kos.foto">
+                                                        <img :src="kos.foto.startsWith('http') ? kos.foto : (kos.foto.startsWith('storage/') ? '/' + kos.foto : (kos.foto.startsWith('/') ? kos.foto : '/storage/kos/' + kos.foto))"
+                                                            class="w-full h-full object-cover">
+                                                    </template>
+                                                    <template x-if="!kos.foto">
+                                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                            </path>
+                                                        </svg>
+                                                    </template>
                                                 </div>
-                                                <div>
-                                                    <h3 class="text-lg font-black text-gray-900" x-text="kos.nama_kos"></h3>
-                                                    <p class="text-sm text-gray-500 flex items-center gap-1">
-                                                        📍 <span x-text="kos.alamat || 'Alamat tidak tersedia'"></span>
-                                                    </p>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2 mb-2">
+                                                        <h3 class="text-lg font-black text-gray-900 leading-tight truncate"
+                                                            x-text="kos.nama_kos"></h3>
+                                                        <template x-if="kos.kamars.length === 0">
+                                                            <span
+                                                                class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-rose-100 text-rose-600 border border-rose-200 shadow-sm shrink-0">
+                                                                Terisi Penuh 🚨
+                                                            </span>
+                                                        </template>
+                                                    </div>
+
+                                                    <div class="space-y-2">
+                                                        <!-- City -->
+                                                        <div class="flex items-center gap-2 text-gray-600">
+                                                            <svg class="w-4 h-4 text-[#36B2B2] shrink-0" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                                </path>
+                                                            </svg>
+                                                            <span class="text-xs font-bold uppercase tracking-wider"
+                                                                x-text="'Kota ' + (kos.kota || '')"></span>
+                                                        </div>
+
+                                                        <!-- Address -->
+                                                        <div class="flex items-start gap-2 text-gray-500">
+                                                            <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                                                </path>
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            </svg>
+                                                            <span class="text-xs font-medium leading-relaxed"
+                                                                x-text="kos.alamat || 'Alamat tidak tersedia'"></span>
+                                                        </div>
+
+                                                        <!-- Price Range -->
+                                                        <template
+                                                            x-if="kos.harga_termurah !== undefined && kos.harga_termurah !== null">
+                                                            <div class="flex items-center gap-2">
+                                                                <div class="p-1 rounded-md bg-[#36B2B2]/10 text-[#36B2B2]">
+                                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                                        viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                        </path>
+                                                                    </svg>
+                                                                </div>
+                                                                <div class="flex items-baseline gap-1">
+                                                                    <span class="text-sm font-black text-gray-900"
+                                                                        x-text="'Rp ' + Number(kos.harga_termurah).toLocaleString('id-ID')"></span>
+                                                                    <template
+                                                                        x-if="kos.harga_termahal && kos.harga_termurah !== kos.harga_termahal">
+                                                                        <span class="text-sm font-black text-gray-900"
+                                                                            x-text="' - ' + Number(kos.harga_termahal).toLocaleString('id-ID')"></span>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+
+                                                        <!-- Social Media -->
+                                                        <template
+                                                            x-if="kos.owner && (kos.owner.instagram || kos.owner.twitter || kos.owner.youtube || kos.owner.tiktok)">
+                                                            <div class="flex flex-wrap items-center gap-2 pt-2">
+                                                                <template x-if="kos.owner.instagram">
+                                                                    <a :href="kos.owner.instagram" target="_blank"
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-pink-50 text-[#E4405F] hover:bg-[#E4405F] hover:text-white transition-all duration-300 shadow-sm border border-pink-100 no-underline">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path
+                                                                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                                                        </svg>
+                                                                    </a>
+                                                                </template>
+                                                                <template x-if="kos.owner.twitter">
+                                                                    <a :href="kos.owner.twitter" target="_blank"
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-50 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition-all duration-300 shadow-sm border border-blue-100 no-underline">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path
+                                                                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                                                                        </svg>
+                                                                    </a>
+                                                                </template>
+                                                                <template x-if="kos.owner.tiktok">
+                                                                    <a :href="kos.owner.tiktok" target="_blank"
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300 shadow-sm border border-gray-200 no-underline">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path
+                                                                                d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.98-.23-2.81.33-.85.51-1.44 1.43-1.58 2.41-.14 1.01.23 2.06.94 2.78.73.74 1.77 1.1 2.81 1.02 1.02-.08 1.96-.69 2.44-1.59.39-.73.52-1.57.51-2.41.01-4.63.01-9.26.01-13.88z" />
+                                                                        </svg>
+                                                                    </a>
+                                                                </template>
+                                                                <template x-if="kos.owner.youtube">
+                                                                    <a :href="kos.owner.youtube" target="_blank"
+                                                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-all duration-300 shadow-sm border border-red-100 no-underline">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path
+                                                                                d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                                                                        </svg>
+                                                                    </a>
+                                                                </template>
+                                                            </div>
+                                                        </template>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-3 shrink-0">
-                                                <!-- Favorite Button -->
-                                                <button @click.stop="toggleFavorit(kos)"
-                                                    class="h-10 w-10 rounded-full flex items-center justify-center transition-all active:scale-75 shadow-sm border"
-                                                    :class="kos.is_favorit ? 'bg-rose-50 text-rose-500 border-rose-100' : 'bg-white text-gray-300 border-gray-100 hover:text-rose-400'">
-                                                    <svg class="w-5 h-5" :fill="kos.is_favorit ? 'currentColor' : 'none'"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-
+                                            <div class="flex flex-col items-end gap-2 shrink-0 mt-4 sm:mt-0 self-end">
                                                 <template x-if="kos.kategori">
                                                     <span
-                                                        class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-                                                        :class="kos.kategori === 'putra' ? 'bg-blue-100 text-blue-600' : (kos.kategori === 'putri' ? 'bg-pink-100 text-pink-600' : 'bg-purple-100 text-purple-600')"
+                                                        class="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full border"
+                                                        :class="kos.kategori === 'putra' ? 'bg-blue-50 text-blue-600 border-blue-100' : (kos.kategori === 'putri' ? 'bg-pink-50 text-pink-600 border-pink-100' : 'bg-purple-50 text-purple-600 border-purple-100')"
                                                         x-text="kos.kategori === 'putra' ? '🧑 Putra' : (kos.kategori === 'putri' ? '👩 Putri' : '👥 Campur')"></span>
                                                 </template>
-                                                <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-                                                    <span x-text="kos.kamars.length"></span> kamar
-                                                </span>
-                                                <svg class="w-5 h-5 text-gray-400 transition-transform duration-300"
-                                                    :class="kos._expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 9l-7 7-7-7"></path>
-                                                </svg>
+
+                                                <button @click="kos._expanded = !kos._expanded"
+                                                    class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200 hover:border-[#36B2B2] hover:bg-[#36B2B2]/5 transition-all outline-none">
+                                                    <span class="text-[10px] font-black uppercase tracking-widest text-[#36B2B2]"
+                                                        x-text="kos._expanded ? 'Tutup' : 'Lihat Kamar'"></span>
+                                                    <span
+                                                        class="text-[10px] font-black text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md"
+                                                        x-text="kos.kamars.length"></span>
+                                                    <svg class="w-3.5 h-3.5 text-[#36B2B2] transition-transform duration-300"
+                                                        :class="kos._expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                            d="M19 9l-7 7-7-7"></path>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -554,8 +665,18 @@
                                         </h4>
 
                                         <template x-if="kos.kamars.length === 0">
-                                            <div class="text-center py-8">
-                                                <p class="text-gray-400 text-sm font-medium">Tidak ada kamar tersedia saat ini.</p>
+                                            <div
+                                                class="text-center py-6 sm:py-8 bg-gray-50/50 rounded-2xl border border-gray-100 mb-2">
+                                                <div
+                                                    class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 mx-auto mb-3">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                                <p class="text-gray-900 text-sm font-bold mb-1">Yah, kos ini sedang penuh!</p>
+                                                <p class="text-gray-500 text-xs font-medium">Semua kamar sudah terisi atau sedang
+                                                    dalam proses transaksi. Coba cari kos lain yuk.</p>
                                             </div>
                                         </template>
 
@@ -574,7 +695,7 @@
                                                         <div
                                                             class="w-full h-32 rounded-xl overflow-hidden bg-white border border-gray-100 shrink-0 relative group-hover/room:shadow-md transition-all">
                                                             <template x-if="kamar.foto">
-                                                                <img :src="kamar.foto.startsWith('http') ? kamar.foto : (kamar.foto.startsWith('/') ? kamar.foto : '/images/kamar/' + kamar.foto)"
+                                                                <img :src="kamar.foto.startsWith('http') ? kamar.foto : (kamar.foto.startsWith('storage/') ? '/' + kamar.foto : (kamar.foto.startsWith('/') ? kamar.foto : '/storage/kamar/' + kamar.foto))"
                                                                     class="w-full h-full object-cover group-hover/room:scale-110 transition-transform duration-500">
                                                             </template>
                                                             <template x-if="!kamar.foto">
@@ -723,7 +844,7 @@
                                             <div
                                                 class="w-12 h-12 rounded-xl bg-white shrink-0 overflow-hidden shadow-sm border border-gray-100">
                                                 <template x-if="selectedKamar.foto">
-                                                    <img :src="selectedKamar.foto.startsWith('http') ? selectedKamar.foto : (selectedKamar.foto.startsWith('/') ? selectedKamar.foto : '/images/kamar/' + selectedKamar.foto)"
+                                                    <img :src="selectedKamar.foto.startsWith('http') ? selectedKamar.foto : (selectedKamar.foto.startsWith('storage/') ? '/' + selectedKamar.foto : (selectedKamar.foto.startsWith('/') ? selectedKamar.foto : '/storage/kamar/' + selectedKamar.foto))"
                                                         class="w-full h-full object-cover">
                                                 </template>
                                                 <template x-if="!selectedKamar.foto">
@@ -933,7 +1054,7 @@
                                     if (data.success) {
                                         this.kosList = data.data.map((kos, i) => ({
                                             ...kos,
-                                            _expanded: i === 0,
+                                            _expanded: false,
                                             is_favorit: kos.favorited_by && kos.favorited_by.length > 0
                                         }));
 

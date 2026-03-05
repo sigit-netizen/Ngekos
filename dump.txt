@@ -1,0 +1,157 @@
+[
+    {
+        "id": 32,
+        "foto": "storage\/kamar\/1kXJQEgr8ZiY40GHb4hphzoZ7fQd3RxHwC7uQ5CN.webp",
+        "nomor_kamar": "103"
+    },
+    {
+        "id": 7,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "101"
+    },
+    {
+        "id": 8,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "102"
+    },
+    {
+        "id": 22,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "211"
+    },
+    {
+        "id": 25,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "214"
+    },
+    {
+        "id": 1,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "101"
+    },
+    {
+        "id": 2,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "102"
+    },
+    {
+        "id": 3,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "101"
+    },
+    {
+        "id": 4,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "102"
+    },
+    {
+        "id": 5,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "101"
+    },
+    {
+        "id": 6,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "102"
+    },
+    {
+        "id": 11,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "101"
+    },
+    {
+        "id": 10,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "103"
+    },
+    {
+        "id": 12,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "201"
+    },
+    {
+        "id": 13,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "202"
+    },
+    {
+        "id": 14,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "203"
+    },
+    {
+        "id": 15,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "204"
+    },
+    {
+        "id": 16,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "205"
+    },
+    {
+        "id": 17,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "206"
+    },
+    {
+        "id": 18,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "207"
+    },
+    {
+        "id": 19,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "208"
+    },
+    {
+        "id": 20,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "209"
+    },
+    {
+        "id": 21,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "210"
+    },
+    {
+        "id": 23,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "212"
+    },
+    {
+        "id": 24,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "213"
+    },
+    {
+        "id": 26,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "215"
+    },
+    {
+        "id": 27,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "216"
+    },
+    {
+        "id": 28,
+        "foto": "room_premium_2.webp",
+        "nomor_kamar": "217"
+    },
+    {
+        "id": 29,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "218"
+    },
+    {
+        "id": 30,
+        "foto": "room_premium_1.webp",
+        "nomor_kamar": "219"
+    },
+    {
+        "id": 31,
+        "foto": "room_premium_3.webp",
+        "nomor_kamar": "220"
+    }
+]

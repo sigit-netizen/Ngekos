@@ -56,10 +56,19 @@ class KamarController extends Controller
                 Rule::unique('kamar')->where(fn($query) => $query->where('id_kos', $kos->id))
             ],
             'harga' => 'required|numeric|min:0',
-            'foto' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|max:10240', // Optimized: Allow images up to 10MB
+            'foto_camera' => 'nullable|image|max:10240',
+            'foto_gallery' => 'nullable|image|max:10240',
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'nullable|string',
         ]);
+
+        // Temporary path for background processing
+        $tempPath = null;
+        $file = $request->file('foto_camera') ?? $request->file('foto_gallery') ?? $request->file('foto');
+        if ($file) {
+            $tempPath = $file->store('temp', 'public');
+        }
 
         // Quota check
         $activeSubscription = $user->langganans()->where('status', 'active')->latest()->first();
@@ -75,9 +84,13 @@ class KamarController extends Controller
             'nomor_kamar' => $request->nomor_kamar,
             'harga' => $request->harga,
             'status' => 'tersedia', // Default, auto in view
-            'foto' => $request->foto,
+            'foto' => $tempPath ? 'storage/' . $tempPath : null, // Show temp before optimized
             'id_kos' => $kos->id,
         ]);
+
+        if ($tempPath) {
+            \App\Jobs\ProcessImageOptimization::dispatch($tempPath, 'kamar', $kamar, 'foto');
+        }
 
         // Add facilities
         if ($request->fasilitas) {
@@ -105,6 +118,11 @@ class KamarController extends Controller
         $user = Auth::user();
         $kos = $user->kos()->first();
 
+        // Security Check: Ensure kamar belongs to user's kos
+        if (!$kos || $kamar->id_kos !== $kos->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $request->validate([
             'nomor_kamar' => [
                 'required',
@@ -113,16 +131,34 @@ class KamarController extends Controller
                 Rule::unique('kamar')->where(fn($query) => $query->where('id_kos', $kos->id))->ignore($kamar->id)
             ],
             'harga' => 'required|numeric|min:0',
-            'foto' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|max:10240',
+            'foto_camera' => 'nullable|image|max:10240',
+            'foto_gallery' => 'nullable|image|max:10240',
         ]);
 
-        $kamar->update($request->only(['nomor_kamar', 'harga', 'foto']));
+        $updateData = $request->only(['nomor_kamar', 'harga']);
+
+        $file = $request->file('foto_camera') ?? $request->file('foto_gallery') ?? $request->file('foto');
+        if ($file) {
+            $tempPath = $file->store('temp', 'public');
+            \App\Jobs\ProcessImageOptimization::dispatch($tempPath, 'kamar', $kamar, 'foto');
+        }
+
+        $kamar->update($updateData);
 
         return back()->with('success', 'Data kamar berhasil diperbarui!');
     }
 
     public function updateFasilitas(Request $request, Kamar $kamar)
     {
+        $user = Auth::user();
+        $kos = $user->kos()->first();
+
+        // Security Check: Ensure kamar belongs to user's kos
+        if (!$kos || $kamar->id_kos !== $kos->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $request->validate([
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'nullable|string',
@@ -149,6 +185,14 @@ class KamarController extends Controller
 
     public function destroy(Kamar $kamar)
     {
+        $user = Auth::user();
+        $kos = $user->kos()->first();
+
+        // Security Check: Ensure kamar belongs to user's kos
+        if (!$kos || $kamar->id_kos !== $kos->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
         $kamar->delete();
         return back()->with('success', 'Kamar berhasil dihapus!');
     }

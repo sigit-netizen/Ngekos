@@ -10,10 +10,11 @@
         </div>
 
         <!-- Filters -->
-        <form action="{{ route('superadmin.dashboard') }}" method="GET" class="flex flex-wrap items-center gap-3">
-            <div class="relative" x-data="{ open: false }">
+        <form action="{{ route('superadmin.dashboard') }}" method="GET"
+            class="flex justify-start sm:justify-end flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <div class="relative flex-1 sm:flex-none" x-data="{ open: false }">
                 <select name="status_member" onchange="this.form.submit()"
-                    class="appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
+                    class="w-full sm:w-auto appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
                     <option value="all" {{ $filters['status_member'] == 'all' ? 'selected' : '' }}>Semua Member</option>
                     <option value="active" {{ $filters['status_member'] == 'active' ? 'selected' : '' }}>Aktif</option>
                     <option value="pending" {{ $filters['status_member'] == 'pending' ? 'selected' : '' }}>Pending</option>
@@ -25,9 +26,9 @@
                 </div>
             </div>
 
-            <div class="relative">
+            <div class="relative flex-1 sm:flex-none">
                 <select name="year" onchange="this.form.submit()"
-                    class="appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
+                    class="w-full sm:w-auto appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
                     @for($y = date('Y'); $y >= date('Y') - 4; $y--)
                         <option value="{{ $y }}" {{ $filters['year'] == $y ? 'selected' : '' }}>{{ $y }}</option>
                     @endfor
@@ -40,11 +41,11 @@
             </div>
 
             {{-- Month Filter --}}
-            <div class="relative">
+            <div class="relative flex-1 sm:flex-none">
                 <select name="month" onchange="this.form.submit()"
-                    class="appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
+                    class="w-full sm:w-auto appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
                     <option value="" {{ $filters['month'] == '' ? 'selected' : '' }}>Semua Bulan</option>
-                    @foreach(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as $i => $mName)
+                    @foreach(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $i => $mName)
                         <option value="{{ $i + 1 }}" {{ $filters['month'] == ($i + 1) ? 'selected' : '' }}>{{ $mName }}</option>
                     @endforeach
                 </select>
@@ -58,7 +59,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:24px; margin-bottom:32px;">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Pengguna -->
         <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group"
             data-aos="fade-up" data-aos-delay="100">
@@ -148,18 +149,20 @@
                         &mdash; Sumbu X: {{ $chart['mode'] === 'daily' ? 'Tanggal' : 'Bulan' }}
                     </p>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4 mt-4 md:mt-0">
                     <div class="flex items-center gap-2">
-                        <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#36B2B2;"></span>
-                        <span class="text-xs font-bold" style="color:#36B2B2;">User (Anak Kos)</span>
+                        <span
+                            style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#36B2B2;"></span>
+                        <span class="text-[10px] sm:text-xs font-bold" style="color:#36B2B2;">Anak Kos</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#8b5cf6;"></span>
-                        <span class="text-xs font-bold" style="color:#8b5cf6;">Member (Pemilik Kos)</span>
+                        <span
+                            style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#8b5cf6;"></span>
+                        <span class="text-[10px] sm:text-xs font-bold" style="color:#8b5cf6;">Pemilik Kos</span>
                     </div>
                 </div>
             </div>
-            <div class="h-[400px]">
+            <div class="h-[320px] sm:h-[400px]">
                 <canvas id="growthChart"></canvas>
             </div>
         </div>
@@ -171,6 +174,15 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const ctx = document.getElementById('growthChart').getContext('2d');
 
+                // Create Gradients
+                const userGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                userGradient.addColorStop(0, 'rgba(54, 178, 178, 0.2)');
+                userGradient.addColorStop(1, 'rgba(54, 178, 178, 0)');
+
+                const memberGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                memberGradient.addColorStop(0, 'rgba(139, 92, 246, 0.2)');
+                memberGradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+
                 new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -180,31 +192,25 @@
                                 label: 'User (Anak Kos)',
                                 data: {!! json_encode($chart['user_growth']) !!},
                                 borderColor: '#36B2B2',
-                                backgroundColor: 'rgba(54, 178, 178, 0.12)',
-                                borderWidth: 3,
-                                tension: 0.4,
+                                backgroundColor: userGradient,
+                                borderWidth: 3.5,
+                                tension: 0.45,
                                 fill: true,
-                                pointBackgroundColor: '#36B2B2',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 3,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointHoverBackgroundColor: '#36B2B2',
+                                pointRadius: 0,
+                                pointHoverRadius: 0,
+                                spanGaps: false
                             },
                             {
                                 label: 'Member (Pemilik Kos)',
                                 data: {!! json_encode($chart['member_growth']) !!},
                                 borderColor: '#8b5cf6',
-                                backgroundColor: 'rgba(139, 92, 246, 0.12)',
-                                borderWidth: 3,
-                                tension: 0.4,
+                                backgroundColor: memberGradient,
+                                borderWidth: 3.5,
+                                tension: 0.45,
                                 fill: true,
-                                pointBackgroundColor: '#8b5cf6',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 3,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointHoverBackgroundColor: '#8b5cf6',
+                                pointRadius: 0,
+                                pointHoverRadius: 0,
+                                spanGaps: false
                             }
                         ]
                     },
@@ -220,17 +226,21 @@
                                 display: false
                             },
                             tooltip: {
-                                backgroundColor: '#1e293b',
+                                backgroundColor: '#fff',
+                                titleColor: '#111827',
+                                bodyColor: '#374151',
+                                borderColor: '#e5e7eb',
+                                borderWidth: 1,
                                 padding: 14,
-                                titleFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
-                                bodyFont: { size: 13, family: 'Inter, sans-serif' },
-                                cornerRadius: 12,
+                                cornerRadius: 16,
                                 displayColors: true,
+                                usePointStyle: true,
                                 callbacks: {
-                                    label: function(ctx) {
+                                    label: function (ctx) {
                                         let v = ctx.raw;
-                                        if (v >= 1000000) v = (v/1000000).toFixed(1) + 'M';
-                                        else if (v >= 1000) v = (v/1000).toFixed(1) + 'k';
+                                        if (v === null) return null;
+                                        if (v >= 1000000) v = (v / 1000000).toFixed(1) + 'M';
+                                        else if (v >= 1000) v = (v / 1000).toFixed(1) + 'k';
                                         return ' ' + ctx.dataset.label + ': ' + v;
                                     }
                                 }
@@ -240,19 +250,19 @@
                             y: {
                                 beginAtZero: true,
                                 grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)',
-                                    drawBorder: false
+                                    color: 'rgba(0, 0, 0, 0.03)',
+                                    drawBorder: false,
+                                    borderDash: [5, 5]
                                 },
                                 ticks: {
-                                    font: { size: 11, weight: 'bold' },
+                                    font: { size: 11, weight: 'bold', family: 'Inter' },
                                     color: '#9ca3af',
-                                    // Auto-format large numbers: 1500 → 1.5k, 10000 → 10k
+                                    padding: 10,
                                     callback: function (value) {
                                         if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
                                         if (value >= 1000) return (value / 1000).toFixed(value % 1000 === 0 ? 0 : 1) + 'k';
                                         return value;
-                                    },
-                                    maxTicksLimit: 8
+                                    }
                                 }
                             },
                             x: {
@@ -260,11 +270,11 @@
                                     display: false
                                 },
                                 ticks: {
-                                    font: { size: 11, weight: 'bold' },
+                                    font: { size: 11, weight: 'bold', family: 'Inter' },
                                     color: '#9ca3af',
-                                    maxRotation: 45,
-                                    autoSkip: true,
-                                    maxTicksLimit: {!! $chart['mode'] === 'daily' ? 31 : 12 !!}
+                                    padding: 10,
+                                    maxRotation: 0,
+                                    autoSkip: true
                                 }
                             }
                         }

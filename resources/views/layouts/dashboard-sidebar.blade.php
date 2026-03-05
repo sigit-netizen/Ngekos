@@ -4,7 +4,7 @@
     <!-- Logo -->
     <div class="flex items-center justify-center h-20 border-b border-gray-100 shrink-0 px-6">
         <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
-            <img src="/images/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
+            <img src="/storage/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
         </a>
 
         <!-- Mobile Close Button -->

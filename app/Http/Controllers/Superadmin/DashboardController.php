@@ -26,6 +26,8 @@ class DashboardController extends Controller
         $activeMembersCount = User::role('admin')->whereIn('id', $activeMemberIds)->count();
         $totalOverall = User::whereDoesntHave('roles', fn($q) => $q->where('name', 'superadmin'))->count();
 
+        $now = Carbon::now();
+
         // ── Chart Mode ────────────────────────────────────────────────
         // month selected → daily breakdown; otherwise → monthly breakdown
         if ($selectedMonth) {
@@ -66,8 +68,15 @@ class DashboardController extends Controller
             for ($d = 1; $d <= $daysInMonth; $d++) {
                 $key = str_pad($d, 2, '0', STR_PAD_LEFT);
                 $labels[] = $d;
-                $userGrowthData[] = (int) ($usersGrowth[$key] ?? 0);
-                $memberGrowthData[] = (int) ($membersGrowth[$key] ?? 0);
+
+                $date = Carbon::create($selectedYear, $selectedMonth, $d);
+                if ($date->gt($now->endOfDay())) {
+                    $userGrowthData[] = null;
+                    $memberGrowthData[] = null;
+                } else {
+                    $userGrowthData[] = (int) ($usersGrowth[$key] ?? 0);
+                    $memberGrowthData[] = (int) ($membersGrowth[$key] ?? 0);
+                }
             }
         } else {
             // Monthly breakdown across the year
@@ -106,8 +115,14 @@ class DashboardController extends Controller
             for ($m = 1; $m <= 12; $m++) {
                 $monthName = Carbon::createFromDate($selectedYear, $m, 1)->format('F');
                 $labels[] = $monthName;
-                $userGrowthData[] = (int) ($usersGrowth[$monthName] ?? 0);
-                $memberGrowthData[] = (int) ($membersGrowth[$monthName] ?? 0);
+
+                if (Carbon::create($selectedYear, $m, 1)->gt($now)) {
+                    $userGrowthData[] = null;
+                    $memberGrowthData[] = null;
+                } else {
+                    $userGrowthData[] = (int) ($usersGrowth[$monthName] ?? 0);
+                    $memberGrowthData[] = (int) ($membersGrowth[$monthName] ?? 0);
+                }
             }
         }
 
