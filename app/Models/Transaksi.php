@@ -51,6 +51,42 @@ class Transaksi extends Model
     }
 
     /**
+     * Get the failure reason description for failed/rejected transactions.
+     * Used mainly for desktop views.
+     */
+    public function getKeteranganGagalAttribute()
+    {
+        if ($this->status === 'rejected') {
+            return $this->bukti_pembayaran
+                ? 'Ditolak Admin (Bukti Tidak Valid)'
+                : 'Ditolak Admin (Saat Pengajuan)';
+        } elseif ($this->status === 'failed') {
+            return $this->bukti_pembayaran
+                ? 'Batal Otomatis (Melewati Waktu Konfirmasi)'
+                : 'Batal Otomatis (Melewati Batas Bayar)';
+        }
+        return '-';
+    }
+
+    /**
+     * Get the shorter failure reason description.
+     * Used mainly for mobile card views.
+     */
+    public function getKeteranganGagalSingkatAttribute()
+    {
+        if ($this->status === 'rejected') {
+            return $this->bukti_pembayaran
+                ? 'Ditolak Admin (Bukti)'
+                : 'Ditolak Admin (Pengajuan)';
+        } elseif ($this->status === 'failed') {
+            return $this->bukti_pembayaran
+                ? 'Batal Waktu Konfirmasi'
+                : 'Batal Batas Bayar';
+        }
+        return '-';
+    }
+
+    /**
      * Check and cancel expired verified transactions.
      * Often called before listing orders to ensure up-to-date status.
      */

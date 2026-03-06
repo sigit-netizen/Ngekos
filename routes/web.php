@@ -54,9 +54,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
         return view('member.pesan_aduan', ['title' => 'Pesan Aduan', 'role' => 'admin']);
     })->name('admin.pesan_aduan');
 
-    Route::get('/admin/laporan-pembayaran', function () {
-        return view('member.laporan_pembayaran', ['title' => 'Laporan Pembayaran', 'role' => 'admin']);
-    })->name('admin.laporan_pembayaran');
+    Route::get('/admin/laporan-pembayaran', [\App\Http\Controllers\Admin\LaporanPembayaranController::class, 'index'])->name('admin.laporan_pembayaran');
 
     Route::get('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('admin.tagihan_sistem');
     Route::put('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'update'])->name('admin.subscription.update');

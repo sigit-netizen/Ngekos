@@ -17,6 +17,8 @@ class Kamar extends Model
         'harga',
         'foto',
         'id_kos',
+        'durasi_sewa',
+        'tipe_durasi',
     ];
 
     public function kos()

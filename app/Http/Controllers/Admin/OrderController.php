@@ -127,6 +127,8 @@ class OrderController extends Controller
                     $q->where('status', 'paid');
                 } elseif ($statusFilter === 'failed') {
                     $q->where('status', 'failed');
+                } elseif ($statusFilter === 'gagal') {
+                    $q->whereIn('status', ['failed', 'rejected']);
                 } else {
                     $q->where('status', 'pending')->where('tipe', Transaksi::TYPE_BOOKING);
                 }

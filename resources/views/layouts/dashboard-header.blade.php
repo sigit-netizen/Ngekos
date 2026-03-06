@@ -4,11 +4,55 @@
     <div class="flex items-center gap-4">
         <!-- Mobile Menu Button -->
         <button @click="sidebarOpen = true"
-            class="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 focus:outline-none transition-colors border border-gray-200 bg-white">
+            class="relative lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 focus:outline-none transition-colors border border-gray-200 bg-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
                 </path>
             </svg>
+            @php
+                $headerNotifCount = 0;
+                if (auth()->check()) {
+                    $user = auth()->user();
+                    if ($user->hasRole('admin') || $user->hasRole('nonaktif')) {
+                        $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
+                        $tpOrder = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
+                        $tpUser = $adminKos ? \App\Models\PendingUser::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
+                        $tpReview = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'verified')->count() : 0;
+
+                        $memberSub = \App\Models\Langganan::where('id_user', $user->id)->latest()->first();
+                        $mExpiry = $memberSub?->jatuh_tempo ? \Carbon\Carbon::parse($memberSub->jatuh_tempo) : ($memberSub?->tanggal_pembayaran ? \Carbon\Carbon::parse($memberSub->tanggal_pembayaran)->addDays(30) : null);
+                        $mNow = now('Asia/Jakarta')->startOfDay();
+                        $mExpWib = $mExpiry ? $mExpiry->copy()->timezone('Asia/Jakarta')->startOfDay() : null;
+                        $mDiff = $mExpWib ? (int) $mNow->diffInDays($mExpWib, false) : 0;
+                        $tagihanNotif = ($mDiff < 0) ? 1 : 0;
+
+                        $headerNotifCount = $tpOrder + $tpUser + $tpReview + $tagihanNotif;
+                    } elseif ($user->hasRole('superadmin')) {
+                        $pendingPackets = \App\Models\Langganan::where('status', 'pending')->count();
+                        $pendingRegistrations = \App\Models\PendingUser::where('status', 'pending')->count();
+
+                        $inactiveCount = \App\Models\Langganan::with(['user.statusUser'])->whereNotNull('tanggal_pembayaran')
+                            ->get()
+                            ->filter(function ($sub) {
+                                if ($sub->user && $sub->user->statusUser && $sub->user->statusUser->status === 'inactive') {
+                                    return false;
+                                }
+                                $expiryDate = $sub->jatuh_tempo ? \Carbon\Carbon::parse($sub->jatuh_tempo) : \Carbon\Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
+                                $nowWib = now('Asia/Jakarta')->startOfDay();
+                                $expiryWib = $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay();
+                                return ((int) $nowWib->diffInDays($expiryWib, false)) < -3;
+                            })->count();
+
+                        $headerNotifCount = $pendingPackets + $pendingRegistrations + $inactiveCount;
+                    }
+                }
+            @endphp
+            @if($headerNotifCount > 0)
+                <span
+                    class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-white shadow-sm animate-bounce">
+                    {{ $headerNotifCount > 9 ? '9+' : $headerNotifCount }}
+                </span>
+            @endif
         </button>
 
         <!-- Page Title -->
@@ -94,41 +138,41 @@
 @push('modals')
     <!-- Global Profile Modal (Root Level) -->
     <div x-cloak x-data="{ 
-                                    verifyPassword: '', 
-                                    isVerifying: false, 
-                                    errorMsg: '',
-                                    mode: 'verify', // 'verify' or 'profile'
-                                    async handleVerify() {
-                                        this.isVerifying = true;
-                                        this.errorMsg = '';
-                                        try {
-                                            const response = await fetch('{{ route('profile.verify-password') }}', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                },
-                                                body: JSON.stringify({ password: this.verifyPassword })
-                                            });
-                                            const data = await response.json();
-                                            if (data.success) {
-                                                this.mode = 'profile';
+                                            verifyPassword: '', 
+                                            isVerifying: false, 
+                                            errorMsg: '',
+                                            mode: 'verify', // 'verify' or 'profile'
+                                            async handleVerify() {
+                                                this.isVerifying = true;
+                                                this.errorMsg = '';
+                                                try {
+                                                    const response = await fetch('{{ route('profile.verify-password') }}', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                        },
+                                                        body: JSON.stringify({ password: this.verifyPassword })
+                                                    });
+                                                    const data = await response.json();
+                                                    if (data.success) {
+                                                        this.mode = 'profile';
+                                                        this.verifyPassword = '';
+                                                    } else {
+                                                        this.errorMsg = data.message;
+                                                    }
+                                                } catch (e) {
+                                                    this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
+                                                } finally {
+                                                    this.isVerifying = false;
+                                                }
+                                            },
+                                            reset() {
+                                                this.mode = 'verify';
                                                 this.verifyPassword = '';
-                                            } else {
-                                                this.errorMsg = data.message;
+                                                this.errorMsg = '';
                                             }
-                                        } catch (e) {
-                                            this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
-                                        } finally {
-                                            this.isVerifying = false;
-                                        }
-                                    },
-                                    reset() {
-                                        this.mode = 'verify';
-                                        this.verifyPassword = '';
-                                        this.errorMsg = '';
-                                    }
-                                }" x-show="$store.profile.isOpen"
+                                        }" x-show="$store.profile.isOpen"
         x-init="document.body.appendChild($el); $watch('$store.profile.isOpen', value => { if(!value) reset() })"
         x-effect="document.body.style.overflow = $store.profile.isOpen ? 'hidden' : ''"
         style="position: fixed; z-index: 2147483647;" x-transition:enter="transition ease-out duration-300"
@@ -258,8 +302,8 @@
                                 </svg>
                                 Nomor Induk Kependudukan (NIK)
                             </label>
-                            <input type="text" name="nik" value="{{ auth()->user()->nik }}"
-                                @cannot('fitur.edit_profile') readonly @endcannot
+                            <input type="text" name="nik" value="{{ auth()->user()->nik }}" @cannot('fitur.edit_profile')
+                                readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="16 digit NIK">
                         </div>

@@ -35,6 +35,10 @@ class DashboardController extends Controller
 
             $stats['totalPenyewa'] = User::where('id_kos', $kos->id)
                 ->where('status', 'active')
+                ->whereHas('transaksis', function ($q) use ($kos) {
+                    $q->where('kode_kos', $kos->kode_kos)
+                        ->where('status', 'paid');
+                })
                 ->count();
 
             $activeSubscription = $user->langganans()->where('status', 'active')->latest()->first();
@@ -111,6 +115,10 @@ class DashboardController extends Controller
 
                 $count = User::where('id_kos', $kos->id)
                     ->where('status', 'active')
+                    ->whereHas('transaksis', function ($q) use ($kos) {
+                        $q->where('kode_kos', $kos->kode_kos)
+                            ->where('status', 'paid');
+                    })
                     ->where('created_at', '<=', $date->endOfDay())
                     ->count();
                 $data[] = $count;
@@ -129,6 +137,10 @@ class DashboardController extends Controller
 
                 $count = User::where('id_kos', $kos->id)
                     ->where('status', 'active')
+                    ->whereHas('transaksis', function ($q) use ($kos) {
+                        $q->where('kode_kos', $kos->kode_kos)
+                            ->where('status', 'paid');
+                    })
                     ->where('created_at', '<=', $date)
                     ->count();
                 $data[] = $count;

@@ -118,6 +118,11 @@ class User extends Authenticatable
         return $this->hasOne(StatusUser::class, 'id_user');
     }
 
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class, 'id_user');
+    }
+
     /**
      * Restore user roles based on their current plan ID.
      */

@@ -6,12 +6,12 @@
         $statusFilter = $statusFilter ?? 'active';
     @endphp
 
-    <div x-data="{ 
-                    activeTab: '{{ $tab }}', 
-                    currentStatus: '{{ $statusFilter }}', 
-                    showProof: false, 
-                    proofUrl: '' 
-                }"
+    <div x-data="{
+            activeTab: '{{ $tab }}',
+            currentStatus: '{{ $statusFilter }}',
+            showProof: false,
+            proofUrl: ''
+        }"
         x-init="$watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
         {{-- Header --}}
@@ -37,22 +37,21 @@
         </div>
 
         {{-- Stats Cards --}}
-        <div
-            class="flex flex-nowrap md:grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10 overflow-x-auto pb-6 md:pb-0 -mx-4 px-4 scrollbar-hide">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-10">
             {{-- Verifikasi (Pending Orders) --}}
             <button @click="activeTab = 'order'; currentStatus = 'verif'; window.location.href = '?tab=order&status=verif'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="(currentStatus === 'verif' || currentStatus === 'pending')
-                                    ? 'bg-rose-50 border-rose-500 shadow-xl shadow-rose-100 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-rose-200 shadow-md shadow-gray-200/50'">
+                                                                    ? 'bg-rose-50 border-rose-500 shadow-xl shadow-rose-100 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-rose-200 shadow-md shadow-gray-200/50'">
                 @if(($orderPendingCount ?? 0) + ($pendingCount ?? 0) > 0)
                     <div
-                        class="absolute top-4 right-4 text-rose-600 text-[9px] font-black z-10 animate-pulse bg-white px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm">
+                        class="absolute top-3 right-3 text-rose-600 text-[9px] font-black z-10 animate-pulse bg-white px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm">
                         NEW
                     </div>
                 @endif
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="(currentStatus === 'verif' || currentStatus === 'pending') ? 'bg-white shadow-sm text-rose-500 border border-rose-100' : 'bg-rose-50 text-rose-500'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -66,7 +65,7 @@
                         {{ ($orderPendingCount ?? 0) + ($pendingCount ?? 0) }}
                     </h3>
                 </div>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="(currentStatus === 'verif' || currentStatus === 'pending') ? 'text-rose-500' : 'text-gray-400'">
                     Verifikasi</p>
             </button>
@@ -74,12 +73,12 @@
             {{-- Menunggu (Verified, waiting for payment) --}}
             <button
                 @click="activeTab = 'order'; currentStatus = 'menunggu'; window.location.href = '?tab=order&status=menunggu'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'menunggu'
-                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                                                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'menunggu' ? 'bg-white shadow-sm text-amber-500 border border-amber-100' : 'bg-amber-50 text-amber-500'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -91,7 +90,7 @@
                     :class="currentStatus === 'menunggu' ? 'text-amber-600' : 'text-gray-900'">
                     {{ $orderMenungguCount ?? 0 }}
                 </h3>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="currentStatus === 'menunggu' ? 'text-amber-500' : 'text-gray-400'">
                     Menunggu</p>
             </button>
@@ -99,12 +98,12 @@
             {{-- Konfirmasi (Verified, proof uploaded) --}}
             <button
                 @click="activeTab = 'order'; currentStatus = 'konfirmasi'; window.location.href = '?tab=order&status=konfirmasi'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'konfirmasi'
-                                    ? 'bg-emerald-50 border-emerald-500 shadow-xl shadow-emerald-100 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-emerald-200 shadow-md shadow-gray-200/50'">
+                                                                    ? 'bg-emerald-50 border-emerald-500 shadow-xl shadow-emerald-100 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-emerald-200 shadow-md shadow-gray-200/50'">
                 @if(($orderKonfirmasiCount ?? 0) > 0)
-                    <div class="absolute top-4 right-4 flex h-5 w-5">
+                    <div class="absolute top-3 right-3 flex h-5 w-5">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                         <span
@@ -113,8 +112,8 @@
                         </span>
                     </div>
                 @endif
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'konfirmasi' ? 'bg-white shadow-sm text-emerald-500 border border-emerald-100' : 'bg-emerald-50 text-emerald-500'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -126,25 +125,25 @@
                     :class="currentStatus === 'konfirmasi' ? 'text-emerald-600' : 'text-gray-900'">
                     {{ $orderKonfirmasiCount ?? 0 }}
                 </h3>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="currentStatus === 'konfirmasi' ? 'text-emerald-500' : 'text-gray-400'">
                     Konfirmasi</p>
             </button>
 
             {{-- Verifikasi Sewa (Recurring Rent) --}}
             <button @click="activeTab = 'order'; currentStatus = 'sewa'; window.location.href = '?tab=order&status=sewa'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'sewa'
-                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
+                                                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
                 @if(($rentKonfirmasiCount ?? 0) > 0)
                     <div
-                        class="absolute top-4 right-4 flex h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-lg items-center justify-center shadow-lg shadow-amber-200 animate-bounce">
+                        class="absolute top-3 right-3 flex h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-lg items-center justify-center shadow-md shadow-amber-200 animate-bounce">
                         {{ $rentKonfirmasiCount }}
                     </div>
                 @endif
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'sewa' ? 'bg-white shadow-sm text-amber-500 border border-amber-100' : 'bg-amber-50 text-amber-500'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -157,7 +156,7 @@
                     :class="currentStatus === 'sewa' ? 'text-amber-600' : 'text-gray-900'">
                     {{ $rentKonfirmasiCount ?? 0 }}
                 </h3>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="currentStatus === 'sewa' ? 'text-amber-500' : 'text-gray-400'">
                     Verif Sewa</p>
             </button>
@@ -165,12 +164,12 @@
             {{-- Aktif (Penyewa Aktif) --}}
             <button
                 @click="activeTab = 'riwayat'; currentStatus = 'active'; window.location.href = '?tab=riwayat&status=active'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'active'
-                                    ? 'bg-[#36B2B2]/5 border-[#36B2B2] shadow-xl shadow-[#36B2B2]/10 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-[#36B2B2]/20 shadow-md shadow-gray-200/50'">
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                                                                    ? 'bg-[#36B2B2]/5 border-[#36B2B2] shadow-xl shadow-[#36B2B2]/10 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-[#36B2B2]/20 shadow-md shadow-gray-200/50'">
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'active' ? 'bg-white shadow-sm text-[#36B2B2] border border-teal-100' : 'bg-[#36B2B2]/10 text-[#36B2B2]'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -183,7 +182,7 @@
                     :class="currentStatus === 'active' ? 'text-[#36B2B2]' : 'text-gray-900'">
                     {{ $activeCount ?? 0 }}
                 </h3>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="currentStatus === 'active' ? 'text-[#36B2B2]' : 'text-gray-400'">
                     Aktif</p>
             </button>
@@ -191,12 +190,12 @@
             {{-- Ditolak --}}
             <button
                 @click="activeTab = 'riwayat'; currentStatus = 'rejected'; window.location.href = '?tab=riwayat&status=rejected'"
-                class="relative flex-shrink-0 w-44 md:w-full p-5 rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
+                class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'rejected'
-                                    ? 'bg-slate-50 border-slate-500 shadow-xl shadow-slate-100 -translate-y-1'
-                                    : 'bg-white border-gray-50 hover:border-slate-200 shadow-md shadow-gray-200/50'">
-                <div class="mb-4">
-                    <div class="inline-flex p-2.5 rounded-2xl transition-all duration-500"
+                                                                    ? 'bg-slate-50 border-slate-500 shadow-xl shadow-slate-100 -translate-y-1'
+                                                                    : 'bg-white border-gray-50 hover:border-slate-200 shadow-md shadow-gray-200/50'">
+                <div class="mb-3 sm:mb-4">
+                    <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'rejected' ? 'bg-white shadow-sm text-slate-500 border border-slate-200' : 'bg-slate-50 text-slate-500'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -208,7 +207,7 @@
                     :class="currentStatus === 'rejected' ? 'text-slate-600' : 'text-gray-900'">
                     {{ $rejectedCount ?? 0 }}
                 </h3>
-                <p class="text-[9px] font-black uppercase tracking-widest transition-colors mt-1"
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors mt-0.5 sm:mt-1"
                     :class="currentStatus === 'rejected' ? 'text-slate-500' : 'text-gray-400'">
                     Ditolak</p>
             </button>
@@ -276,9 +275,9 @@
                 <div class="flex items-center gap-3">
                     <span class="w-1.5 h-6 bg-[#36B2B2] rounded-full"></span>
                     <h3 class="text-base sm:text-lg md:text-xl font-black text-gray-900 whitespace-nowrap" x-text="
-                                            activeTab === 'order' ? 'Antrean Verifikasi' :
-                                            (currentStatus === 'active' ? 'Basis Data Penyewa' : 'Arsip Penolakan')
-                                        "></h3>
+                                                                            activeTab === 'order' ? 'Antrean Verifikasi' :
+                                                                            (currentStatus === 'active' ? 'Basis Data Penyewa' : 'Arsip Penolakan')
+                                                                        "></h3>
                 </div>
 
                 <template x-if="activeTab === 'riwayat'">
@@ -307,6 +306,9 @@
                         <button @click="currentStatus = 'sewa'; window.location.href = '?tab=order&status=sewa'"
                             class="flex-1 md:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-[0.85rem] text-[9px] sm:text-[10px] font-black transition-all duration-300 uppercase tracking-widest whitespace-nowrap"
                             :class="currentStatus === 'sewa' ? 'bg-white text-[#36B2B2] shadow-sm' : 'text-gray-400 hover:text-gray-600'">SEWA</button>
+                        <button @click="currentStatus = 'gagal'; window.location.href = '?tab=order&status=gagal'"
+                            class="flex-1 md:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-[0.85rem] text-[9px] sm:text-[10px] font-black transition-all duration-300 uppercase tracking-widest whitespace-nowrap"
+                            :class="currentStatus === 'gagal' ? 'bg-white text-rose-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'">GAGAL</button>
                     </div>
                 </template>
             </div>
@@ -332,652 +334,677 @@
                 <div x-show="activeTab === 'order'">
 
                     {{-- Desktop Table View --}}
-                    <div
-                        class="hidden md:block overflow-x-auto mb-8 bg-white border border-t-0 border-gray-100 rounded-b-3xl">
-                        <table class="w-full text-left whitespace-nowrap">
-                            <thead>
-                                <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
-                                    <th class="px-8 py-5">Calon Penyewa</th>
-                                    <th class="px-8 py-5">WhatsApp</th>
-                                    <th class="px-8 py-5">Alamat</th>
-                                    <th class="px-8 py-5">Tanggal Daftar</th>
-                                    <th class="px-8 py-5 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @foreach($pendingPenyewa as $pending)
-                                    <tr class="group hover:bg-amber-50/40 transition-all border-b border-gray-50 last:border-0">
-                                        <td class="px-8 py-6">
-                                            <div class="flex items-center gap-4">
-                                                <div
-                                                    class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-600 flex items-center justify-center font-black text-sm border border-amber-200/50 shadow-sm">
-                                                    {{ substr($pending->name, 0, 1) }}
-                                                </div>
-                                                <div>
-                                                    <div class="flex items-center gap-2 mb-1">
-                                                        <div class="font-black text-gray-900 leading-none">{{ $pending->name }}
-                                                        </div>
-                                                        <div x-data="{ 
-                                                                                        expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                        now: new Date().getTime(),
-                                                                                        timer: '',
-                                                                                        init() {
-                                                                                            this.updateTimer();
-                                                                                            setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                        },
-                                                                                        updateTimer() {
-                                                                                            let diff = this.expiryTime - this.now;
-                                                                                            if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                            let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                            let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                            this.timer = `${h}j ${m}m ${s}d`;
-                                                                                        }
-                                                                                    }"
-                                                            class="px-2 py-0.5 bg-rose-500 text-white text-[9px] font-black rounded-lg shadow-sm animate-pulse">
-                                                            <span x-text="timer"></span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-[10px] text-gray-400 font-bold tracking-tight">
-                                                        {{ $pending->email }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="font-black text-gray-700 text-sm tracking-tight">{{ $pending->nomor_wa }}</span>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="text-xs font-bold text-gray-500 max-w-[200px] line-clamp-2 leading-relaxed">{{ $pending->alamat ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ optional($pending->created_at)->format('d M Y') ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-8 py-6 text-center">
-                                            <div class="flex items-center justify-center gap-3">
-                                                <form method="POST" action="{{ route('admin.penyewa.verify', $pending->id) }}">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Terima Pendaftaran?', 'Calon penyewa ini akan diverifikasi.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="px-5 py-2.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100 active:scale-95 uppercase tracking-widest">
-                                                        ✓ Terima
-                                                    </button>
-                                                </form>
-                                                <form method="POST" action="{{ route('admin.penyewa.reject', $pending->id) }}">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Tolak Pendaftaran?', 'Hapus data ini?', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="px-5 py-2.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest active:scale-95">
-                                                        ✗ Tolak
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+                    <div x-show="currentStatus === 'regis'" x-transition:enter="transition ease-out duration-300 transform"
+                        x-transition:enter-start="opacity-0 translate-y-4"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200 transform"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 -translate-y-4" style="display: none;">
+                        <div
+                            class="hidden md:block overflow-x-auto mb-8 bg-white border border-t-0 border-gray-100 rounded-b-3xl">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
+                                        <th class="px-8 py-5">Calon Penyewa</th>
+                                        <th class="px-8 py-5">WhatsApp</th>
+                                        <th class="px-8 py-5">Alamat</th>
+                                        <th class="px-8 py-5">Tanggal Daftar</th>
+                                        <th class="px-8 py-5 text-center">Aksi</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach($pendingPenyewa as $pending)
+                                        <tr
+                                            class="group hover:bg-amber-50/40 transition-all border-b border-gray-50 last:border-0">
+                                            <td class="px-8 py-6">
+                                                <div class="flex items-center gap-4">
+                                                    <div
+                                                        class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-600 flex items-center justify-center font-black text-sm border border-amber-200/50 shadow-sm">
+                                                        {{ substr($pending->name, 0, 1) }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <div class="font-black text-gray-900 leading-none">
+                                                                {{ $pending->name }}
+                                                            </div>
+                                                            <div x-data="{ 
+                                                                                                                                                    expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                    now: new Date().getTime(),
+                                                                                                                                                    timer: '',
+                                                                                                                                                    init() {
+                                                                                                                                                        this.updateTimer();
+                                                                                                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                    },
+                                                                                                                                                    updateTimer() {
+                                                                                                                                                        let diff = this.expiryTime - this.now;
+                                                                                                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                    }
+                                                                                                                                                }"
+                                                                class="px-2 py-0.5 bg-rose-500 text-white text-[9px] font-black rounded-lg shadow-sm animate-pulse">
+                                                                <span x-text="timer"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-[10px] text-gray-400 font-bold tracking-tight">
+                                                            {{ $pending->email }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="font-black text-gray-700 text-sm tracking-tight">{{ $pending->nomor_wa }}</span>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="text-xs font-bold text-gray-500 max-w-[200px] line-clamp-2 leading-relaxed">{{ $pending->alamat ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ optional($pending->created_at)->format('d M Y') ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-8 py-6 text-center">
+                                                <div class="flex items-center justify-center gap-3">
+                                                    <form method="POST"
+                                                        action="{{ route('admin.penyewa.verify', $pending->id) }}">
+                                                        @csrf
+                                                        <button type="button"
+                                                            @click="window.swalConfirm('Terima Pendaftaran?', 'Calon penyewa ini akan diverifikasi.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="px-5 py-2.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100 active:scale-95 uppercase tracking-widest">
+                                                            ✓ Terima
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST"
+                                                        action="{{ route('admin.penyewa.reject', $pending->id) }}">
+                                                        @csrf
+                                                        <button type="button"
+                                                            @click="window.swalConfirm('Tolak Pendaftaran?', 'Hapus data ini?', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="px-5 py-2.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest active:scale-95">
+                                                            ✗ Tolak
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
 
-                    {{-- Mobile Card View --}}
-                    <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-10 mt-2">
-                        @foreach($pendingPenyewa as $pending)
-                            <div
-                                class="bg-white rounded-[2rem] p-5 sm:p-6 border border-gray-100 shadow-xl shadow-gray-200/40 relative group active:scale-[0.98] transition-all overflow-hidden">
-                                <div class="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-full -mr-12 -mt-12 opacity-50">
-                                </div>
-                                <div class="flex items-center gap-4 mb-5 relative">
-                                    <div
-                                        class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-400 to-amber-500 text-white rounded-2xl flex items-center justify-center font-black text-lg shrink-0 shadow-lg shadow-amber-200">
-                                        {{ substr($pending->name, 0, 1) }}
+                        {{-- Mobile Card View --}}
+                        <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-10 mt-2">
+                            @foreach($pendingPenyewa as $pending)
+                                <div
+                                    class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm relative group overflow-hidden flex flex-col gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center font-bold text-lg shrink-0">
+                                            {{ substr($pending->name, 0, 1) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-bold text-gray-900 text-base leading-tight truncate">
+                                                {{ $pending->name }}
+                                            </h4>
+                                            <p class="text-[11px] text-gray-500 tracking-tight mt-0.5 truncate">
+                                                {{ $pending->nomor_wa }} &bull;
+                                                {{ optional($pending->created_at)->format('d/m/y') }}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="min-w-0">
-                                        <h4 class="font-black text-gray-900 text-base sm:text-lg leading-tight truncate">
-                                            {{ $pending->name }}</h4>
-                                        <p
-                                            class="text-[10px] sm:text-[11px] text-gray-400 font-bold tracking-tight mt-0.5 truncate">
-                                            {{ $pending->email }}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                <div class="space-y-3 mb-6 relative">
-                                    <div class="bg-gray-50/80 p-4 rounded-2xl border border-gray-100/50">
-                                        <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-200/50">
-                                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Batas
-                                                Verif</span>
+                                    <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-100/50 flex flex-col gap-2">
+                                        <div class="flex items-start gap-2">
+                                            <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                            <span
+                                                class="text-xs text-gray-600 leading-relaxed line-clamp-2">{{ $pending->alamat ?? '-' }}</span>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-1 pt-2 border-t border-gray-200/50">
+                                            <span class="text-[10px] font-semibold text-gray-500 uppercase">Sisa Waktu</span>
                                             <div x-data="{ 
-                                                                    expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                    now: new Date().getTime(),
-                                                                    timer: '',
-                                                                    init() {
-                                                                        this.updateTimer();
-                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                    },
-                                                                    updateTimer() {
-                                                                        let diff = this.expiryTime - this.now;
-                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                        this.timer = `${h}j ${m}m ${s}d`;
-                                                                    }
-                                                                }"
-                                                class="px-2.5 py-1 bg-rose-500 text-white text-[9px] font-black rounded-lg shadow-lg shadow-rose-200 animate-pulse">
+                                                                                                        expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                        now: new Date().getTime(),
+                                                                                                        timer: '',
+                                                                                                        init() {
+                                                                                                            this.updateTimer();
+                                                                                                            setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                        },
+                                                                                                        updateTimer() {
+                                                                                                            let diff = this.expiryTime - this.now;
+                                                                                                            if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                            let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                            let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                            this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                        }
+                                                                                                    }"
+                                                class="px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded-md animate-pulse">
                                                 <span x-text="timer"></span>
                                             </div>
                                         </div>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <span
-                                                    class="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">WhatsApp</span>
-                                                <span class="text-xs font-black text-gray-700">{{ $pending->nomor_wa }}</span>
-                                            </div>
-                                            <div>
-                                                <span
-                                                    class="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">Daftar</span>
-                                                <span
-                                                    class="text-xs font-black text-gray-700">{{ optional($pending->created_at)->format('d/m/y') }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 pt-3 border-t border-gray-200/50">
-                                            <span
-                                                class="text-[8px] font-black text-gray-400 uppercase tracking-widest block mb-1">Alamat</span>
-                                            <span
-                                                class="text-[11px] text-gray-500 font-bold leading-relaxed line-clamp-2">{{ $pending->alamat ?? '-' }}</span>
-                                        </div>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <form method="POST" action="{{ route('admin.penyewa.verify', $pending->id) }}"
+                                            class="flex-1">
+                                            @csrf
+                                            <button type="button"
+                                                @click="window.swalConfirm('Terima Pendaftaran?', 'Calon penyewa ini akan diverifikasi.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors uppercase tracking-wide">
+                                                Terima
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.penyewa.reject', $pending->id) }}"
+                                            class="flex-1">
+                                            @csrf
+                                            <button type="button"
+                                                @click="window.swalConfirm('Tolak Pendaftaran?', 'Hapus pendaftaran ini?', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                class="w-full py-2.5 rounded-xl text-xs font-bold bg-white border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors uppercase tracking-wide">
+                                                Tolak
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
+                            @endforeach
+                        </div>
+                    </div>
 
-                                <div class="flex gap-3 relative">
-                                    <form method="POST" action="{{ route('admin.penyewa.verify', $pending->id) }}"
-                                        class="flex-1">
-                                        @csrf
-                                        <button type="button"
-                                            @click="window.swalConfirm('Terima Pendaftaran?', 'Calon penyewa ini akan diverifikasi.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                            class="w-full py-3.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white shadow-xl shadow-emerald-100 uppercase tracking-widest active:scale-95 transition-all">
-                                            ✓ Terima
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.penyewa.reject', $pending->id) }}"
-                                        class="flex-1">
-                                        @csrf
-                                        <button type="button"
-                                            @click="window.swalConfirm('Tolak Pendaftaran?', 'Hapus pendaftaran ini?', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                            class="w-full py-3.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 uppercase tracking-widest active:scale-95 transition-all">
-                                            ✗ Tolak
-                                        </button>
-                                    </form>
+                    <div x-show="currentStatus !== 'regis'" x-transition:enter="transition ease-out duration-300 transform"
+                        x-transition:enter-start="opacity-0 translate-y-4"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200 transform"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 -translate-y-4" style="display: none;">
+                        <div class="px-8 py-5 bg-blue-50/50 border-y border-blue-100/50 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-black text-gray-900 leading-none" x-text="
+                                                                                        currentStatus === 'verif' ? 'Verifikasi Order Baru' :
+                                                                                        (currentStatus === 'menunggu' ? 'Menunggu Pembayaran' : 
+                                                                                        (currentStatus === 'konfirmasi' ? 'Konfirmasi Bukti Transfer' : 'Riwayat Pembatalan'))
+                                                                                    "></h4>
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1" x-text="
+                                                                                        currentStatus === 'verif' ? 'Pesanan baru yang baru masuk' :
+                                                                                        (currentStatus === 'menunggu' ? 'Pesanan diterima & menunggu bukti bayar' : 
+                                                                                        (currentStatus === 'konfirmasi' ? 'Pembayaran yang perlu Anda konfirmasi' : 'Riwayat pesanan yang dibatalkan atau ditolak'))
+                                                                                    "></p>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                    <div class="px-8 py-5 bg-blue-50/50 border-y border-blue-100/50 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-black text-gray-900 leading-none" x-text="
-                                                        currentStatus === 'verif' ? 'Verifikasi Order Baru' :
-                                                        (currentStatus === 'menunggu' ? 'Menunggu Pembayaran' : 'Konfirmasi Bukti Transfer')
-                                                    "></h4>
-                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1" x-text="
-                                                        currentStatus === 'verif' ? 'Pesanan baru yang baru masuk' :
-                                                        (currentStatus === 'menunggu' ? 'Pesanan diterima & menunggu bukti bayar' : 'Pembayaran yang perlu Anda konfirmasi')
-                                                    "></p>
-                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
+                                :class="{
+                                                                                    'bg-rose-100 text-rose-700 border-rose-200': currentStatus === 'verif',
+                                                                                    'bg-amber-100 text-amber-700 border-amber-200': currentStatus === 'menunggu',
+                                                                                    'bg-emerald-100 text-emerald-700 border-emerald-200': currentStatus === 'konfirmasi'
+                                                                                }">
+                                {{ count($orderTransaksi ?? []) }} Data
+                            </span>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border" :class="{
-                                                    'bg-rose-100 text-rose-700 border-rose-200': currentStatus === 'verif',
-                                                    'bg-amber-100 text-amber-700 border-amber-200': currentStatus === 'menunggu',
-                                                    'bg-emerald-100 text-emerald-700 border-emerald-200': currentStatus === 'konfirmasi'
-                                                }">
-                            {{ count($orderTransaksi ?? []) }} Data
-                        </span>
-                    </div>
-                    {{-- Desktop Table View --}}
-                    <div class="hidden md:block overflow-x-auto bg-white border border-t-0 border-gray-100 rounded-b-3xl">
-                        <table class="w-full text-left whitespace-nowrap">
-                            <thead>
-                                <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
-                                    <th class="px-8 py-5">User</th>
-                                    <th class="px-8 py-5">No. Kamar</th>
-                                    <th class="px-8 py-5">Harga</th>
-                                    <th class="px-8 py-5">Catatan</th>
-                                    <th class="px-8 py-5">Tanggal</th>
-                                    <th class="px-8 py-5 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                @forelse($orderTransaksi ?? [] as $order)
-                                    <tr class="group hover:bg-slate-50 transition-colors">
-                                        <td class="px-8 py-6">
-                                            <div class="flex items-center gap-3">
-                                                <div
-                                                    class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
-                                                    {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
-                                                </div>
-                                                <div>
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="font-bold text-gray-900">{{ $order->user->name ?? 'N/A' }}
-                                                        </div>
-                                                        @if($order->status === 'pending')
-                                                            <div x-data="{ 
-                                                                                                    expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                    now: new Date().getTime(),
-                                                                                                    timer: '',
-                                                                                                    init() {
-                                                                                                        this.updateTimer();
-                                                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                                    },
-                                                                                                    updateTimer() {
-                                                                                                        let diff = this.expiryTime - this.now;
-                                                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                    }
-                                                                                                }"
-                                                                class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
-                                                                <span x-text="timer"></span>
-                                                            </div>
-                                                        @elseif($order->status === 'verified' && $order->bukti_pembayaran)
-                                                            {{-- Countdown Timer for Owner to Confirm Payment --}}
-                                                            <div x-data="{ 
-                                                                                                    expiryTime: new Date('{{ optional($order->tanggal_pembayaran)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                    now: new Date().getTime(),
-                                                                                                    timer: '',
-                                                                                                    init() {
-                                                                                                        this.updateTimer();
-                                                                                                        setInterval(() => {
-                                                                                                            this.now = new Date().getTime();
-                                                                                                            this.updateTimer();
-                                                                                                        }, 1000);
-                                                                                                    },
-                                                                                                    updateTimer() {
-                                                                                                        let diff = this.expiryTime - this.now;
-                                                                                                        if (diff <= 0) {
-                                                                                                            this.timer = 'EXPIRED';
-                                                                                                            return;
-                                                                                                        }
-                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                    }
-                                                                                                }"
-                                                                class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
-                                                                <span x-text="timer"></span>
-                                                            </div>
-                                                        @endif
+                        {{-- Desktop Table View --}}
+                        <div
+                            class="hidden md:block overflow-x-auto bg-white border border-t-0 border-gray-100 rounded-b-3xl">
+                            <table class="w-full text-left whitespace-nowrap">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
+                                        <th class="px-8 py-5">User</th>
+                                        <th class="px-8 py-5">WhatsApp</th>
+                                        <th class="px-8 py-5">No. Kamar</th>
+                                        <th class="px-8 py-5">Harga</th>
+                                        @if($statusFilter === 'gagal')
+                                            <th class="px-8 py-5">Keterangan Gagal</th>
+                                        @else
+                                            <th class="px-8 py-5">Catatan</th>
+                                        @endif
+                                        <th class="px-8 py-5">Tanggal</th>
+                                        <th class="px-8 py-5 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @forelse($orderTransaksi ?? [] as $order)
+                                        <tr class="group hover:bg-slate-50 transition-colors">
+                                            <td class="px-8 py-6">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
+                                                        {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
                                                     </div>
-                                                    <div class="text-[10px] text-gray-400 font-medium">
-                                                        {{ $order->user->email ?? '' }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="font-bold text-gray-700 text-sm">{{ $order->kamar->nomor_kamar ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span class="font-bold text-[#36B2B2] text-sm">Rp
-                                                {{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="text-xs text-gray-500 line-clamp-2 max-w-[150px]">{{ $order->catatan ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-8 py-6">
-                                            <span
-                                                class="text-xs font-bold text-gray-500">{{ optional($order->created_at)->format('d M Y') ?? '-' }}</span>
-                                        </td>
-                                        <td class="px-8 py-6 text-center">
-                                            <div class="flex items-center justify-center gap-2">
-                                                @if($order->status === 'pending')
-                                                    @if($order->tipe === 'sewa')
+                                                    <div>
                                                         <div class="flex items-center gap-2">
-                                                            <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}">
-                                                                @csrf
-                                                                <button type="button"
-                                                                    @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                    class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
-                                                                    ✓ Konfirmasi
-                                                                </button>
-                                                            </form>
-                                                            <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
-                                                                @csrf
-                                                                <button type="button"
-                                                                    @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                    class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
-                                                                    Tolak
-                                                                </button>
-                                                            </form>
+                                                            <div class="font-bold text-gray-900">
+                                                                {{ $order->user->name ?? 'N/A' }}
+                                                            </div>
+                                                            @if($order->status === 'pending')
+                                                                <div x-data="{ 
+                                                                                                                                                                                            expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                            now: new Date().getTime(),
+                                                                                                                                                                                            timer: '',
+                                                                                                                                                                                            init() {
+                                                                                                                                                                                                this.updateTimer();
+                                                                                                                                                                                                setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                                                            },
+                                                                                                                                                                                            updateTimer() {
+                                                                                                                                                                                                let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                                                                let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                            }
+                                                                                                                                                                                        }"
+                                                                    class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
+                                                                    <span x-text="timer"></span>
+                                                                </div>
+                                                            @elseif($order->status === 'verified' && $order->bukti_pembayaran)
+                                                                {{-- Countdown Timer for Owner to Confirm Payment --}}
+                                                                <div x-data="{ 
+                                                                                                                                                                                            expiryTime: new Date('{{ optional($order->tanggal_pembayaran)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                            now: new Date().getTime(),
+                                                                                                                                                                                            timer: '',
+                                                                                                                                                                                            init() {
+                                                                                                                                                                                                this.updateTimer();
+                                                                                                                                                                                                setInterval(() => {
+                                                                                                                                                                                                    this.now = new Date().getTime();
+                                                                                                                                                                                                    this.updateTimer();
+                                                                                                                                                                                                }, 1000);
+                                                                                                                                                                                            },
+                                                                                                                                                                                            updateTimer() {
+                                                                                                                                                                                                let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                if (diff <= 0) {
+                                                                                                                                                                                                    this.timer = 'EXPIRED';
+                                                                                                                                                                                                    return;
+                                                                                                                                                                                                }
+                                                                                                                                                                                                let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                            }
+                                                                                                                                                                                        }"
+                                                                    class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
+                                                                    <span x-text="timer"></span>
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                        @if($order->bukti_pembayaran)
-                                                            <button
-                                                                @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                                class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
-                                                                Lihat Bukti
-                                                            </button>
-                                                        @endif
-                                                    @else
-                                                        <form method="POST" action="{{ route('admin.order.verify', $order->id) }}">
-                                                            @csrf
-                                                            <button type="button"
-                                                                @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
-                                                                ✓ Terima
-                                                            </button>
-                                                        </form>
-                                                        <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
-                                                            @csrf
-                                                            <button type="button"
-                                                                @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                class="text-[10px] font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-widest">
-                                                                Tolak
-                                                            </button>
-                                                        </form>
-                                                    @endif
-                                                @elseif($order->status === 'verified')
-                                                    @if($order->bukti_pembayaran)
-                                                        @if($statusFilter === 'konfirmasi')
+                                                        <div class="text-[10px] text-gray-400 font-medium">
+                                                            {{ $order->user->email ?? '' }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="font-bold text-gray-700 text-sm">{{ $order->kamar->nomor_kamar ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span class="font-bold text-[#36B2B2] text-sm">Rp
+                                                    {{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                @if($statusFilter === 'gagal')
+                                                    <div class="flex flex-col gap-1">
+                                                        <span
+                                                            class="text-[10px] font-bold px-2 py-1 rounded-md w-fit border {{ $order->status === 'rejected' ? 'text-rose-500 bg-rose-50 border-rose-100' : 'text-slate-500 bg-slate-100 border-slate-200' }}">
+                                                            {{ $order->keterangan_gagal }}
+                                                        </span>
+                                                    </div>
+                                                @else
+                                                    <span
+                                                        class="text-xs text-gray-500 line-clamp-2 max-w-[150px]">{{ $order->catatan ?? '-' }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                <span
+                                                    class="text-xs font-bold text-gray-500">{{ optional($order->created_at)->format('d M Y') ?? '-' }}</span>
+                                            </td>
+                                            <td class="px-8 py-6 text-center">
+                                                <div class="flex items-center justify-center gap-2">
+                                                    @if($order->status === 'pending')
+                                                        @if($order->tipe === 'sewa')
                                                             <div class="flex items-center gap-2">
-                                                                <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}">
+                                                                <form method="POST"
+                                                                    action="{{ route('admin.order.confirm', $order->id) }}">
                                                                     @csrf
                                                                     <button type="button"
-                                                                        @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                        @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                                         class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
                                                                         ✓ Konfirmasi
                                                                     </button>
                                                                 </form>
-                                                                <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
+                                                                <form method="POST"
+                                                                    action="{{ route('admin.order.reject', $order->id) }}">
                                                                     @csrf
                                                                     <button type="button"
-                                                                        @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                        @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                                         class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
                                                                         Tolak
                                                                     </button>
                                                                 </form>
                                                             </div>
-                                                            <button
-                                                                @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                                class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
-                                                                Lihat Bukti
-                                                            </button>
+                                                            @if($order->bukti_pembayaran)
+                                                                <button
+                                                                    @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                                    class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
+                                                                    Lihat Bukti
+                                                                </button>
+                                                            @endif
+                                                        @else
+                                                            <form method="POST" action="{{ route('admin.order.verify', $order->id) }}">
+                                                                @csrf
+                                                                <button type="button"
+                                                                    @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                    class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                    ✓ Terima
+                                                                </button>
+                                                            </form>
+                                                            <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
+                                                                @csrf
+                                                                <button type="button"
+                                                                    @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                    class="text-[10px] font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-widest">
+                                                                    Tolak
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    @elseif($order->status === 'verified')
+                                                        @if($order->bukti_pembayaran)
+                                                            @if($statusFilter === 'konfirmasi')
+                                                                <div class="flex items-center gap-2">
+                                                                    <form method="POST"
+                                                                        action="{{ route('admin.order.confirm', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                            ✓ Konfirmasi
+                                                                        </button>
+                                                                    </form>
+                                                                    <form method="POST"
+                                                                        action="{{ route('admin.order.reject', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
+                                                                            Tolak
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                                <button
+                                                                    @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                                    class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
+                                                                    Lihat Bukti
+                                                                </button>
+                                                            @else
+                                                                <span
+                                                                    class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-tight">Sudah
+                                                                    Bayar</span>
+                                                                <button
+                                                                    @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                                    class="text-[9px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
+                                                                    Lihat Bukti
+                                                                </button>
+                                                            @endif
                                                         @else
                                                             <span
-                                                                class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-tight">Sudah
-                                                                Bayar</span>
-                                                            <button
-                                                                @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                                class="text-[9px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
-                                                                Lihat Bukti
-                                                            </button>
+                                                                class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tight">Menunggu
+                                                                Bukti</span>
+                                                            @if($order->batas_bayar)
+                                                                <span class="text-[8px] font-medium text-gray-400 italic">Hingga:
+                                                                    {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
+                                                            @endif
                                                         @endif
+                                                    @elseif($order->status === 'paid')
+                                                        <span
+                                                            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600">BERHASIL</span>
+                                                    @elseif($order->status === 'failed')
+                                                        <span
+                                                            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-600">GAGAL</span>
                                                     @else
                                                         <span
-                                                            class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tight">Menunggu
-                                                            Bukti</span>
-                                                        @if($order->batas_bayar)
-                                                            <span class="text-[8px] font-medium text-gray-400 italic">Hingga:
-                                                                {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
-                                                        @endif
+                                                            class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600">DITOLAK</span>
                                                     @endif
-                                                @elseif($order->status === 'paid')
-                                                    <span
-                                                        class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600">BERHASIL</span>
-                                                @elseif($order->status === 'failed')
-                                                    <span
-                                                        class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-600">GAGAL</span>
-                                                @else
-                                                    <span
-                                                        class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-600">DITOLAK</span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="px-8 py-20 text-center">
-                                            <div
-                                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
-                                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                                                </svg>
-                                            </div>
-                                            <p class="text-gray-400 text-sm font-medium">Belum ada order kamar dari user.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- Mobile Card View --}}
-                    <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-4">
-                        @forelse($orderTransaksi ?? [] as $order)
-                            <div
-                                class="bg-white rounded-[2.5rem] p-5 sm:p-6 border border-gray-100 shadow-xl shadow-gray-200/40 relative active:scale-[0.98] transition-all overflow-hidden">
-                                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 opacity-50">
-                                </div>
-                                <div class="flex items-start justify-between mb-5 relative">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center font-black text-sm shrink-0">
-                                            {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <h4 class="font-black text-gray-900 text-base leading-tight truncate">
-                                                {{ $order->user->name ?? 'N/A' }}</h4>
-                                            <div class="flex items-center gap-2 mt-1">
-                                                <span
-                                                    class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[8px] font-black uppercase rounded-md">UNIT
-                                                    {{ $order->kamar->nomor_kamar ?? '-' }}</span>
-                                                @if($order->status === 'pending')
-                                                    <div x-data="{ 
-                                                                                expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                now: new Date().getTime(),
-                                                                                timer: '',
-                                                                                init() {
-                                                                                    this.updateTimer();
-                                                                                    setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                },
-                                                                                updateTimer() {
-                                                                                    let diff = this.expiryTime - this.now;
-                                                                                    if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                    this.timer = `${h}j ${m}m ${s}d`;
-                                                                                }
-                                                                            }"
-                                                        class="px-2 py-0.5 bg-red-600 text-red-50 text-[8px] font-black rounded-md animate-pulse">
-                                                        <span x-text="timer"></span>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="text-right shrink-0">
-                                        <span
-                                            class="text-[9px] font-black text-[#36B2B2] uppercase tracking-widest block mb-0.5">Total
-                                            Bayar</span>
-                                        <span class="text-base font-black text-gray-900 tabular-nums">
-                                            Rp{{ number_format($order->jumlah_bayar, 0, ',', '.') }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="bg-gray-50/80 p-4 rounded-2xl border border-gray-100/50 mb-5 relative text-[11px]">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="font-black text-gray-400 uppercase text-[9px]">Catatan:</span>
-                                        <span class="font-bold text-gray-700 truncate ml-4">{{ $order->catatan ?? '-' }}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-black text-gray-400 uppercase text-[9px]">Tgl Order:</span>
-                                        <span
-                                            class="font-bold text-gray-700">{{ optional($order->created_at)->format('d M Y') }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col gap-2 relative">
-                                    @if($order->status === 'pending')
-                                        @if($order->tipe === 'sewa')
-                                            <div class="flex gap-2">
-                                                <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}"
-                                                    class="flex-1">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="w-full py-3.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white shadow-xl shadow-emerald-100 uppercase tracking-widest">
-                                                        ✓ Konfirmasi
-                                                    </button>
-                                                </form>
-                                                <form method="POST" action="{{ route('admin.order.reject', $order->id) }}"
-                                                    class="flex-1">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="w-full py-3.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 uppercase tracking-widest">
-                                                        ✗ Tolak
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            @if($order->bukti_pembayaran)
-                                                <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                    class="w-full flex items-center justify-center gap-2 py-2 text-[10px] font-black text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-all uppercase tracking-widest mt-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="px-8 py-20 text-center">
+                                                <div
+                                                    class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
+                                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                                                     </svg>
-                                                    Lihat Bukti Bayar
-                                                </button>
-                                            @endif
+                                                </div>
+                                                <p class="text-gray-400 text-sm font-medium">Belum ada order kamar dari user.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- Mobile Card View --}}
+                        <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-4">
+                            @forelse($orderTransaksi ?? [] as $order)
+                                <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                                                {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <h4 class="font-bold text-gray-900 text-base truncate">
+                                                    {{ $order->user->name ?? 'N/A' }}
+                                                </h4>
+                                                <div class="flex items-center gap-2 mt-0.5">
+                                                    <span class="text-[11px] font-medium text-gray-500">Unit
+                                                        {{ $order->kamar->nomor_kamar ?? '-' }}</span>
+                                                    @if($order->status === 'pending')
+                                                        <div x-data="{ 
+                                                                                                                                                expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                now: new Date().getTime(),
+                                                                                                                                                timer: '',
+                                                                                                                                                init() {
+                                                                                                                                                    this.updateTimer();
+                                                                                                                                                    setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                },
+                                                                                                                                                updateTimer() {
+                                                                                                                                                    let diff = this.expiryTime - this.now;
+                                                                                                                                                    if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                    this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                }
+                                                                                                                                            }"
+                                                            class="px-1.5 py-0.5 bg-red-50 text-red-600 text-[9px] font-bold rounded animate-pulse">
+                                                            <span x-text="timer"></span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right shrink-0">
+                                            <span class="text-[9px] text-gray-400 font-semibold block uppercase">Total</span>
+                                            <span
+                                                class="text-sm font-bold text-[#36B2B2]">Rp{{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 rounded-xl p-3 flex flex-col gap-1.5 text-xs">
+                                        <div class="flex justify-between items-center text-gray-600">
+                                            <span class="text-gray-500 font-medium whitespace-nowrap">Tgl Order:</span>
+                                            <span
+                                                class="font-medium text-gray-700 ml-2 text-right">{{ optional($order->created_at)->format('d M Y') }}</span>
+                                        </div>
+                                        @if($statusFilter === 'gagal')
+                                            <div
+                                                class="flex justify-between items-start text-gray-600 mt-1 pt-2 border-t border-gray-200/60">
+                                                <span class="text-gray-500 font-medium whitespace-nowrap mt-0.5">Alasan:</span>
+                                                <div class="flex flex-col items-end gap-1 ml-2">
+                                                    <span
+                                                        class="text-[9px] font-bold px-2 py-1 rounded-md text-right border {{ $order->status === 'rejected' ? 'text-rose-500 bg-rose-50 border-rose-100' : 'text-slate-500 bg-slate-100 border-slate-200' }}">
+                                                        {{ $order->keterangan_gagal_singkat }}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         @else
-                                            <div class="flex gap-2">
-                                                <form method="POST" action="{{ route('admin.order.verify', $order->id) }}"
-                                                    class="flex-1">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="w-full py-3.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white shadow-xl shadow-emerald-100 uppercase tracking-widest">
-                                                        ✓ Terima
-                                                    </button>
-                                                </form>
-                                                <form method="POST" action="{{ route('admin.order.reject', $order->id) }}"
-                                                    class="flex-1">
-                                                    @csrf
-                                                    <button type="button"
-                                                        @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                        class="w-full py-3.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 uppercase tracking-widest">
-                                                        ✗ Tolak
-                                                    </button>
-                                                </form>
+                                            <div class="flex justify-between items-center text-gray-600">
+                                                <span class="text-gray-500 font-medium whitespace-nowrap">Catatan:</span>
+                                                <span
+                                                    class="font-medium text-gray-700 ml-2 truncate max-w-[150px] text-right">{{ $order->catatan ?? '-' }}</span>
                                             </div>
                                         @endif
-                                    @elseif($order->status === 'verified')
-                                        @if($order->bukti_pembayaran)
-                                            @if($statusFilter === 'konfirmasi')
+                                    </div>
+
+                                    <div class="flex flex-col gap-2">
+                                        @if($order->status === 'pending')
+                                            @if($order->tipe === 'sewa')
                                                 <div class="flex gap-2">
                                                     <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}"
                                                         class="flex-1">
                                                         @csrf
                                                         <button type="button"
-                                                            @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                            class="w-full py-3.5 rounded-xl text-[10px] font-black bg-emerald-500 text-white shadow-xl shadow-emerald-100 uppercase tracking-widest">
-                                                            ✓ Konfirmasi
+                                                            @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors uppercase tracking-wide">
+                                                            Konfirmasi
                                                         </button>
                                                     </form>
                                                     <form method="POST" action="{{ route('admin.order.reject', $order->id) }}"
                                                         class="flex-1">
                                                         @csrf
                                                         <button type="button"
-                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                            class="w-full py-3.5 rounded-xl text-[10px] font-black bg-white border-2 border-rose-50 text-rose-500 uppercase tracking-widest">
-                                                            ✗ Tolak
+                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="w-full py-2.5 rounded-xl text-xs font-bold bg-white border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors uppercase tracking-wide">
+                                                            Tolak
                                                         </button>
                                                     </form>
                                                 </div>
-                                                <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                    class="w-full flex items-center justify-center gap-2 py-2 text-[10px] font-black text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-all uppercase tracking-widest mt-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                    Lihat Bukti Bayar
-                                                </button>
-                                            @else
-                                                <div class="flex flex-col gap-2">
-                                                    <span
-                                                        class="px-4 py-2.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest text-center shadow-sm">Sudah
-                                                        Bayar ✓</span>
+                                                @if($order->bukti_pembayaran)
                                                     <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                        class="text-[10px] font-black text-[#36B2B2] hover:underline uppercase tracking-widest mt-1 text-center py-1">
+                                                        class="w-full py-2 text-xs font-bold text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-colors mt-1 uppercase">
                                                         Lihat Bukti
                                                     </button>
+                                                @endif
+                                            @else
+                                                <div class="flex gap-2">
+                                                    <form method="POST" action="{{ route('admin.order.verify', $order->id) }}"
+                                                        class="flex-1">
+                                                        @csrf
+                                                        <button type="button"
+                                                            @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors uppercase tracking-wide">
+                                                            Terima
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST" action="{{ route('admin.order.reject', $order->id) }}"
+                                                        class="flex-1">
+                                                        @csrf
+                                                        <button type="button"
+                                                            @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                            class="w-full py-2.5 rounded-xl text-xs font-bold bg-white border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors uppercase tracking-wide">
+                                                            Tolak
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             @endif
-                                        @else
-                                            <div class="flex flex-col gap-3">
-                                                <span
-                                                    class="px-4 py-2.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-widest text-center shadow-sm">Menunggu
-                                                    Bukti</span>
-                                                @if($order->batas_bayar)
-                                                    <div
-                                                        class="flex items-center justify-center gap-2 text-[9px] font-bold text-gray-400 italic">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Hingga: {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}
+                                        @elseif($order->status === 'verified')
+                                            @if($order->bukti_pembayaran)
+                                                @if($statusFilter === 'konfirmasi')
+                                                    <div class="flex gap-2">
+                                                        <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}"
+                                                            class="flex-1">
+                                                            @csrf
+                                                            <button type="button"
+                                                                @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors uppercase tracking-wide">
+                                                                Konfirmasi
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="{{ route('admin.order.reject', $order->id) }}"
+                                                            class="flex-1">
+                                                            @csrf
+                                                            <button type="button"
+                                                                @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                class="w-full py-2.5 rounded-xl text-xs font-bold bg-white border border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors uppercase tracking-wide">
+                                                                Tolak
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                    <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                        class="w-full py-2 text-xs font-bold text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-colors mt-1 uppercase tracking-wider">
+                                                        Lihat Bukti
+                                                    </button>
+                                                @else
+                                                    <div class="flex items-center justify-between">
+                                                        <span
+                                                            class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase">Sudah
+                                                            Bayar ✓</span>
+                                                        <button
+                                                            @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                            class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-wider">
+                                                            Lihat Bukti
+                                                        </button>
                                                     </div>
                                                 @endif
-                                            </div>
+                                            @else
+                                                <div class="flex items-center justify-between">
+                                                    <span
+                                                        class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase">Menunggu
+                                                        Bukti</span>
+                                                    @if($order->batas_bayar)
+                                                        <span class="text-[10px] font-medium text-gray-400">Hingga:
+                                                            {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        @elseif($order->status === 'paid')
+                                            <span
+                                                class="px-3 py-2 rounded-xl text-xs font-bold text-center bg-emerald-50 text-emerald-600 uppercase border border-emerald-100">Berhasil
+                                                ✓</span>
+                                        @elseif($order->status === 'failed')
+                                            <span
+                                                class="px-3 py-2 rounded-xl text-xs font-bold text-center bg-slate-50 text-slate-500 uppercase border border-slate-200">Gagal
+                                                ✗</span>
+                                        @else
+                                            <span
+                                                class="px-3 py-2 rounded-xl text-xs font-bold text-center bg-rose-50 text-rose-500 uppercase border border-rose-100">Ditolak
+                                                ✗</span>
                                         @endif
-                                    @elseif($order->status === 'paid')
-                                        <span
-                                            class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500 text-white text-center shadow-lg shadow-emerald-100">BERHASIL
-                                            ✓</span>
-                                    @elseif($order->status === 'failed')
-                                        <span
-                                            class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 text-center border border-slate-200">GAGAL
-                                            ✗</span>
-                                    @else
-                                        <span
-                                            class="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-rose-50 text-rose-500 text-center border border-rose-100 shadow-sm">DITOLAK
-                                            ✗</span>
-                                    @endif
+                                    </div>
                                 </div>
-                            </div>
-                        @empty
-                            <div
-                                class="py-12 bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 text-center mx-4">
-                                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Database Kosong</p>
-                            </div>
-                        @endforelse
-                    </div>
-
-                    @if(isset($orderTransaksi) && $orderTransaksi instanceof \Illuminate\Pagination\LengthAwarePaginator && $orderTransaksi->hasPages())
-                        <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">
-                            {{ $orderTransaksi->appends(['tab' => 'order'])->links() }}
+                            @empty
+                                <div
+                                    class="py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 text-center mx-4">
+                                    <p class="text-gray-400 text-[11px] font-bold uppercase tracking-wider">Database Kosong</p>
+                                </div>
+                            @endforelse
                         </div>
-                    @endif
+
+                        @if(isset($orderTransaksi) && $orderTransaksi instanceof \Illuminate\Pagination\LengthAwarePaginator && $orderTransaksi->hasPages())
+                            <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">
+                                {{ $orderTransaksi->appends(['tab' => 'order'])->links() }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- 3. Riwayat (Active/Rejected) --}}
@@ -1086,74 +1113,52 @@
                     {{-- Mobile Card View --}}
                     <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-4">
                         @forelse($riwayatPenyewa ?? [] as $penyewa)
-                            <div
-                                class="bg-white rounded-[2rem] p-5 sm:p-6 border border-gray-100 shadow-xl shadow-gray-200/40 relative active:scale-[0.98] transition-all overflow-hidden">
-                                <div
-                                    class="absolute top-0 right-0 w-24 h-24 {{ $statusFilter === 'active' ? 'bg-emerald-50' : 'bg-rose-50' }} rounded-full -mr-12 -mt-12 opacity-50">
-                                </div>
-                                <div class="flex items-start justify-between mb-5 relative">
+                            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
+                                <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-12 h-12 {{ $statusFilter === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600' }} rounded-2xl flex items-center justify-center font-black text-sm shrink-0">
+                                            class="w-10 h-10 {{ $statusFilter === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }} rounded-full flex items-center justify-center font-bold text-sm shrink-0">
                                             {{ substr(optional($penyewa)->name ?? '?', 0, 1) }}
                                         </div>
                                         <div class="min-w-0">
-                                            <h4 class="font-black text-gray-900 text-base leading-tight truncate">
+                                            <h4 class="font-bold text-gray-900 text-sm truncate">
                                                 {{ optional($penyewa)->name ?? 'N/A' }}
                                             </h4>
-                                            <p class="text-[10px] text-gray-400 font-bold tracking-tight mt-0.5 mt-1 truncate">
-                                                {{ optional($penyewa)->email ?? '' }}
+                                            <p class="text-xs text-gray-500 truncate">{{ optional($penyewa)->nomor_wa ?? '-' }}
                                             </p>
                                         </div>
                                     </div>
                                     <div class="shrink-0">
                                         @if($statusFilter === 'active')
-                                            <div
-                                                class="px-2.5 py-1 bg-emerald-500 text-white text-[8px] font-black uppercase rounded-lg shadow-lg shadow-emerald-100">
-                                                AKTIF</div>
+                                            <span
+                                                class="px-2.5 py-1 text-[9px] font-bold bg-emerald-500 text-white rounded-md uppercase">Aktif</span>
                                         @else
-                                            <div
-                                                class="px-2.5 py-1 bg-rose-500 text-white text-[8px] font-black uppercase rounded-lg shadow-lg shadow-rose-100">
-                                                DITOLAK</div>
+                                            <span
+                                                class="px-2.5 py-1 text-[9px] font-bold bg-white border border-rose-200 text-rose-500 rounded-md uppercase">Ditolak</span>
                                         @endif
                                     </div>
                                 </div>
-
-                                <div class="bg-gray-50/80 p-4 rounded-2xl border border-gray-100/50 mb-4 relative text-[11px]">
-                                    <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-200/50">
-                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">No.
-                                            WhatsApp</span>
+                                <div class="bg-gray-50 rounded-xl p-3 flex flex-col gap-1.5 text-xs">
+                                    <div class="flex justify-between items-center text-gray-600">
+                                        <span class="text-gray-500 font-medium">Email:</span>
                                         <span
-                                            class="font-black text-gray-700 tabular-nums">{{ optional($penyewa)->nomor_wa ?? '-' }}</span>
+                                            class="font-medium truncate max-w-[150px] text-right">{{ optional($penyewa)->email ?? '-' }}</span>
                                     </div>
-                                    <div class="flex flex-col gap-1.5">
-                                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Alamat
-                                            Hunian</span>
+                                    <div class="flex justify-between items-start text-gray-600">
+                                        <span class="text-gray-500 font-medium mt-0.5">Alamat:</span>
                                         <span
-                                            class="font-bold text-gray-500 leading-relaxed line-clamp-2">{{ $penyewa->alamat ?? '-' }}</span>
+                                            class="font-medium text-right line-clamp-2 max-w-[180px]">{{ $penyewa->alamat ?? '-' }}</span>
                                     </div>
-                                </div>
-
-                                <div
-                                    class="flex items-center justify-center gap-2 text-[9px] font-black text-gray-300 uppercase tracking-widest relative">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    Terdaftar: {{ optional($penyewa->created_at)->format('d/m/Y') }}
+                                    <div
+                                        class="flex justify-between items-center text-gray-600 mt-1 pt-2 border-t border-gray-200/60">
+                                        <span class="text-gray-500 font-medium whitespace-nowrap">Tanggal Terdaftar:</span>
+                                        <span class="font-medium">{{ optional($penyewa->created_at)->format('d/m/Y') }}</span>
+                                    </div>
                                 </div>
                             </div>
                         @empty
-                            <div class="py-16 text-center">
-                                <div
-                                    class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                                    <svg class="w-8 h-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Database Kosong</p>
+                            <div class="py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 text-center mx-4">
+                                <p class="text-gray-400 text-[11px] font-bold uppercase tracking-wider">Database Kosong</p>
                             </div>
                         @endforelse
                     </div>
