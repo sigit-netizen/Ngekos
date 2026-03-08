@@ -104,6 +104,33 @@
                 <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
             </button>
 
+            <!-- 4. Konfirmasi Bayar Member -->
+            <button @click="activeTab = 'pending_payment_member'; window.location.href = '?tab=pending_payment_member'"
+                class="relative p-6 rounded-3xl border-2 transition-all duration-500 text-left group overflow-hidden"
+                :class="activeTab === 'pending_payment_member' 
+                    ? 'bg-[#36B2B2] border-[#2D8E8E] shadow-xl shadow-[#36B2B2]/40 -translate-y-1' 
+                    : 'bg-white border-gray-50 hover:border-[#36B2B2]/30 shadow-md shadow-gray-200/50'">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 rounded-2xl transition-all duration-500"
+                        :class="activeTab === 'pending_payment_member' ? 'bg-white/20 text-white rotate-12' : 'bg-[#36B2B2]/10 text-[#36B2B2] group-hover:rotate-12'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    @if($pendingPaymentMemberCount > 0)
+                        <span class="flex h-4 w-4">
+                            <span class="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-white shadow-sm"></span>
+                        </span>
+                    @endif
+                </div>
+                <h3 class="text-4xl font-black mb-1 transition-colors duration-500"
+                    :class="activeTab === 'pending_payment_member' ? 'text-white' : 'text-gray-900'">{{ $pendingPaymentMemberCount }}</h3>
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-500"
+                    :class="activeTab === 'pending_payment_member' ? 'text-white/90' : 'text-[#36B2B2]'">Konfirmasi Bayar Member</p>
+                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+            </button>
+
             <!-- 4. Akun Member Status (Active/Rejected) -->
             <button @click="activeTab = 'active_member'; window.location.href = '?tab=active_member&status=' + currentStatus"
                 class="relative p-6 rounded-3xl border-2 transition-all duration-500 text-left group overflow-hidden"
@@ -188,6 +215,7 @@
                     <span class="w-2 h-6 bg-green-600 rounded-full"></span>
                     <span x-text="
                             activeTab === 'pending_member' ? 'Verifikasi Akun Pemilik Kos' :
+                            activeTab === 'pending_payment_member' ? 'Konfirmasi Pembayaran Member Baru' :
                             activeTab === 'active_member' ? (currentStatus === 'active' ? 'Daftar Member Aktif' : 'Daftar Member Ditolak') :
                             activeTab === 'pending_user' ? 'Verifikasi Akun Penyewa (Anak Kos)' :
                             activeTab === 'active_user' ? (currentStatus === 'active' ? 'Daftar User Aktif' : 'Daftar User Ditolak') :
@@ -290,6 +318,72 @@
                         </table>
                     </div>
                     <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">{{ $pendingMembers->links() }}</div>
+                </div>
+
+                <!-- 1b. Pending Payment Members Table -->
+                <div x-show="activeTab === 'pending_payment_member'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead>
+                                <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
+                                    <th class="px-8 py-5">Calon Member</th>
+                                    <th class="px-8 py-5">Bukti Bayar</th>
+                                    <th class="px-8 py-5">Metode</th>
+                                    <th class="px-8 py-5 text-center">Aksi Token</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                @forelse($pendingPaymentMembers as $m)
+                                    <tr class="group hover:bg-[#36B2B2]/5 transition-colors">
+                                        <td class="px-8 py-6">
+                                            <div class="font-bold text-gray-900">{{ $m->name }}</div>
+                                            <div class="text-[10px] text-gray-400 font-medium">{{ $m->email }}</div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            @if($m->bukti_pembayaran)
+                                                <button type="button" 
+                                                    @click="$dispatch('open-proof-modal', { url: '{{ asset('storage/' . $m->bukti_pembayaran) }}' })"
+                                                    class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    LIHAT BUKTI
+                                                </button>
+                                            @else
+                                                <span class="text-[10px] text-gray-400 italic">Belum upload</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest">
+                                                {{ $m->metode_pembayaran ?? '-' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center justify-center gap-3">
+                                                <form action="{{ route('superadmin.order.member.confirm', $m->id) }}" method="POST"
+                                                    class="inline"> @csrf
+                                                    <button type="submit"
+                                                        class="px-5 py-2.5 bg-[#36B2B2] text-white rounded-xl text-xs font-black hover:bg-[#2D8E8E] transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#36B2B2]/20">
+                                                        AKTIFKAN AKUN
+                                                    </button>
+                                                </form>
+                                                <button type="button"
+                                                    @click="$dispatch('open-reject-modal', { id: {{ $m->id }}, name: '{{ $m->name }}', nik: '{{ $m->nik }}' })"
+                                                    class="px-5 py-2.5 bg-red-50 hover:bg-red-500 text-red-500 hover:text-white rounded-xl text-xs font-black border border-red-100 transition-all">
+                                                    TOLAK
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-8 py-20 text-center text-gray-400 text-sm font-medium">Data kosong.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 2. Active/Rejected Members Table -->
@@ -439,7 +533,8 @@
                                 <tr class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
                                     <th class="px-8 py-5">Pemilik Kos</th>
                                     <th class="px-8 py-5">Paket Yang Dipilih</th>
-                                    <th class="px-8 py-5">Jumlah Kamar</th>
+                                    <th class="px-8 py-5 text-center">Sisa Waktu Verif</th>
+                                    <th class="px-8 py-5">Bukti Bayar</th>
                                     <th class="px-8 py-5 text-center">Aksi Token</th>
                                 </tr>
                             </thead>
@@ -452,20 +547,75 @@
                                                 {{ $sub->user->email ?? '' }}</div>
                                         </td>
                                         <td class="px-8 py-6">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-2 h-2 rounded-full bg-purple-500"></div>
-                                                <span
-                                                    class="font-black text-purple-700 uppercase tracking-tighter text-xs">{{ $sub->jenis_langganan->nama ?? 'N/A' }}</span>
+                                            <div class="flex flex-col gap-1">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                                                    <span class="font-black text-purple-700 uppercase tracking-tighter text-xs">{{ $sub->jenis_langganan->nama ?? 'N/A' }}</span>
+                                                </div>
+                                                <div class="text-[10px] text-gray-400 font-bold tracking-tight">
+                                                    {{ $sub->jumlah_kamar ? $sub->jumlah_kamar . ' Kamar' : '-' }}
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-6 font-bold text-gray-600 text-xs">
-                                            {{ $sub->jumlah_kamar ? $sub->jumlah_kamar . ' Kamar' : '-' }}</td>
+                                        <td class="px-8 py-6" 
+                                            x-data="{
+                                                deadline: {{ $sub->updated_at->addDay()->timestamp * 1000 }},
+                                                remaining: '00:00:00',
+                                                updateTimer() {
+                                                    let now = new Date().getTime();
+                                                    let diff = this.deadline - now;
+                                                    if (diff <= 0) {
+                                                        this.remaining = 'EXPIRED';
+                                                        return;
+                                                    }
+                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                    this.remaining = 
+                                                        String(h).padStart(2, '0') + ':' + 
+                                                        String(m).padStart(2, '0') + ':' + 
+                                                        String(s).padStart(2, '0');
+                                                }
+                                            }"
+                                            x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
+                                            <div class="flex items-center justify-center gap-2 bg-gray-900 text-emerald-400 px-3 py-1.5 rounded-lg shadow-inner border border-gray-800 w-fit mx-auto">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span class="text-xs font-black tracking-widest font-mono" x-text="remaining">00:00:00</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="flex flex-col gap-2">
+                                                @if($sub->bukti_pembayaran)
+                                                    <button type="button" 
+                                                        @click="$dispatch('open-proof-modal', { url: '{{ asset('storage/' . $sub->bukti_pembayaran) }}' })"
+                                                        class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black border border-blue-100 hover:bg-blue-600 hover:text-white transition-all w-fit">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                        </svg>
+                                                        LIHAT BUKTI
+                                                    </button>
+                                                @else
+                                                    <span class="text-[10px] text-gray-400 italic">Belum upload</span>
+                                                @endif
+                                                @if($sub->metode_pembayaran)
+                                                    <span class="text-[9px] font-black text-gray-500 bg-gray-100 px-2 py-0.5 rounded w-fit uppercase tracking-widest">
+                                                        {{ $sub->metode_pembayaran }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex items-center justify-center gap-2">
                                                 <form action="{{ route('superadmin.order.verify', $sub->id) }}" method="POST">
                                                     @csrf
                                                     <button type="submit"
-                                                        class="px-6 py-2.5 bg-green-50 text-green-700 rounded-xl text-xs font-black border border-green-200 hover:bg-green-600 hover:text-white transition-all active:scale-95 hover:scale-105 shadow-sm shadow-green-600/10">AKTIFKAN</button>
+                                                        class="px-6 py-2.5 bg-green-50 text-green-700 rounded-xl text-xs font-black border border-green-200 hover:bg-green-600 hover:text-white transition-all active:scale-95 hover:scale-105 shadow-sm shadow-green-600/10"
+                                                        {{ !$sub->bukti_pembayaran ? 'disabled opacity-50 cursor-not-allowed' : '' }}>
+                                                        AKTIFKAN
+                                                    </button>
                                                 </form>
                                                 <form action="{{ route('superadmin.order.reject', $sub->id) }}" method="POST">
                                                     @csrf
@@ -477,7 +627,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-8 py-20 text-center text-gray-400">Pembayaran paket sudah
+                                        <td colspan="4" class="px-8 py-20 text-center text-gray-400 text-sm font-medium">Pembayaran paket sudah
                                             diverifikasi semua.</td>
                                     </tr>
                                 @endforelse
@@ -615,6 +765,60 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+    <!-- Modal View Bukti Bayar -->
+    <div x-data="{ showProof: false, imageUrl: '' }" 
+         x-show="showProof" 
+         @open-proof-modal.window="showProof = true; imageUrl = $event.detail.url"
+         x-cloak
+         class="fixed inset-0 z-[200] overflow-y-auto flex items-center justify-center p-4">
+        
+        <!-- Backdrop -->
+        <div x-show="showProof" 
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/90 backdrop-blur-md transition-opacity" 
+             @click="showProof = false"></div>
+
+        <!-- Compact Close Button -->
+        <button x-show="showProof"
+                @click="showProof = false" 
+                class="fixed top-6 right-6 z-[260] p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-95 group">
+            <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Image Container (Smaller) -->
+        <div x-show="showProof"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="relative z-[250] max-w-2xl w-full">
+            
+            <div class="bg-white p-1.5 rounded-3xl shadow-2xl">
+                <img :src="imageUrl" alt="Bukti Pembayaran" 
+                     class="w-full h-auto rounded-[1.3rem] shadow-inner max-h-[70vh] object-contain bg-gray-50">
+            </div>
+            
+            <!-- Action below image (Compact) -->
+            <div class="mt-4 flex justify-center">
+                <a :href="imageUrl" download 
+                   class="px-6 py-3 bg-white text-[#36B2B2] rounded-xl font-black shadow-xl hover:bg-gray-50 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95 text-sm uppercase tracking-wider">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Simpan Gambar
+                </a>
+            </div>
         </div>
     </div>
 @endsection

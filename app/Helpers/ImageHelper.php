@@ -19,8 +19,8 @@ class ImageHelper
      */
     public static function uploadAndOptimize($file, $directory = 'uploads', $width = 1200)
     {
-        // Increase execution time for heavy image processing (compression/convert)
-        set_time_limit(180); // 3 minutes
+        // Disable time limit for this function (will be controlled by Queue Job timeout)
+        set_time_limit(0);
 
         // 1. Initialize ImageManager with GD driver
         $manager = new ImageManager(new Driver());

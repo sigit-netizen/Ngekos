@@ -346,8 +346,8 @@
                                 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Media
                                 Sosial</span>
                             <div class="h-px flex-1 bg-gray-100"></div>
+                            <br>
                         </div>
-                        <br>
                         <!-- Instagram -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
@@ -414,8 +414,8 @@
                                 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Keamanan
                                 Akun</span>
                             <div class="h-px flex-1 bg-gray-100"></div>
+                            <br>
                         </div>
-                        <br>
                         <!-- Password -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">

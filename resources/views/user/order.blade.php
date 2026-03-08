@@ -1,22 +1,20 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
-    @php
-        $tab = request('tab', 'all');
-    @endphp
+
 
     <div x-data="{ 
-                                            activeTab: '{{ $tab }}', 
-                                            showUploadModal: false, 
-                                            selectedOrderId: null,
-                                            selectedOrderName: '',
-                                            selectedOrderAmount: 0,
-                                            showProof: false,
-                                            proofUrl: '',
-                                            previewUrl: null
-                                        }"
+                                                                        activeTab: '{{ $tab }}', 
+                                                                        showUploadModal: false, 
+                                                                        selectedOrderId: null,
+                                                                        selectedOrderName: '',
+                                                                        selectedOrderAmount: 0,
+                                                                        showProof: false,
+                                                                        proofUrl: '',
+                                                                        previewUrl: null
+                                                                    }"
         x-init="$watch('showUploadModal', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open')); 
-                                                    $watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
+                                                                                $watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
         {{-- Header Summary Card --}}
         <div class="bg-gradient-to-br from-[#36B2B2] to-[#2D8E8E] rounded-[2.5rem] p-8 sm:p-12 shadow-2xl shadow-[#36B2B2]/20 mb-10 overflow-hidden relative group"
@@ -105,39 +103,41 @@
                         {{-- Countdown Timer --}}
                         @php
                             $expiryTime = null;
-                            if ($order->status === 'pending') {
+                            if ($order->status === 'pending' && $order->created_at) {
                                 $expiryTime = $order->created_at->addDay();
                             } elseif ($order->status === 'verified' && !$order->bukti_pembayaran) {
                                 $expiryTime = $order->batas_bayar;
                             } elseif ($order->status === 'verified' && $order->bukti_pembayaran) {
-                                $expiryTime = $order->tanggal_pembayaran->addDay();
+                                // Once proof is uploaded, we give Admin 24h to verify (using updated_at as proxy for upload time)
+                                $expiryTime = $order->updated_at->addDay();
                             }
                         @endphp
 
                         @if($expiryTime)
                             <div x-data="{ 
-                                            expiryTime: new Date('{{ $expiryTime->toIso8601String() }}').getTime(),
-                                            now: new Date().getTime(),
-                                            timer: '',
-                                            init() {
-                                                this.updateTimer();
-                                                setInterval(() => {
-                                                    this.now = new Date().getTime();
-                                                    this.updateTimer();
-                                                }, 1000);
-                                            },
-                                            updateTimer() {
-                                                let diff = this.expiryTime - this.now;
-                                                if (diff <= 0) {
-                                                    this.timer = 'EXPIRED';
-                                                    return;
-                                                }
-                                                let h = Math.floor(diff / (1000 * 60 * 60));
-                                                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                this.timer = `${h}j ${m}m ${s}d`;
-                                            }
-                                        }" class="px-2 py-1 bg-red-600 text-white rounded-lg animate-pulse ml-2 shadow-inner border border-red-400">
+                                                                                                                                expiryTime: new Date('{{ $expiryTime->toIso8601String() }}').getTime(),
+                                                                                                                                now: new Date().getTime(),
+                                                                                                                                timer: '',
+                                                                                                                                init() {
+                                                                                                                                    this.updateTimer();
+                                                                                                                                    setInterval(() => {
+                                                                                                                                        this.now = new Date().getTime();
+                                                                                                                                        this.updateTimer();
+                                                                                                                                    }, 1000);
+                                                                                                                                },
+                                                                                                                                updateTimer() {
+                                                                                                                                    let diff = this.expiryTime - this.now;
+                                                                                                                                    if (diff <= 0) {
+                                                                                                                                        this.timer = 'EXPIRED';
+                                                                                                                                        return;
+                                                                                                                                    }
+                                                                                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                    this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                }
+                                                                                                                            }"
+                                class="px-2 py-1 bg-red-600 text-white rounded-lg animate-pulse ml-2 shadow-inner border border-red-400">
                                 <span x-text="timer" class="font-bold text-[11px] leading-none"></span>
                             </div>
                         @endif
@@ -179,6 +179,49 @@
                                             <span class="text-[11px] font-black text-[#36B2B2] uppercase tracking-wider">Rp
                                                 {{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
                                         </div>
+
+                                        {{-- Payment Method --}}
+                                        <div
+                                            class="flex items-center gap-1.5 px-3 py-1.5 {{ $order->metode_pembayaran === 'manual' ? 'bg-amber-50 border-amber-100' : 'bg-blue-50 border-blue-100' }} rounded-xl border">
+                                            <span
+                                                class="text-[10px] font-black uppercase tracking-widest {{ $order->metode_pembayaran === 'manual' ? 'text-amber-600' : 'text-blue-600' }}">
+                                                {{ $order->metode_pembayaran === 'manual' ? 'Manual' : 'Py-Men' }}
+                                            </span>
+                                        </div>
+
+                                        @if ($order->metode_pembayaran === 'manual' && $order->tanggal_pembayaran && in_array($order->status, ['pending', 'verified']))
+                                            <div class="flex flex-col items-center gap-1 px-3 py-1.5 bg-rose-50 rounded-xl border border-rose-100"
+                                                x-data="{
+                                                                                        target: new Date('{{ $order->batas_bayar ?: $order->tanggal_pembayaran }}').getTime(),
+                                                                                        display: '--:--:--',
+                                                                                        init() {
+                                                                                            this.update();
+                                                                                            setInterval(() => this.update(), 1000);
+                                                                                        },
+                                                                                        update() {
+                                                                                            const now = new Date().getTime();
+                                                                                            const diff = this.target - now;
+                                                                                            if (diff <= 0) {
+                                                                                                this.display = 'BATAL OTOMATIS';
+                                                                                                return;
+                                                                                            }
+                                                                                            const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                            this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                        }
+                                                                                    }">
+                                                <span
+                                                    class="text-[8px] font-black text-rose-400 uppercase tracking-widest text-center">Sisa
+                                                    Waktu Bayar</span>
+                                                <span class="text-[11px] font-black text-rose-600 font-mono tracking-tighter"
+                                                    x-text="display"></span>
+                                                <span class="text-[8px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">
+                                                    Hingga:
+                                                    {{ \Carbon\Carbon::parse($order->batas_bayar ?: $order->tanggal_pembayaran)->format('d M, H:i') }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end">
@@ -228,11 +271,18 @@
                                     <form id="cancel-order-{{ $order->id }}" action="{{ route('user.order.cancel', $order->id) }}"
                                         method="POST" class="hidden">@csrf</form>
                                 @elseif($order->status === 'verified' && !$order->bukti_pembayaran)
-                                    <button type="button"
-                                        x-on:click.prevent="selectedOrderId = {{ $order->id }}; selectedOrderName = '{{ addslashes($order->kamar->kos->nama_kos ?? 'N/A') }}'; selectedOrderAmount = {{ $order->jumlah_bayar }}; showUploadModal = true;"
-                                        class="px-10 py-3.5 bg-[#36B2B2] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-[#2D8E8E] transition-all shadow-xl shadow-[#36B2B2]/20 active:scale-95 cursor-pointer">
-                                        Unggah Bukti Pembayaran
-                                    </button>
+                                    <div class="flex flex-col gap-3">
+                                        <button type="button"
+                                            @click="selectedOrderId = '{{ $order->id }}'; selectedOrderName = '{{ addslashes($order->kamar->kos->nama_kos ?? 'N/A') }}'; selectedOrderAmount = {{ $order->jumlah_bayar }}; showUploadModal = true"
+                                            class="px-8 py-3 bg-[#36B2B2] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-[#2d9696] transition-all active:scale-95 cursor-pointer shadow-lg shadow-[#36B2B2]/20">
+                                            Unggah Bukti Bayar
+                                        </button>
+                                        @if($order->metode_pembayaran === 'manual')
+                                            <p class="text-[9px] font-bold text-amber-600 uppercase tracking-tight">
+                                                * Anda juga bisa bayar langsung ke admin/pemilik kos tanpa unggah bukti.
+                                            </p>
+                                        @endif
+                                    </div>
                                 @elseif($order->bukti_pembayaran)
                                     <button type="button"
                                         @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"

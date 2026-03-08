@@ -56,9 +56,8 @@ class DashboardController extends Controller
 
             // Count for 'Konfirmasi' - Recurring Rent
             $stats['rentKonfirmasiCount'] = Transaksi::where('kode_kos', $kos->kode_kos)
-                ->where('status', 'pending')
+                ->whereIn('status', ['pending', 'verified'])
                 ->where('tipe', Transaksi::TYPE_SEWA)
-                ->whereNotNull('bukti_pembayaran')
                 ->count();
 
             // Count pending penyewa from pending_users table who registered with this kos's kode_kos

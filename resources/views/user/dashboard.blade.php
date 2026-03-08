@@ -32,20 +32,14 @@
             touch-action: none;
         }
     </style>
-    @php
-        $user = auth()->user();
-        $isPenyewa = $user->isPenyewa();
-    @endphp
+
 
     @if($isPenyewa)
         @can('fitur.sudah_sewa')
             {{-- ============================================ --}}
             {{-- DASHBOARD PENYEWA (Verified Tenant) --}}
             {{-- ============================================ --}}
-            @php
-                $kosData = $user->kosAnak;
-                $kamarData = $user->kamar;
-            @endphp
+
 
             <!-- Welcome Banner Penyewa -->
             <div class="bg-gradient-to-br from-[#36B2B2]/10 to-emerald-50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-sm border border-[#36B2B2]/20 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6"
@@ -148,7 +142,7 @@
                             <p class="text-xs text-gray-500">Cek jadwal pembayaran</p>
                         </div>
                     </a>
-                    <a href="{{ route('user.aduan') }}"
+                    <a href="{{ route('user.fasilitas') }}"
                         class="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-[#36B2B2]/30 hover:bg-[#36B2B2]/5 transition-all duration-300 group">
                         <div
                             class="h-10 w-10 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
@@ -207,22 +201,6 @@
             </div>
 
             <!-- Order Status Card -->
-            @php
-                $latestOrder = \App\Models\Transaksi::where('id_user', $user->id)
-                    ->latest()
-                    ->with(['kamar.kos'])
-                    ->first();
-
-                if (!$latestOrder) {
-                    $orderStatus = 'belum_order';
-                } elseif ($latestOrder->status === 'pending') {
-                    $orderStatus = 'pending';
-                } elseif ($latestOrder->status === 'verified') {
-                    $orderStatus = 'verified';
-                } else {
-                    $orderStatus = 'belum_order'; // rejected = can order again
-                }
-            @endphp
 
             @if($orderStatus === 'verified')
                 {{-- Terverifikasi: auto-reload will show penyewa dashboard --}}
@@ -346,7 +324,7 @@
                         </div>
 
                         <!-- Kategori -->
-                        <div class="sm:w-40">
+                        <div class="sm:w-36">
                             <select x-model="filters.kategori"
                                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#36B2B2]/30 focus:border-[#36B2B2] transition-all text-sm font-medium bg-white appearance-none cursor-pointer">
                                 <option value="">Semua Tipe</option>
@@ -355,19 +333,18 @@
                                 <option value="campur">👥 Campur</option>
                             </select>
                         </div>
+
+                        <!-- Tipe Sewa -->
+                        <div class="sm:w-40">
+                            <select x-model="filters.tipe_sewa"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#36B2B2]/30 focus:border-[#36B2B2] transition-all text-sm font-medium bg-white appearance-none cursor-pointer">
+                                <option value="">Semua Durasi</option>
+                                <option value="bulan">🗓️ Bulanan</option>
+                                <option value="minggu">📅 Mingguan</option>
+                                <option value="hari">☀️ Harian</option>
+                            </select>
+                        </div>
                     </div>
-
-                    @php
-                        $popularCities = \App\Models\Kos::whereNotNull('kota')
-                            ->where('kota', '!=', '')
-                            ->distinct()
-                            ->pluck('kota')
-                            ->toArray();
-
-                        if (empty($popularCities)) {
-                            $popularCities = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang'];
-                        }
-                    @endphp
                     <!-- City Chips -->
                     <div class="flex flex-wrap gap-2 mb-5">
                         <p class="w-full text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Kota Populer
@@ -724,9 +701,9 @@
                                                             </div>
 
                                                             <div class="text-right mb-3">
-                                                                <p
-                                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">
-                                                                    Per Bulan</p>
+                                                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1"
+                                                                    x-text="kamar.tipe_durasi === 'hari' ? 'Per Hari' : (kamar.tipe_durasi === 'minggu' ? 'Per Minggu' : 'Per Bulan')">
+                                                                </p>
                                                                 <div class="flex items-baseline justify-end gap-1">
                                                                     <span class="text-xs font-black text-[#36B2B2]">Rp</span>
                                                                     <span class="text-xl font-black text-gray-900 tracking-tight"
@@ -864,7 +841,7 @@
                                                 <h4 class="text-base font-black text-gray-900"
                                                     x-text="'Kamar ' + selectedKamar.nomor_kamar"></h4>
                                                 <p class="text-sm font-bold text-gray-600 mt-1"
-                                                    x-text="'Rp ' + Number(selectedKamar.harga).toLocaleString('id-ID') + ' / bulan'">
+                                                    x-text="'Rp ' + Number(selectedKamar.harga).toLocaleString('id-ID') + (selectedKamar.tipe_durasi === 'hari' ? ' / hari' : (selectedKamar.tipe_durasi === 'minggu' ? ' / minggu' : ' / bulan'))">
                                                 </p>
                                             </div>
                                         </div>
@@ -940,15 +917,18 @@
                                             x-transition:leave="transition ease-in duration-200"
                                             x-transition:leave-start="opacity-100 translate-y-0"
                                             x-transition:leave-end="opacity-0 -translate-y-2">
-                                            <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
-                                                Batas Waktu Pembayaran (Manual) <span class="text-rose-500">*</span>
-                                            </label>
-                                            <input type="datetime-local" x-model="paymentDeadline"
-                                                :required="paymentMethod === 'manual'"
-                                                class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
-                                            <p class="text-[9px] font-medium text-gray-500 mt-1">Silakan pilih tanggal dan jam
-                                                sebelum
-                                                anda melakukan pembayaran.</p>
+                                            <div class="mb-0">
+                                                <label
+                                                    class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+                                                    Batas Waktu Pembayaran (Manual) <span class="text-rose-500">*</span>
+                                                </label>
+                                                <input type="datetime-local" name="batas_bayar" x-model="paymentDeadline"
+                                                    :required="paymentMethod === 'manual'"
+                                                    class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
+                                                <p class="text-[9px] font-medium text-gray-500 mt-1">Silakan pilih tanggal dan jam
+                                                    sebelum
+                                                    anda melakukan pembayaran.</p>
+                                            </div>
                                         </div>
 
                                         <!-- Additional Notes -->
@@ -979,126 +959,129 @@
                     </div>
                 </div>
 
-                <script>
-                    function kosSearch() {
-                        return {
-                            filters: {
-                                lokasi: '',
-                                harga: '',
-                                kategori: '',
-                                is_favorit_only: false,
-                            },
-                            loading: false,
-                            searchPerformed: false,
-                            error: null,
-                            kosList: [],
-                            showOrderModal: false,
-                            selectedKamar: null,
-                            selectedKos: null,
-                            orderNote: '',
-                            jumlahBayar: 0,
-                            paymentMethod: 'manual',
-                            paymentDeadline: '',
-                            init() {
-                                const urlParams = new URLSearchParams(window.location.search);
-                                if (urlParams.get('filter') === 'favorit') {
-                                    this.filters.is_favorit_only = true;
-                                }
-                                this.search();
-                            },
-                            resetFilters() {
-                                this.filters = {
-                                    lokasi: '',
-                                    harga: '',
-                                    kategori: '',
-                                    is_favorit_only: false,
-                                };
-                                this.searchPerformed = false;
-                                this.kosList = [];
-                                this.error = null;
-                                this.search(); // Restore recommendations
-                            },
-                            async search() {
-                                this.loading = true;
-                                this.error = null;
-                                this.kosList = [];
-
-                                const payload = {};
-                                if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
-                                if (this.filters.harga) payload.harga = this.filters.harga;
-                                if (this.filters.kategori) payload.kategori = this.filters.kategori;
-
-                                // Add explicit kota filter if it matches one of the popular cities
-                                const popularCities = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang'];
-                                if (popularCities.includes(this.filters.lokasi)) {
-                                    payload.kota = this.filters.lokasi;
-                                }
-
-                                try {
-                                    const res = await fetch('{{ route('user.order.search') }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Accept': 'application/json',
+                <script>         function kosSearch() {
+                                    return {
+                                        filters: {
+                                            lokasi: '',
+                                            harga: '',
+                                            kategori: '',
+                                            tipe_sewa: '',
+                                            is_favorit_only: false,
                                         },
-                                        body: JSON.stringify(payload),
-                                    });
-                                    const data = await res.json();
-
-                                    // Update searchPerformed state correctly
-                                    const loc = this.filters.lokasi ? this.filters.lokasi.trim() : '';
-                                    const hasFilters = loc || this.filters.harga || this.filters.kategori || this.filters.is_favorit_only;
-                                    this.searchPerformed = !!hasFilters;
-
-                                    if (data.success) {
-                                        this.kosList = data.data.map((kos, i) => ({
-                                            ...kos,
-                                            _expanded: false,
-                                            is_favorit: kos.favorited_by && kos.favorited_by.length > 0
-                                        }));
-
-                                        // Local filter for favorites if selected
-                                        if (this.filters.is_favorit_only) {
-                                            this.kosList = this.kosList.filter(k => k.is_favorit);
-                                            if (this.kosList.length === 0) {
-                                                this.error = "Belum ada kos yang ditandai sebagai favorit.";
+                                        loading: false,
+                                        searchPerformed: false,
+                                        error: null,
+                                        kosList: [],
+                                        showOrderModal: false,
+                                        selectedKamar: null,
+                                        selectedKos: null,
+                                        orderNote: '',
+                                        jumlahBayar: 0,
+                                        paymentMethod: 'manual',
+                                        paymentDeadline: '',
+                                        orderPaymentDate: '',
+                                        init() {
+                                            const urlParams = new URLSearchParams(window.location.search);
+                                            if (urlParams.get('filter') === 'favorit') {
+                                                this.filters.is_favorit_only = true;
                                             }
-                                        }
-                                    } else {
-                                        this.error = data.message || 'Tidak ditemukan.';
+                                            this.search();
+                                        },
+                                        resetFilters() {
+                                            this.filters = {
+                                                lokasi: '',
+                                                harga: '',
+                                                kategori: '',
+                                                tipe_sewa: '',
+                                                is_favorit_only: false,
+                                            };
+                                            this.searchPerformed = false;
+                                            this.kosList = [];
+                                            this.error = null;
+                                            this.search(); // Restore recommendations
+                                        },
+                                        async search() {
+                                            this.loading = true;
+                                            this.error = null;
+                                            this.kosList = [];
+
+                                            const payload = {};
+                                            if (this.filters.lokasi.trim()) payload.lokasi = this.filters.lokasi.trim();
+                                            if (this.filters.harga) payload.harga = this.filters.harga;
+                                            if (this.filters.kategori) payload.kategori = this.filters.kategori;
+                                            if (this.filters.tipe_sewa) payload.tipe_sewa = this.filters.tipe_sewa;
+
+                                            // Add explicit kota filter if it matches one of the popular cities
+                                            const popularCities = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang'];
+                                            if (popularCities.includes(this.filters.lokasi)) {
+                                                payload.kota = this.filters.lokasi;
+                                            }
+
+                                            try {
+                                                const res = await fetch('{{ route('user.order.search') }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Accept': 'application/json',
+                                                    },
+                                                    body: JSON.stringify(payload),
+                                                });
+                                                const data = await res.json();
+
+                                                // Update searchPerformed state correctly
+                                                const loc = this.filters.lokasi ? this.filters.lokasi.trim() : '';
+                                                const hasFilters = loc || this.filters.harga || this.filters.kategori || this.filters.is_favorit_only;
+                                                this.searchPerformed = !!hasFilters;
+
+                                                if (data.success) {
+                                                    this.kosList = data.data.map((kos, i) => ({
+                                                        ...kos,
+                                                        _expanded: false,
+                                                        is_favorit: kos.favorited_by && kos.favorited_by.length > 0
+                                                    }));
+
+                                                    // Local filter for favorites if selected
+                                                    if (this.filters.is_favorit_only) {
+                                                        this.kosList = this.kosList.filter(k => k.is_favorit);
+                                                        if (this.kosList.length === 0) {
+                                                            this.error = "Belum ada kos yang ditandai sebagai favorit.";
+                                                        }
+                                                    }
+                                                } else {
+                                                    this.error = data.message || 'Tidak ditemukan.';
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                                this.error = "Terjadi kesalahan saat mencari kos.";
+                                            } finally {
+                                                this.loading = false;
+                                            }
+                                        },
+                                        async toggleFavorit(kos) {
+                                            try {
+                                                const res = await fetch(`/user/kos/${kos.id}/toggle-favorit`, {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Accept': 'application/json',
+                                                    }
+                                                });
+                                                const data = await res.json();
+                                                if (data.success) {
+                                                    kos.is_favorit = data.is_favorit;
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                            }
+                                        },
                                     }
-                                } catch (err) {
-                                    console.error(err);
-                                    this.error = "Terjadi kesalahan saat mencari kos.";
-                                } finally {
-                                    this.loading = false;
                                 }
-                            },
-                            async toggleFavorit(kos) {
-                                try {
-                                    const res = await fetch(`/user/kos/${kos.id}/toggle-favorit`, {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                            'Accept': 'application/json',
-                                        }
-                                    });
-                                    const data = await res.json();
-                                    if (data.success) {
-                                        kos.is_favorit = data.is_favorit;
-                                    }
-                                } catch (err) {
-                                    console.error(err);
-                                }
-                            },
-                        }
-                    }
-                </script>
+                            </script>
         @endcan
     @endif
 
-        <!-- Spacer for bottom -->
-        <div class="h-10"></div>
+            <!-- Spacer for bottom -->
+            <div class="h-10"></div>
 @endsection

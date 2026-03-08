@@ -2,117 +2,117 @@
 
 @section('dashboard-content')
     <div x-data="{ 
-                                                                                                                                            showAddModal: false,
-                                                                                                                                            showEditModal: false,
-                                                                                                                                            showFasilitasModal: false,
-                                                                                                                                            activeKamar: null,
-                                                                                                                                            search: '',
-                                                                                                                                            filterStatus: 'all',
-                                                                                                                                            formData: {
-                                                                                                                                                nomor_kamar: '',
-                                                                                                                                                harga: '',
-                                                                                                                                             durasi_sewa: 1,
-                                                                                                                                             tipe_durasi: 'bulan',
-                                                                                                                                                foto: '',
-                                                                                                                                                addPreviewUrl: null,
-                                                                                                                                                fasilitas: ['']
-                                                                                                                                            },
-                                                                                                                                            editFormData: {
-                                                                                                                                                nomor_kamar: '',
-                                                                                                                                                harga: '',
-                                                                                                                                             durasi_sewa: 1,
-                                                                                                                                             tipe_durasi: 'bulan',
-                                                                                                                                                foto: '',
-                                                                                                                                                editPreviewUrl: null
-                                                                                                                                            },
-                                                                                                                                            fasilitasData: {
-                                                                                                                                                items: []
-                                                                                                                                            },
-                                                                                                                                            init() {
-                                                                                                                                                this.$watch('showAddModal', value => this.toggleScroll(value));
-                                                                                                                                                this.$watch('showEditModal', value => this.toggleScroll(value));
-                                                                                                                                                this.$watch('showFasilitasModal', value => this.toggleScroll(value));
-                                                                                                                                            },
-                                                                                                                                            toggleScroll(isEnabled) {
-                                                                                                                                                if (isEnabled) {
-                                                                                                                                                    document.body.style.overflow = 'hidden';
-                                                                                                                                                } else {
-                                                                                                                                                    // Only restore if all modals are closed
-                                                                                                                                                    if (!this.showAddModal && !this.showEditModal && !this.showFasilitasModal) {
-                                                                                                                                                        document.body.style.overflow = '';
-                                                                                                                                                    }
-                                                                                                                                                }
-                                                                                                                                            },
-                                                                                                                                            formatCurrency(value) {
-                                                                                                                                                if (!value) return '';
-                                                                                                                                                let val = value.toString().replace(/\D/g, '');
-                                                                                                                                                return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                                                                                                                                            },
-                                                                                                                                            updateHarga(e, target) {
-                                                                                                                                                let rawValue = e.target.value.replace(/\D/g, '');
-                                                                                                                                                this[target].harga = this.formatCurrency(rawValue);
-                                                                                                                                            },
-                                                                                                                                            openEditModal(kamar) {
-                                                                                                                                                this.activeKamar = kamar;
-                                                                                                                                                this.editFormData = {
-                                                                                                                                                    nomor_kamar: kamar.nomor_kamar,
-                                                                                                                                                    harga: this.formatCurrency(Math.round(kamar.harga)),
-                                                                                                                                                 durasi_sewa: kamar.durasi_sewa || 1,
-                                                                                                                                                 tipe_durasi: kamar.tipe_durasi || 'bulan',
-                                                                                                                                                    foto: kamar.foto || '',
-                                                                                                                                                    editPreviewUrl: null
-                                                                                                                                                };
-                                                                                                                                                this.showEditModal = true;
-                                                                                                                                            },
-                                                                                                                                            openFasilitasModal(kamar) {
-                                                                                                                                                this.activeKamar = kamar;
-                                                                                                                                                this.fasilitasData.items = kamar.fasilitas.length > 0
-                                                                                                                                                    ? kamar.fasilitas.map(f => f.nama_fasilitas)
-                                                                                                                                                    : [''];
-                                                                                                                                                this.showFasilitasModal = true;
-                                                                                                                                            },
-                                                                                                                                            addFasilitasRow() {
-                                                                                                                                                this.fasilitasData.items.push('');
-                                                                                                                                            },
-                                                                                                                                            removeFasilitasRow(index) {
-                                                                                                                                                this.fasilitasData.items.splice(index, 1);
-                                                                                                                                                if (this.fasilitasData.items.length === 0) {
-                                                                                                                                                    this.fasilitasData.items.push('');
-                                                                                                                                                }
-                                                                                                                                            },
-                                                                                                                                            addFasilitasRowNew() {
-                                                                                                                                                this.formData.fasilitas.push('');
-                                                                                                                                            },
-                                                                                                                                            removeFasilitasRowNew(index) {
-                                                                                                                                                this.formData.fasilitas.splice(index, 1);
-                                                                                                                                                if (this.formData.fasilitas.length === 0) {
-                                                                                                                                                    this.formData.fasilitas.push('');
-                                                                                                                                                }
-                                                                                                                                            },
-                                                                                                                                            currentPage: 1,
-                                                                                                                                            itemsPerPage: 10,
-                                                                                                                                            get filteredKamars() {
-                                                                                                                                                if (!window.existingKamars) return [];
-                                                                                                                                                return window.existingKamars.filter(kamar => {
-                                                                                                                                                    const matchSearch = this.search === '' ||
-                                                                                                                                                                       kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
-                                                                                                                                                    const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
+                                                                                                                                                    showAddModal: false,
+                                                                                                                                                    showEditModal: false,
+                                                                                                                                                    showFasilitasModal: false,
+                                                                                                                                                    activeKamar: null,
+                                                                                                                                                    search: '',
+                                                                                                                                                    filterStatus: 'all',
+                                                                                                                                                    formData: {
+                                                                                                                                                        nomor_kamar: '',
+                                                                                                                                                        harga: '',
+                                                                                                                                                     durasi_sewa: 3,
+                                                                                                                                                     tipe_durasi: 'hari',
+                                                                                                                                                        foto: '',
+                                                                                                                                                        addPreviewUrl: null,
+                                                                                                                                                        fasilitas: ['']
+                                                                                                                                                    },
+                                                                                                                                                    editFormData: {
+                                                                                                                                                        nomor_kamar: '',
+                                                                                                                                                        harga: '',
+                                                                                                                                                     durasi_sewa: 3,
+                                                                                                                                                     tipe_durasi: 'hari',
+                                                                                                                                                        foto: '',
+                                                                                                                                                        editPreviewUrl: null
+                                                                                                                                                    },
+                                                                                                                                                    fasilitasData: {
+                                                                                                                                                        items: []
+                                                                                                                                                    },
+                                                                                                                                                    init() {
+                                                                                                                                                        this.$watch('showAddModal', value => this.toggleScroll(value));
+                                                                                                                                                        this.$watch('showEditModal', value => this.toggleScroll(value));
+                                                                                                                                                        this.$watch('showFasilitasModal', value => this.toggleScroll(value));
+                                                                                                                                                    },
+                                                                                                                                                    toggleScroll(isEnabled) {
+                                                                                                                                                        if (isEnabled) {
+                                                                                                                                                            document.body.style.overflow = 'hidden';
+                                                                                                                                                        } else {
+                                                                                                                                                            // Only restore if all modals are closed
+                                                                                                                                                            if (!this.showAddModal && !this.showEditModal && !this.showFasilitasModal) {
+                                                                                                                                                                document.body.style.overflow = '';
+                                                                                                                                                            }
+                                                                                                                                                        }
+                                                                                                                                                    },
+                                                                                                                                                    formatCurrency(value) {
+                                                                                                                                                        if (!value) return '';
+                                                                                                                                                        let val = value.toString().replace(/\D/g, '');
+                                                                                                                                                        return val.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                                                                                                                                    },
+                                                                                                                                                    updateHarga(e, target) {
+                                                                                                                                                        let rawValue = e.target.value.replace(/\D/g, '');
+                                                                                                                                                        this[target].harga = this.formatCurrency(rawValue);
+                                                                                                                                                    },
+                                                                                                                                                    openEditModal(kamar) {
+                                                                                                                                                        this.activeKamar = kamar;
+                                                                                                                                                        this.editFormData = {
+                                                                                                                                                            nomor_kamar: kamar.nomor_kamar,
+                                                                                                                                                            harga: this.formatCurrency(Math.round(kamar.harga)),
+                                                                                                                                                         durasi_sewa: kamar.durasi_sewa || 1,
+                                                                                                                                                         tipe_durasi: kamar.tipe_durasi || 'bulan',
+                                                                                                                                                            foto: kamar.foto || '',
+                                                                                                                                                            editPreviewUrl: null
+                                                                                                                                                        };
+                                                                                                                                                        this.showEditModal = true;
+                                                                                                                                                    },
+                                                                                                                                                    openFasilitasModal(kamar) {
+                                                                                                                                                        this.activeKamar = kamar;
+                                                                                                                                                        this.fasilitasData.items = kamar.fasilitas.length > 0
+                                                                                                                                                            ? kamar.fasilitas.map(f => f.nama_fasilitas)
+                                                                                                                                                            : [''];
+                                                                                                                                                        this.showFasilitasModal = true;
+                                                                                                                                                    },
+                                                                                                                                                    addFasilitasRow() {
+                                                                                                                                                        this.fasilitasData.items.push('');
+                                                                                                                                                    },
+                                                                                                                                                    removeFasilitasRow(index) {
+                                                                                                                                                        this.fasilitasData.items.splice(index, 1);
+                                                                                                                                                        if (this.fasilitasData.items.length === 0) {
+                                                                                                                                                            this.fasilitasData.items.push('');
+                                                                                                                                                        }
+                                                                                                                                                    },
+                                                                                                                                                    addFasilitasRowNew() {
+                                                                                                                                                        this.formData.fasilitas.push('');
+                                                                                                                                                    },
+                                                                                                                                                    removeFasilitasRowNew(index) {
+                                                                                                                                                        this.formData.fasilitas.splice(index, 1);
+                                                                                                                                                        if (this.formData.fasilitas.length === 0) {
+                                                                                                                                                            this.formData.fasilitas.push('');
+                                                                                                                                                        }
+                                                                                                                                                    },
+                                                                                                                                                    currentPage: 1,
+                                                                                                                                                    itemsPerPage: 10,
+                                                                                                                                                    get filteredKamars() {
+                                                                                                                                                        if (!window.existingKamars) return [];
+                                                                                                                                                        return window.existingKamars.filter(kamar => {
+                                                                                                                                                            const matchSearch = this.search === '' ||
+                                                                                                                                                                               kamar.nomor_kamar.toLowerCase().includes(this.search.toLowerCase());
+                                                                                                                                                            const matchStatus = this.filterStatus === 'all' || kamar.status === this.filterStatus;
 
-                                                                                                                                                    return matchSearch && matchStatus;
-                                                                                                                                                });
-                                                                                                                                            },
-                                                                                                                                            get pagedKamars() {
-                                                                                                                                                const start = (this.currentPage - 1) * this.itemsPerPage;
-                                                                                                                                                return this.filteredKamars.slice(start, start + this.itemsPerPage);
-                                                                                                                                            },
-                                                                                                                                            get totalPages() {
-                                                                                                                                                return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
-                                                                                                                                            },
-                                                                                                                                            get isNomorKamarDuplicate() {
-                                                                                                                                                if (!this.formData.nomor_kamar) return false;
-                                                                                                                                                return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
-                                                                                                                                            }
-                                                                                                                                        }"
+                                                                                                                                                            return matchSearch && matchStatus;
+                                                                                                                                                        });
+                                                                                                                                                    },
+                                                                                                                                                    get pagedKamars() {
+                                                                                                                                                        const start = (this.currentPage - 1) * this.itemsPerPage;
+                                                                                                                                                        return this.filteredKamars.slice(start, start + this.itemsPerPage);
+                                                                                                                                                    },
+                                                                                                                                                    get totalPages() {
+                                                                                                                                                        return Math.max(1, Math.ceil(this.filteredKamars.length / this.itemsPerPage));
+                                                                                                                                                    },
+                                                                                                                                                    get isNomorKamarDuplicate() {
+                                                                                                                                                        if (!this.formData.nomor_kamar) return false;
+                                                                                                                                                        return window.existingKamars.some(k => k.nomor_kamar.toLowerCase() === this.formData.nomor_kamar.toLowerCase());
+                                                                                                                                                    }
+                                                                                                                                                }"
         x-init="$watch('search', () => currentPage = 1); $watch('filterStatus', () => currentPage = 1);"
         class="pb-12 text-gray-800">
 
@@ -563,6 +563,7 @@
                             <select name="tipe_durasi" x-model="formData.tipe_durasi" required
                                 class="w-full px-5 py-2.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] outline-none transition-all font-black text-gray-800 text-sm">
                                 <option value="hari">Hari</option>
+                                <option value="minggu">Minggu</option>
                                 <option value="bulan">Bulan</option>
                             </select>
                         </div>
@@ -741,6 +742,7 @@
                             <select name="tipe_durasi" x-model="editFormData.tipe_durasi" required
                                 class="w-full px-5 py-2.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-indigo-600 outline-none transition-all font-black text-gray-800 text-sm">
                                 <option value="hari">Hari</option>
+                                <option value="minggu">Minggu</option>
                                 <option value="bulan">Bulan</option>
                             </select>
                         </div>

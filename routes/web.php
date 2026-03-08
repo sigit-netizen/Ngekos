@@ -50,14 +50,24 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
         return view('member.cabang_kos', ['title' => 'Cabang Kos', 'role' => 'admin']);
     })->name('admin.cabang_kos');
 
-    Route::get('/admin/pesan-aduan', function () {
-        return view('member.pesan_aduan', ['title' => 'Pesan Aduan', 'role' => 'admin']);
-    })->name('admin.pesan_aduan');
+    // Aduan Management
+    Route::get('/admin/pesan-aduan', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'index'])->name('admin.pesan_aduan');
+    Route::post('/admin/aduan/{aduan}/read', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'markRead'])->name('admin.aduan.read');
+    Route::post('/admin/aduan/{aduan}/unread', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'markUnread'])->name('admin.aduan.unread');
+    Route::delete('/admin/aduan/{aduan}', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'destroy'])->name('admin.aduan.destroy');
 
+    Route::get('/admin/fasilitas', [\App\Http\Controllers\Admin\FasilitasKosController::class, 'index'])->name('admin.fasilitas');
+    Route::post('/admin/fasilitas', [\App\Http\Controllers\Admin\FasilitasKosController::class, 'store'])->name('admin.fasilitas.store');
+    Route::put('/admin/fasilitas/{fasilitas}', [\App\Http\Controllers\Admin\FasilitasKosController::class, 'update'])->name('admin.fasilitas.update');
+    Route::delete('/admin/fasilitas/{fasilitas}', [\App\Http\Controllers\Admin\FasilitasKosController::class, 'destroy'])->name('admin.fasilitas.destroy');
+
+    Route::get('/admin/aduan', fn() => redirect()->route('admin.pesan_aduan'));
+    Route::get('/admin/pesan_aduan', fn() => redirect()->route('admin.pesan_aduan'));
     Route::get('/admin/laporan-pembayaran', [\App\Http\Controllers\Admin\LaporanPembayaranController::class, 'index'])->name('admin.laporan_pembayaran');
 
     Route::get('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'index'])->name('admin.tagihan_sistem');
     Route::put('/admin/tagihan-sistem', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'update'])->name('admin.subscription.update');
+    Route::post('/admin/tagihan-sistem/upload-proof', [\App\Http\Controllers\Admin\SubscriptionManagementController::class, 'uploadProof'])->name('admin.subscription.upload-proof');
 
     Route::get('/admin/order', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.order');
     Route::post('/admin/order/{id}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyOrder'])->name('admin.order.verify');
@@ -68,8 +78,13 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::post('/admin/penyewa/{pendingUser}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyPenyewa'])->name('admin.penyewa.verify');
     Route::post('/admin/penyewa/{pendingUser}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectPenyewa'])->name('admin.penyewa.reject');
 
+
     // Dynamic Route for automatically generated admin menus
     Route::get('/admin/{page}', function ($page) {
+        // Prevent pages with required controller data from being served without them
+        if (in_array($page, ['pesan_aduan'])) {
+            abort(404);
+        }
         if (view()->exists('member.' . $page)) {
             $title = ucwords(str_replace(['_', '-'], ' ', $page));
             return view('member.' . $page, ['title' => $title, 'role' => 'admin']);
@@ -80,17 +95,9 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
 
 // Protected User Dashboards (Anak Kos)
 Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(function () {
-    Route::get('/user', function () {
-        return view('user.dashboard', ['role' => 'user']);
-    })->name('user.dashboard');
+    Route::get('/user', [\App\Http\Controllers\User\DashboardController::class, 'index'])->name('user.dashboard');
 
-    Route::get('/user/dashboard', function () {
-        return view('user.dashboard', ['title' => 'Dashboard User', 'role' => 'user']);
-    })->name('user.dashboard.detail');
-
-    Route::get('/user/pesan', function () {
-        return view('user.pesan', ['title' => 'Pesan', 'role' => 'user']);
-    })->name('user.pesan');
+    Route::get('/user/dashboard', [\App\Http\Controllers\User\DashboardController::class, 'index'])->name('user.dashboard.detail');
 
     Route::get('/user/order', [\App\Http\Controllers\User\UserOrderController::class, 'index'])->name('user.order');
     Route::post('/user/order/search', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('user.order.search');
@@ -99,13 +106,13 @@ Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(func
     Route::post('/user/order/{transaksi}/upload-proof', [\App\Http\Controllers\User\UserOrderController::class, 'uploadProof'])->name('user.order.upload-proof');
     Route::post('/user/kos/{id}/toggle-favorit', [\App\Http\Controllers\User\UserOrderController::class, 'toggleFavorit'])->name('user.kos.toggle-favorit');
 
-    Route::get('/user/jatuh-tempo', function () {
-        return view('user.jatuh_tempo', ['title' => 'Jatuh Tempo', 'role' => 'user']);
-    })->name('user.jatuh_tempo');
+    Route::get('/user/jatuh-tempo', [\App\Http\Controllers\User\JatuhTempoController::class, 'index'])->name('user.jatuh_tempo');
+    Route::post('/user/jatuh-tempo', [\App\Http\Controllers\User\JatuhTempoController::class, 'store'])->name('user.jatuh_tempo.store');
 
-    Route::get('/user/aduan', function () {
-        return view('user.aduan', ['title' => 'Aduan Fasilitas', 'role' => 'user']);
-    })->name('user.aduan');
+    // Fasilitas routes
+    Route::get('/user/fasilitas', [\App\Http\Controllers\User\FasilitasController::class, 'index'])->name('user.fasilitas');
+    Route::post('/user/fasilitas/aduan', [\App\Http\Controllers\User\FasilitasController::class, 'storeAduan'])->name('user.fasilitas.aduan');
+    Route::post('/user/fasilitas/tambah', [\App\Http\Controllers\User\FasilitasController::class, 'storeTambah'])->name('user.fasilitas.tambah');
 
     // Dynamic Route for automatically generated user menus
     Route::get('/user/{page}', function ($page) {
@@ -145,6 +152,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/superadmin/order/user/{pendingUser}/reject', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'rejectUser'])->name('superadmin.order.user.reject');
     Route::post('/superadmin/order/packet/{subscription}/verify', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'verifyPacket'])->name('superadmin.order.verify');
     Route::post('/superadmin/order/packet/{subscription}/reject', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'rejectPacket'])->name('superadmin.order.reject');
+    Route::post('/superadmin/order/member/{pendingUser}/confirm', [\App\Http\Controllers\Superadmin\OrderManagementController::class, 'confirmMemberPayment'])->name('superadmin.order.member.confirm');
 
     Route::get('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'index'])->name('superadmin.permission');
     Route::post('/superadmin/permission', [\App\Http\Controllers\Superadmin\PermissionManagementController::class, 'store'])->name('superadmin.permission.store');
@@ -170,7 +178,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 // Registration Pending Status Page (public, no auth required)
 Route::get('/registration/pending', function (\Illuminate\Http\Request $request) {
     $pendingUser = \App\Models\PendingUser::where('email', $request->email)
-        ->where('status', 'pending')
+        ->whereIn('status', ['pending', 'verified', 'konfirmasi'])
         ->first();
 
     if (!$pendingUser) {
@@ -179,6 +187,8 @@ Route::get('/registration/pending', function (\Illuminate\Http\Request $request)
 
     return view('pending.dashboardPanding', ['pendingUser' => $pendingUser]);
 })->name('registration.pending');
+
+Route::post('/registration/upload-proof', [\App\Http\Controllers\Auth\PendingUserController::class, 'uploadProof'])->name('registration.upload-proof');
 
 Route::post('/registration/cancel', function (\Illuminate\Http\Request $request) {
     $pendingUser = \App\Models\PendingUser::where('email', $request->email)

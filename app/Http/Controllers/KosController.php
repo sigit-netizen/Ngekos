@@ -23,7 +23,7 @@ class KosController extends Controller
 
         if ($editField === 'nama_kos') {
             $rules['nama_kos'] = 'required|string|max:255';
-            $rules['foto'] = 'nullable|image|max:10240';
+            $rules['foto'] = 'nullable|image|max:512000';
             $updateData['nama_kos'] = $request->nama_kos;
 
             if ($request->hasFile('foto')) {

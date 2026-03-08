@@ -20,11 +20,22 @@
     <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
         @php
             $user = auth()->user();
-            $planName = $user->getPlanName();
+
+            // Get latest active subscription with plan details for accurate labeling
+            $latestSub = \App\Models\Langganan::with('jenis_langganan')
+                ->where('id_user', $user->id)
+                ->where('status', 'active')
+                ->latest()
+                ->first();
+
+            // Set plan name primarily from active subscription, fallback to user model logic
+            $planName = $latestSub ? ($latestSub->jenis_langganan->nama ?? $user->getPlanName()) : $user->getPlanName();
+
+            // Strip "MEMBER " prefix if present for cleaner sidebar look (optional but good)
+            $planName = str_replace('MEMBER ', '', strtoupper($planName));
 
             // Calculate Status for Admin Sidebar Badge
             $sidebarStatus = 'active';
-            $latestSub = \App\Models\Langganan::where('id_user', $user->id)->where('status', 'active')->latest()->first();
             if ($latestSub && !($user->hasRole('superadmin') || $user->id_plans == 6)) {
                 $expiryDate = $latestSub->jatuh_tempo ? \Carbon\Carbon::parse($latestSub->jatuh_tempo) : \Carbon\Carbon::parse($latestSub->tanggal_pembayaran)->addDays(30);
                 $nowWib = now('Asia/Jakarta')->startOfDay();
@@ -41,20 +52,20 @@
         @if (($role ?? 'user') == 'admin')
             <div class="px-4 mb-6">
                 <div class="p-3 rounded-2xl border transition-all duration-300
-                                                @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
-                                                @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
-                                                @else bg-red-50 border-red-100 @endif">
+                                                                @if($sidebarStatus == 'active') bg-[#36B2B2]/5 border-[#36B2B2]/10 
+                                                                @elseif($sidebarStatus == 'grace') bg-amber-50 border-amber-100 
+                                                                @else bg-red-50 border-red-100 @endif">
 
                     <div class="flex items-center gap-2 mb-1">
                         <div class="w-2 h-2 rounded-full 
-                                                        @if($sidebarStatus == 'active') bg-[#36B2B2] 
-                                                        @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
-                                                        @else bg-red-500 @endif">
+                                                                        @if($sidebarStatus == 'active') bg-[#36B2B2] 
+                                                                        @elseif($sidebarStatus == 'grace') bg-amber-500 animate-pulse 
+                                                                        @else bg-red-500 @endif">
                         </div>
                         <span class="text-[10px] font-bold uppercase tracking-wider
-                                                        @if($sidebarStatus == 'active') text-[#36B2B2] 
-                                                        @elseif($sidebarStatus == 'grace') text-amber-700 
-                                                        @else text-red-700 @endif">
+                                                                        @if($sidebarStatus == 'active') text-[#36B2B2] 
+                                                                        @elseif($sidebarStatus == 'grace') text-amber-700 
+                                                                        @else text-red-700 @endif">
                             {{ $planName }}
                             @if($sidebarStatus == 'active') ACTIVE
                             @elseif($sidebarStatus == 'grace') GRACE PERIOD
@@ -301,6 +312,22 @@
                     Kamar
                 </a>
             @endcan
+
+            <!-- Fasilitas -->
+            @can('menu.fasilitas')
+                <a href="{{ route('admin.fasilitas') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/fasilitas*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                    <div
+                        class="{{ request()->is('admin/fasilitas*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4">
+                            </path>
+                        </svg>
+                    </div>
+                    Fasilitas
+                </a>
+            @endcan
             @can('menu.order')
                 @php
                     $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
@@ -372,17 +399,35 @@
 
             <!-- Aduan -->
             @can('menu.pesan_aduan')
+                @php
+                    $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
+                    $unreadAduanCount = $adminKos ? \App\Models\Aduan::where('id_kos', $adminKos->id)->where('status', 'belum_dibaca')->count() : 0;
+                @endphp
                 <a href="{{ route('admin.pesan_aduan') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                     <div
-                        class="{{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 rounded-lg">
+                        class="{{ request()->is('admin/pesan-aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} transition-colors p-1.5 relative rounded-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
                             </path>
                         </svg>
+                        @if($unreadAduanCount > 0)
+                            <span
+                                class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white animate-pulse">
+                                {{ $unreadAduanCount }}
+                            </span>
+                        @endif
                     </div>
-                    Pesan Aduan
+                    <div class="flex-1 flex items-center justify-between">
+                        <span>Pesan Aduan</span>
+                        @if($unreadAduanCount > 0)
+                            <span
+                                class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-100 italic">
+                                {{ $unreadAduanCount }} Baru
+                            </span>
+                        @endif
+                    </div>
                 </a>
             @endcan
 
@@ -454,7 +499,7 @@
                 if (\Illuminate\Support\Facades\File::exists($adminDynamicPath)) {
                     foreach (\Illuminate\Support\Facades\File::files($adminDynamicPath) as $file) {
                         $name = str_replace('.blade.php', '', $file->getFilename());
-                        if (!in_array($name, ['dashboard', 'kamar', 'order', 'data_penyewa', 'cabang_kos', 'pesan_aduan', 'laporan_pembayaran', 'tagihan_sistem'])) {
+                        if (!in_array($name, ['dashboard', 'kamar', 'order', 'data_penyewa', 'cabang_kos', 'pesan_aduan', 'laporan_pembayaran', 'tagihan_sistem', 'fasilitas'])) {
                             $dynamicAdminMenus[] = $name;
                         }
                     }
@@ -527,10 +572,10 @@
 
             <!-- Aduan Fasilitas -->
             @can('menu.aduan')
-                <a href="{{ route('user.aduan') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/aduan*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
+                <a href="{{ route('user.fasilitas') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('user/fasilitas*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                     <div
-                        class="{{ request()->is('user/aduan*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
+                        class="{{ request()->is('user/fasilitas*') ? 'bg-[#36B2B2] text-white' : 'text-gray-400 group-hover:text-[#36B2B2]' }} p-1.5 transition-colors relative rounded-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">

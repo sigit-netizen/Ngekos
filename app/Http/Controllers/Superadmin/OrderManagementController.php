@@ -16,10 +16,11 @@ class OrderManagementController extends Controller
 
         // Counts for Pending User and Pending Member from PendingUser Table
         $pendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'pending')->count();
-        $pendingMemberCount = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'pending')->count();
+        $pendingMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'pending')->count();
+        $pendingPaymentMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'konfirmasi')->count();
 
         // Rejected counts from PendingUser table
-        $rejectedPendingMemberCount = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'rejected')->count();
+        $rejectedPendingMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'rejected')->count();
         $rejectedPendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->count();
 
         // Counts for Active/Rejected from User Table (Role-based to match list visibility)
@@ -38,12 +39,15 @@ class OrderManagementController extends Controller
         ")->first();
 
         // 1. Pending Member (From PendingUser Table)
-        $pendingMembers = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'pending')->latest()->paginate(10, ['*'], 'member_p');
+        $pendingMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'pending')->latest()->paginate(10, ['*'], 'member_p');
+
+        // 1b. Pending Payment Member (From PendingUser Table)
+        $pendingPaymentMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'konfirmasi')->latest()->paginate(10, ['*'], 'member_pay');
 
         // 2. Active/Rejected Member
         if ($statusFilter === 'rejected') {
             // Show rejected registrations from pending_users
-            $activeMembers = \App\Models\PendingUser::where('id_plans', 2)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'member_a');
+            $activeMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'member_a');
         } else {
             $activeMembers = User::role(['admin', 'pro', 'premium', 'per_kamar_pro', 'per_kamar_premium'])
                 ->where('status', $statusFilter)
@@ -74,6 +78,7 @@ class OrderManagementController extends Controller
             'statusFilter' => $statusFilter,
 
             'pendingMemberCount' => $pendingMemberCount,
+            'pendingPaymentMemberCount' => $pendingPaymentMemberCount,
             'activeMemberCount' => $activeMemberCount,
             'pendingUserCount' => $pendingUserCount,
             'activeUserCount' => $activeUserCount,
@@ -85,6 +90,7 @@ class OrderManagementController extends Controller
             'rejectedPacketCount' => $packetCounts->rejected ?? 0,
 
             'pendingMembers' => $pendingMembers,
+            'pendingPaymentMembers' => $pendingPaymentMembers,
             'activeMembers' => $activeMembers,
             'pendingUsers' => $pendingUsers,
             'activeUsers' => $activeUsers,
@@ -95,22 +101,22 @@ class OrderManagementController extends Controller
 
     public function verifyUser(\App\Models\PendingUser $pendingUser)
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
-            // 1. Create the official User
-            $user = User::create([
-                'name' => $pendingUser->name,
-                'email' => $pendingUser->email,
-                'password' => $pendingUser->password, // Password already hashed from signup
-                'nik' => $pendingUser->nik,
-                'nomor_wa' => $pendingUser->nomor_wa,
-                'tanggal_lahir' => $pendingUser->tanggal_lahir,
-                'alamat' => $pendingUser->alamat,
-                'status' => 'active',
-            ]);
+        // For Anak Kos (id_plans == 1), keep immediate activation
+        if ($pendingUser->id_plans == 1) {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
+                // 1. Create the official User
+                $user = User::create([
+                    'name' => $pendingUser->name,
+                    'email' => $pendingUser->email,
+                    'password' => $pendingUser->password,
+                    'nik' => $pendingUser->nik,
+                    'nomor_wa' => $pendingUser->nomor_wa,
+                    'tanggal_lahir' => $pendingUser->tanggal_lahir,
+                    'alamat' => $pendingUser->alamat,
+                    'status' => 'active',
+                ]);
 
-            // 2. Role & Plan Logic
-            if ($pendingUser->id_plans == 1) {
-                // Anak Kos
+                // 2. Role & Plan Logic
                 $user->id_plans = 1;
 
                 // Link to kos via kode_kos
@@ -131,61 +137,85 @@ class OrderManagementController extends Controller
                 }
 
                 $user->save();
-            } else {
-                // Pemilik Kos
-                $planType = $pendingUser->plan_type;
 
-                $map = [
-                    'pro' => 2,
-                    'premium' => 3,
-                    'premium_perkamar' => 4,
-                    'pro_perkamar' => 5
-                ];
+                // 5. Delete from staging
+                $pendingUser->delete();
 
-                if (isset($map[$planType])) {
-                    $user->id_plans = $map[$planType];
-                }
+                return back()->with('success', 'Akun ' . $user->name . ' berhasil diverifikasi dan diaktifkan!');
+            });
+        }
 
+        // For Members (id_plans == 2), just verify the data
+        $pendingUser->update(['status' => 'verified']);
+        return back()->with('success', 'Data ' . $pendingUser->name . ' berhasil diverifikasi. Menunggu pembayaran dari calon member.');
+    }
 
-                $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
-                $user->save();
+    public function confirmMemberPayment(\App\Models\PendingUser $pendingUser)
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
+            // 1. Create the official User
+            $user = User::create([
+                'name' => $pendingUser->name,
+                'email' => $pendingUser->email,
+                'password' => $pendingUser->password,
+                'nik' => $pendingUser->nik,
+                'nomor_wa' => $pendingUser->nomor_wa,
+                'tanggal_lahir' => $pendingUser->tanggal_lahir,
+                'alamat' => $pendingUser->alamat,
+                'status' => 'active',
+            ]);
 
-                // 3. Create active Langganan record
-                $langgananNames = [
-                    'pro' => 'MEMBER PRO',
-                    'premium' => 'MEMBER PREMIUM',
-                    'pro_perkamar' => 'PER KAMAR PRO',
-                    'premium_perkamar' => 'PER KAMAR PREMIUM'
-                ];
+            // 2. Role & Plan Logic
+            $planType = $pendingUser->plan_type;
+            $map = [
+                'pro' => 2,
+                'premium' => 3,
+                'premium_perkamar' => 4,
+                'pro_perkamar' => 5
+            ];
 
-                if (isset($langgananNames[$planType])) {
-                    $jenis = \App\Models\JenisLangganan::where('nama', $langgananNames[$planType])->first();
-                    if ($jenis) {
-                        \App\Models\Langganan::create([
-                            'id_user' => $user->id,
-                            'id_langganan' => $jenis->id,
-                            'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
-                            'status' => 'active',
-                            'tanggal_pembayaran' => now('Asia/Jakarta'),
-                            'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
-                        ]);
-                    }
-                }
-
-                // 4. Automatically create a default Kos record
-                \App\Models\Kos::create([
-                    'id_user' => $user->id,
-                    'nama_kos' => 'Kos Baru ' . $user->name,
-                    'alamat' => $pendingUser->alamat ?? 'Lokasi belum ditentukan',
-                    'kode_kos' => rand(1000, 9999), // Generate a random 4-digit code
-                    'is_kode_kos_edited' => false,
-                ]);
+            if (isset($map[$planType])) {
+                $user->id_plans = $map[$planType];
             }
+
+            $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
+            $user->save();
+
+            // 3. Create active Langganan record
+            $langgananNames = [
+                'pro' => 'MEMBER PRO',
+                'premium' => 'MEMBER PREMIUM',
+                'pro_perkamar' => 'PER KAMAR PRO',
+                'premium_perkamar' => 'PER KAMAR PREMIUM'
+            ];
+
+            if (isset($langgananNames[$planType])) {
+                $jenis = \App\Models\JenisLangganan::where('nama', $langgananNames[$planType])->first();
+                if ($jenis) {
+                    \App\Models\Langganan::create([
+                        'id_user' => $user->id,
+                        'id_langganan' => $jenis->id,
+                        'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
+                        'status' => 'active',
+                        'tanggal_pembayaran' => now('Asia/Jakarta'),
+                        'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
+                    ]);
+                }
+            }
+
+            // 4. Automatically create a default Kos record
+            \App\Models\Kos::create([
+                'id_user' => $user->id,
+                'nama_kos' => 'Kos Baru ' . $user->name,
+                'alamat' => $pendingUser->alamat ?? 'Lokasi belum ditentukan',
+                'kode_kos' => rand(1000, 9999), // Generate a random 4-digit code
+                'is_kode_kos_edited' => false,
+            ]);
 
             // 5. Delete from staging
             $pendingUser->delete();
 
-            return back()->with('success', 'Akun ' . $user->name . ' berhasil diverifikasi dan diaktifkan!');
+            return back()->with('success', 'Pembayaran member ' . $user->name . ' berhasil dikonfirmasi. Akun resmi aktif!');
         });
     }
 
@@ -208,11 +238,13 @@ class OrderManagementController extends Controller
         $subscription->update([
             'status' => 'active',
             'tanggal_pembayaran' => now('Asia/Jakarta'),
-            'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
+            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
         ]);
 
-        // Auto-reactivate user if packet is verified
+        // Auto-reactivate user if packet is verified and sync plan ID
         if ($subscription->user) {
+            $subscription->user->id_plans = $subscription->id_langganan;
+            $subscription->user->save();
             $subscription->user->activateStatus();
         }
 

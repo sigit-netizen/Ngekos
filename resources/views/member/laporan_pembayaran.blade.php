@@ -11,27 +11,39 @@
 
         <!-- Horizontal Compact Filters -->
         <form action="{{ route('admin.laporan_pembayaran') }}" method="GET"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+            class="grid grid-cols-1 md:grid-cols-12 lg:grid-cols-12 gap-4 items-end bg-gray-50/80 p-5 rounded-2xl border border-gray-100/50 shadow-inner">
             <!-- Search Penyewa -->
-            <div class="lg:col-span-4">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Nama Penyewa</label>
+            <div class="md:col-span-6 lg:col-span-3">
+                <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penyewa</label>
                 <div class="relative group">
                     <input type="text" name="search" value="{{ $search }}" placeholder="Cari penyewa..."
-                        class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 pl-10 h-10 transition-all">
-                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-4 focus:ring-[#36B2B2]/5 pl-10 h-11 transition-all placeholder:text-gray-300">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#36B2B2] transition-colors">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
                 </div>
             </div>
 
+            <!-- Duration Type Filter -->
+            <div class="md:col-span-6 lg:col-span-2">
+                <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Bulan / Hari</label>
+                <select name="duration_type"
+                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-4 focus:ring-[#36B2B2]/5 h-11 cursor-pointer transition-all">
+                    <option value="">Semua Tipe</option>
+                    <option value="bulan" {{ $selectedDurationType == 'bulan' ? 'selected' : '' }}>Bulanan</option>
+                    <option value="minggu" {{ $selectedDurationType == 'minggu' ? 'selected' : '' }}>Mingguan</option>
+                    <option value="hari" {{ $selectedDurationType == 'hari' ? 'selected' : '' }}>Harian</option>
+                </select>
+            </div>
+
             <!-- Year Filter -->
-            <div class="lg:col-span-3">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
+            <div class="md:col-span-4 lg:col-span-2">
+                <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
                 <select name="year"
-                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 h-10 cursor-pointer transition-all">
+                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-4 focus:ring-[#36B2B2]/5 h-11 cursor-pointer transition-all">
                     @for($y = date('Y'); $y >= 2024; $y--)
                         <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>{{ $y }}</option>
                     @endfor
@@ -39,11 +51,11 @@
             </div>
 
             <!-- Month Filter -->
-            <div class="lg:col-span-3">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
+            <div class="md:col-span-4 lg:col-span-2">
+                <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
                 <select name="month"
-                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 h-10 cursor-pointer transition-all">
-                    <option value="">Jan - Des</option>
+                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-4 focus:ring-[#36B2B2]/5 h-11 cursor-pointer transition-all">
+                    <option value="">Jan-Des</option>
                     @foreach(range(1, 12) as $m)
                         <option value="{{ $m }}" {{ $selectedMonth == $m ? 'selected' : '' }}>
                             {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
@@ -52,14 +64,29 @@
                 </select>
             </div>
 
+            <!-- Status Filter -->
+            <div class="md:col-span-4 lg:col-span-3">
+                <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                <select name="status"
+                    class="w-full rounded-xl border-gray-200 bg-white text-xs font-bold focus:border-[#36B2B2] focus:ring-4 focus:ring-[#36B2B2]/5 h-11 cursor-pointer transition-all">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ $selectedStatus == 'active' ? 'selected' : '' }}>Aktif (Masa Aktif)</option>
+                    <option value="grace" {{ $selectedStatus == 'grace' ? 'selected' : '' }}>Tenggang (Masa Tenggang)</option>
+                    <option value="expired" {{ $selectedStatus == 'expired' ? 'selected' : '' }}>Habis (Sewa Habis)</option>
+                </select>
+            </div>
+
             <!-- Actions -->
-            <div class="lg:col-span-12 xl:col-span-2 flex gap-2">
+            <div class="md:col-span-12 lg:col-span-12 xl:col-span-2 xl:flex-none flex gap-2">
                 <button type="submit"
-                    class="flex-1 h-10 bg-[#36B2B2] text-white rounded-xl text-xs font-bold hover:bg-[#2b8f8f] transition-all shadow-sm active:scale-95">
+                    class="flex-[2] xl:w-28 h-11 bg-[#36B2B2] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2b8f8f] hover:shadow-lg hover:shadow-[#36B2B2]/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                     Cari
                 </button>
                 <a href="{{ route('admin.laporan_pembayaran') }}"
-                    class="flex-1 h-10 bg-gray-200 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-300 transition-all flex items-center justify-center active:scale-95">
+                    class="flex-1 xl:w-24 h-11 bg-gray-200/80 text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-300 transition-all flex items-center justify-center active:scale-95">
                     Reset
                 </a>
             </div>

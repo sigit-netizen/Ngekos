@@ -57,10 +57,10 @@ class KamarController extends Controller
             ],
             'harga' => 'required|numeric|min:0',
             'durasi_sewa' => 'required|integer|min:1',
-            'tipe_durasi' => 'required|in:hari,bulan',
-            'foto' => 'nullable|image|max:10240', // Optimized: Allow images up to 10MB
-            'foto_camera' => 'nullable|image|max:10240',
-            'foto_gallery' => 'nullable|image|max:10240',
+            'tipe_durasi' => 'required|in:hari,minggu,bulan',
+            'foto' => 'nullable|image|max:512000',
+            'foto_camera' => 'nullable|image|max:512000',
+            'foto_gallery' => 'nullable|image|max:512000',
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'nullable|string',
         ]);
@@ -85,6 +85,9 @@ class KamarController extends Controller
         // Max duration check (1 year)
         if ($request->tipe_durasi === 'bulan' && $request->durasi_sewa > 12) {
             return back()->with('error', 'Durasi maksimal adalah 12 bulan.');
+        }
+        if ($request->tipe_durasi === 'minggu' && $request->durasi_sewa > 52) {
+            return back()->with('error', 'Durasi maksimal adalah 52 minggu.');
         }
         if ($request->tipe_durasi === 'hari' && $request->durasi_sewa > 365) {
             return back()->with('error', 'Durasi maksimal adalah 365 hari.');
@@ -144,15 +147,18 @@ class KamarController extends Controller
             ],
             'harga' => 'required|numeric|min:0',
             'durasi_sewa' => 'required|integer|min:1',
-            'tipe_durasi' => 'required|in:hari,bulan',
-            'foto' => 'nullable|image|max:10240',
-            'foto_camera' => 'nullable|image|max:10240',
-            'foto_gallery' => 'nullable|image|max:10240',
+            'tipe_durasi' => 'required|in:hari,minggu,bulan',
+            'foto' => 'nullable|image|max:512000',
+            'foto_camera' => 'nullable|image|max:512000',
+            'foto_gallery' => 'nullable|image|max:512000',
         ]);
 
         // Max duration check (1 year)
         if ($request->tipe_durasi === 'bulan' && $request->durasi_sewa > 12) {
             return back()->with('error', 'Durasi maksimal adalah 12 bulan.');
+        }
+        if ($request->tipe_durasi === 'minggu' && $request->durasi_sewa > 52) {
+            return back()->with('error', 'Durasi maksimal adalah 52 minggu.');
         }
         if ($request->tipe_durasi === 'hari' && $request->durasi_sewa > 365) {
             return back()->with('error', 'Durasi maksimal adalah 365 hari.');

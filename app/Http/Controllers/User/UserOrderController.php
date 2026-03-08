@@ -31,10 +31,13 @@ class UserOrderController extends Controller
         $verifiedCount = Transaksi::where('id_user', $user->id)->where('status', 'verified')->count();
         $rejectedCount = Transaksi::where('id_user', $user->id)->where('status', 'rejected')->count();
 
+        $tab = $request->input('tab', 'all');
+
         return view('user.order', [
             'title' => 'Order Kamar',
             'role' => 'user',
             'orders' => $orders,
+            'tab' => $tab,
             'pendingCount' => $pendingCount,
             'verifiedCount' => $verifiedCount,
             'rejectedCount' => $rejectedCount,
@@ -60,7 +63,9 @@ class UserOrderController extends Controller
             }
         }
 
-        $searchPerformed = $request->filled('lokasi') || $request->filled('harga') || $request->filled('kategori') || $request->filled('kota');
+        $tipeSewa = $request->tipe_sewa;
+
+        $searchPerformed = $request->filled('lokasi') || $request->filled('harga') || $request->filled('kategori') || $request->filled('kota') || $request->filled('tipe_sewa');
 
         $query = Kos::query();
 
@@ -83,6 +88,13 @@ class UserOrderController extends Controller
             $query->where('kategori', $kategori);
         }
 
+        // 3. Filter by tipe_sewa (tipe_durasi in kamar)
+        if ($tipeSewa) {
+            $query->whereHas('kamars', function ($q) use ($tipeSewa) {
+                $q->where('tipe_durasi', $tipeSewa);
+            });
+        }
+
         // 3. Optional: Add base constraints (we no longer hide full kos, so we don't strictly use whereHas for 'tersedia' here)
         // If price is specified, we check if the kos AT LEAST has a room matching the price. 
         // If they just search without price, we show all matching kos.
@@ -97,13 +109,16 @@ class UserOrderController extends Controller
             });
         }
 
-        // 4. Eager load: Only load available rooms to determine "Penuh" status in UI
+        // 4. Eager load: Only load matching available rooms
         $query->with([
-            'kamars' => function ($q) use ($hargaMin, $hargaMax) {
+            'kamars' => function ($q) use ($hargaMin, $hargaMax, $tipeSewa) {
                 $q->where('status', 'tersedia')
                     ->whereDoesntHave('transaksis', function ($sub) {
                         $sub->whereIn('status', ['pending', 'verified', 'paid']);
                     });
+                if ($tipeSewa) {
+                    $q->where('tipe_durasi', $tipeSewa);
+                }
                 if (!is_null($hargaMin)) {
                     $q->where('harga', '>=', $hargaMin);
                 }
@@ -169,6 +184,7 @@ class UserOrderController extends Controller
                         'id' => $kamar->id,
                         'nomor_kamar' => $kamar->nomor_kamar,
                         'harga' => $kamar->harga,
+                        'tipe_durasi' => $kamar->tipe_durasi,
                         'foto' => $kamar->foto,
                         'fasilitas' => $kamar->fasilitas->pluck('nama_fasilitas')->toArray(),
                     ];
@@ -192,8 +208,8 @@ class UserOrderController extends Controller
             'id_kamar' => 'required|exists:kamar,id',
             'kode_kos' => 'required|numeric',
             'jumlah_bayar' => 'required|numeric|min:0',
-            'metode_pembayaran' => 'required|string|in:manual,pymen',
-            'batas_bayar' => 'nullable|date_format:Y-m-d\TH:i',
+            'metode_pembayaran' => 'required|in:manual,pymen',
+            'batas_bayar' => 'required_if:metode_pembayaran,manual|nullable|date_format:Y-m-d\TH:i',
             'catatan' => 'nullable|string|max:500',
         ]);
 
@@ -214,6 +230,9 @@ class UserOrderController extends Controller
         $isRentPayment = $isPenyewa && $user->id_kamar == $request->id_kamar;
         $tipe = $isRentPayment ? Transaksi::TYPE_SEWA : Transaksi::TYPE_BOOKING;
 
+        // Get kamar details
+        $kamar = Kamar::findOrFail($request->id_kamar);
+
         if (!$isRentPayment) {
             // NEW: Check if the room is locked by someone else (pending, verified or paid)
             $lockedOrder = Transaksi::where('id_kamar', $request->id_kamar)
@@ -229,9 +248,6 @@ class UserOrderController extends Controller
                 return back()->with('error', 'Anda sudah menjadi penyewa. Tidak bisa membuat order baru.');
             }
 
-            // Get kamar details
-            $kamar = Kamar::findOrFail($request->id_kamar);
-
             // Check if kamar is still available (only for new bookings)
             if ($kamar->status !== 'tersedia') {
                 return back()->with('error', 'Maaf, kamar ini sudah tidak tersedia.');
@@ -244,21 +260,36 @@ class UserOrderController extends Controller
             $batasBayar = now()->addDays(3);
         }
 
+        $duration = $kamar->durasi_sewa ?? 1;
+        $type = $kamar->tipe_durasi ?? 'bulan';
+        $initialJatuhTempo = now('Asia/Jakarta');
+
+        if ($type === 'hari') {
+            $initialJatuhTempo->addDays($duration);
+        } elseif ($type === 'minggu') {
+            $initialJatuhTempo->addWeeks($duration);
+        } else {
+            $initialJatuhTempo->addDays($duration * 30);
+        }
+
         Transaksi::create([
             'jumlah_bayar' => $request->jumlah_bayar,
-            'tanggal_pembayaran' => null,
-            'status' => 'pending',
+            'tanggal_pembayaran' => $request->metode_pembayaran === 'manual' ? $request->batas_bayar : null,
+            'status' => $tipe === Transaksi::TYPE_SEWA ? 'verified' : 'pending',
             'tipe' => $tipe,
+            'durasi_sewa' => $duration,
+            'tipe_durasi' => $type,
             'id_user' => $user->id,
             'id_kamar' => $request->id_kamar,
-            'kode_kos' => $request->kode_kos,
+            'kode_kos' => $kamar->kos->kode_kos,
             'catatan' => $request->catatan,
             'metode_pembayaran' => $request->metode_pembayaran,
             'batas_bayar' => $batasBayar,
             'bukti_pembayaran' => null,
+            'jatuh_tempo' => $initialJatuhTempo,
         ]);
 
-        $message = $isRentPayment ? 'Pembayaran sewa berhasil dikirim! Menunggu verifikasi admin.' : 'Order berhasil dikirim! Menunggu verifikasi admin.';
+        $message = $isRentPayment ? 'Pembayaran sewa berhasil dikirim! Segera unggah bukti pembayaran di menu Order.' : 'Order berhasil dikirim! Menunggu verifikasi admin.';
         return redirect()->route('user.order')->with('success', $message);
     }
 
@@ -283,8 +314,8 @@ class UserOrderController extends Controller
     public function uploadProof(Request $request, $id)
     {
         $request->validate([
-            'bukti_pembayaran_camera' => 'nullable|image|max:10240',
-            'bukti_pembayaran_gallery' => 'nullable|image|max:10240',
+            'bukti_pembayaran_camera' => 'nullable|image|max:512000',
+            'bukti_pembayaran_gallery' => 'nullable|image|max:512000',
         ]);
 
         $order = Transaksi::where('id_user', auth()->id())->findOrFail($id);
@@ -306,7 +337,6 @@ class UserOrderController extends Controller
 
             $order->update([
                 'bukti_pembayaran' => 'storage/' . $tempPath,
-                'tanggal_pembayaran' => now(),
             ]);
 
             \App\Jobs\ProcessImageOptimization::dispatch(

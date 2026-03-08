@@ -82,9 +82,8 @@ class OrderController extends Controller
 
         // Count for 'Verifikasi Sewa' (Sudah upload bukti tapi belum dikonfirmasi admin) - Recurring Rent
         $rentKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'verified'])
             ->where('tipe', Transaksi::TYPE_SEWA)
-            ->whereNotNull('bukti_pembayaran')
             ->count();
 
         // Total verified count (Diterima)
@@ -120,7 +119,7 @@ class OrderController extends Controller
                 } elseif ($statusFilter === 'konfirmasi') {
                     $q->where('status', 'verified')->where('tipe', Transaksi::TYPE_BOOKING)->whereNotNull('bukti_pembayaran');
                 } elseif ($statusFilter === 'sewa') {
-                    $q->where('status', 'pending')->where('tipe', Transaksi::TYPE_SEWA)->whereNotNull('bukti_pembayaran');
+                    $q->whereIn('status', ['pending', 'verified'])->where('tipe', Transaksi::TYPE_SEWA);
                 } elseif ($statusFilter === 'rejected') {
                     $q->where('status', 'rejected');
                 } elseif ($statusFilter === 'paid') {
@@ -185,10 +184,14 @@ class OrderController extends Controller
         \DB::beginTransaction();
         try {
             // Update transaksi status to verified (accepted by admin)
-            // This starts the 24h window to upload proof
+            // For manual payment, use user's planned date. For others, use 1 day.
+            $batasBayar = ($transaksi->metode_pembayaran === 'manual' && $transaksi->tanggal_pembayaran)
+                ? $transaksi->tanggal_pembayaran
+                : now()->addDay();
+
             $transaksi->update([
                 'status' => 'verified',
-                'batas_bayar' => now()->addDay(),
+                'batas_bayar' => $batasBayar,
             ]);
 
             // HOLD THE ROOM
@@ -220,7 +223,7 @@ class OrderController extends Controller
             return back()->with('error', 'Akses ditolak.');
         }
 
-        if (!$transaksi->bukti_pembayaran) {
+        if ($transaksi->metode_pembayaran !== 'manual' && !$transaksi->bukti_pembayaran) {
             return back()->with('error', 'Bukti pembayaran belum diunggah.');
         }
 
@@ -242,9 +245,22 @@ class OrderController extends Controller
             // Let's use 'paid' or just stick to 'active'.
             // Original code: 'status' => 'verified' in transaksi, and user 'status' => 'active'.
 
+            $paymentDate = now('Asia/Jakarta');
+            $duration = $transaksi->durasi_sewa ?? 1;
+            $type = $transaksi->tipe_durasi ?? 'bulan';
+
+            if ($type === 'hari') {
+                $jatuhTempo = $paymentDate->copy()->addDays($duration);
+            } elseif ($type === 'minggu') {
+                $jatuhTempo = $paymentDate->copy()->addWeeks($duration);
+            } else {
+                $jatuhTempo = $paymentDate->copy()->addDays($duration * 30);
+            }
+
             $transaksi->update([
-                'status' => 'paid', // New state for paid
-                'tanggal_pembayaran' => now(),
+                'status' => 'paid',
+                'tanggal_pembayaran' => $paymentDate,
+                'jatuh_tempo' => $jatuhTempo,
             ]);
 
             // Update user

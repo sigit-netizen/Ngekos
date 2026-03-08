@@ -21,6 +21,11 @@ class ProcessImageOptimization implements ShouldQueue
     protected $field;
 
     /**
+     * The number of seconds the job can run before timing out.
+     */
+    public $timeout = 300; // 5 minutes
+
+    /**
      * Create a new job instance.
      */
     public function __construct($tempPath, $directory, Model $model, $field = 'foto')
@@ -36,6 +41,8 @@ class ProcessImageOptimization implements ShouldQueue
      */
     public function handle(): void
     {
+        ini_set('memory_limit', '512M'); // Increase memory for large images
+        
         // 1. Check if temp file exists
         if (!Storage::disk('public')->exists($this->tempPath)) {
             return;

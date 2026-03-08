@@ -25,6 +25,7 @@ class Transaksi extends Model
         'metode_pembayaran',
         'batas_bayar',
         'bukti_pembayaran',
+        'jatuh_tempo',
     ];
 
     const TYPE_BOOKING = 'booking';
@@ -33,6 +34,7 @@ class Transaksi extends Model
     protected $casts = [
         'batas_bayar' => 'datetime',
         'tanggal_pembayaran' => 'datetime',
+        'jatuh_tempo' => 'date',
     ];
 
     public function user()
@@ -119,7 +121,7 @@ class Transaksi extends Model
         // 3. Handle Verified orders with Proof (Waiting for Admin Confirmation) - 24h limit
         $expiredUnconfirmed = self::where('status', 'verified')
             ->whereNotNull('bukti_pembayaran')
-            ->where('tanggal_pembayaran', '<', now()->subDay())
+            ->where('updated_at', '<', now()->subDay())
             ->get();
 
         foreach ($expiredUnconfirmed as $order) {

@@ -36,11 +36,11 @@ class RegisteredUserController extends Controller
             'nomor_wa' => ['required', 'numeric', 'unique:users,nomor_wa'],
             'tanggal_lahir' => ['required', 'date'],
             'alamat' => ['required', 'string'],
-            'id_plans' => ['required', 'integer', 'in:1,2'], // 1: Anak Kos, 2: Pemilik Kos
+            'id_plans' => ['required', 'integer', 'in:1,2,3,4,5'], // 1: Anak Kos, 2-5: various Landlord Plans
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', Rules\Password::defaults()],
-            'plan_type' => ['nullable', 'string', 'required_if:id_plans,2'],
-            'package_type' => ['nullable', 'string', 'required_if:plan_type,premium'],
+            'plan_type' => ['nullable', 'string', 'required_unless:id_plans,1'],
+            'package_type' => ['nullable', 'string', 'required_if:plan_type,premium,plan_type,premium_perkamar'],
             'jumlah_kamar' => ['nullable', 'integer', 'min:1'],
             'kode_kos' => ['nullable', 'numeric', 'exists:kos,kode_kos'],
         ], [

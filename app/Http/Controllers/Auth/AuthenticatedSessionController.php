@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('pages.auth.signin', ['title' => 'Sign In']);
+        return view('pages.auth.signin', ['title' => 'Masuk']);
     }
 
     /**
@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
         $pendingUser = \App\Models\PendingUser::where('email', $request->email)->first();
 
         if ($pendingUser) {
-            if ($pendingUser->status === 'pending') {
+            if (in_array($pendingUser->status, ['pending', 'verified', 'konfirmasi'])) {
                 return redirect()->route('registration.pending', ['email' => $pendingUser->email]);
             }
 

@@ -17,11 +17,22 @@ class SubscriptionManagementController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Fetch user's active subscription (latest one)
+        // 1. Fetch user's current valid subscription (for display cards)
+        // We want the latest one that HAS been paid (to show accurate active/expired dates)
         $subscription = Langganan::with('jenis_langganan')
             ->where('id_user', $user->id)
+            ->whereNotNull('tanggal_pembayaran')
             ->latest()
             ->first();
+
+        // 1b. Fetch any pending or rejected LATEST overall attempt
+        // Only show pending/rejected banner if it is the absolute latest record
+        // This prevents old rejected attempts from showing up after a new active one exists.
+        $latestOverall = Langganan::where('id_user', $user->id)->latest()->first();
+        $pendingSubscription = null;
+        if ($latestOverall && in_array($latestOverall->status, ['pending', 'rejected'])) {
+            $pendingSubscription = $latestOverall->load('jenis_langganan');
+        }
 
         // 2. Fetch all available plans for purchasing/upgrading
         $availablePlans = JenisLangganan::all();
@@ -35,7 +46,7 @@ class SubscriptionManagementController extends Controller
 
         // 4. Calculate metrics (securely in controller)
         // Primary truth is jatuh_tempo, fallback to specialized 30-day calculation if missing
-        $expiryDate = $subscription?->jatuh_tempo ? \Carbon\Carbon::parse($subscription->jatuh_tempo) : ($subscription?->tanggal_pembayaran ? \Carbon\Carbon::parse($subscription->tanggal_pembayaran)->addDays(28) : null);
+        $expiryDate = $subscription?->jatuh_tempo ? \Carbon\Carbon::parse($subscription->jatuh_tempo) : ($subscription?->tanggal_pembayaran ? \Carbon\Carbon::parse($subscription->tanggal_pembayaran)->addDays(30) : null);
 
         // Use Asia/Jakarta for comparison
         $nowWib = now('Asia/Jakarta')->startOfDay();
@@ -62,6 +73,7 @@ class SubscriptionManagementController extends Controller
             return view('member.tagihan_sistem', [
                 'title' => 'Tagihan Sistem',
                 'subscription' => $subscription,
+                'pendingSubscription' => $pendingSubscription,
                 'availablePlans' => $availablePlans,
                 'history' => $history,
                 'expiryDate' => $expiryDate,
@@ -76,6 +88,7 @@ class SubscriptionManagementController extends Controller
         return view('admin.subscription', [
             'title' => 'Manajemen Langganan',
             'subscription' => $subscription,
+            'pendingSubscription' => $pendingSubscription,
             'availablePlans' => $availablePlans,
             'history' => $history,
             'expiryDate' => $expiryDate,
@@ -99,16 +112,59 @@ class SubscriptionManagementController extends Controller
 
         $user = Auth::user();
 
-        Langganan::updateOrCreate(
-            ['id_user' => $user->id],
-            [
-                'id_langganan' => $request->id_langganan,
-                'jumlah_kamar' => $request->jumlah_kamar ?? 0,
-                'status' => 'pending', // Await payment confirmation
-                'tanggal_pembayaran' => null
-            ]
-        );
+        // If there's already a pending subscription, delete it first to avoid duplicates
+        Langganan::where('id_user', $user->id)
+            ->where('status', 'pending')
+            ->delete();
 
-        return back()->with('success', 'Permintaan perubahan paket berhasil diajukan!');
+        Langganan::create([
+            'id_user' => $user->id,
+            'id_langganan' => $request->id_langganan,
+            'jumlah_kamar' => $request->jumlah_kamar ?? 0,
+            'status' => 'pending', // Await payment confirmation
+            'tanggal_pembayaran' => null
+        ]);
+
+        return back()->with('success', 'Permintaan perubahan paket berhasil diajukan! Silakan lengkapi pembayaran.');
+    }
+
+    /**
+     * Upload payment proof for a pending subscription.
+     */
+    public function uploadProof(Request $request)
+    {
+        $request->validate([
+            'bukti_pembayaran' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:512000'], // 500MB as requested before
+            'metode_pembayaran' => ['required', 'string'],
+        ]);
+
+        $user = Auth::user();
+        $subscription = Langganan::where('id_user', $user->id)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        if (!$subscription) {
+            return back()->with('error', 'Tidak ada permintaan paket yang aktif.');
+        }
+
+        if ($request->hasFile('bukti_pembayaran')) {
+            // Delete old proof if exists
+            if ($subscription->bukti_pembayaran) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($subscription->bukti_pembayaran);
+            }
+
+            $file = $request->file('bukti_pembayaran');
+            $path = $file->store('pembayaran_paket_langganan', 'public');
+
+            $subscription->update([
+                'bukti_pembayaran' => $path,
+                'metode_pembayaran' => $request->metode_pembayaran,
+            ]);
+
+            return back()->with('success', 'Bukti pembayaran berhasil diunggah! Hubungi admin untuk aktivasi cepat.');
+        }
+
+        return back()->with('error', 'Gagal mengunggah bukti pembayaran.');
     }
 }

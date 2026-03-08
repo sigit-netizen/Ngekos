@@ -7,11 +7,11 @@
     @endphp
 
     <div x-data="{
-            activeTab: '{{ $tab }}',
-            currentStatus: '{{ $statusFilter }}',
-            showProof: false,
-            proofUrl: ''
-        }"
+                                    activeTab: '{{ $tab }}',
+                                    currentStatus: '{{ $statusFilter }}',
+                                    showProof: false,
+                                    proofUrl: ''
+                                }"
         x-init="$watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
         {{-- Header --}}
@@ -42,8 +42,8 @@
             <button @click="activeTab = 'order'; currentStatus = 'verif'; window.location.href = '?tab=order&status=verif'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="(currentStatus === 'verif' || currentStatus === 'pending')
-                                                                    ? 'bg-rose-50 border-rose-500 shadow-xl shadow-rose-100 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-rose-200 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-rose-50 border-rose-500 shadow-xl shadow-rose-100 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-rose-200 shadow-md shadow-gray-200/50'">
                 @if(($orderPendingCount ?? 0) + ($pendingCount ?? 0) > 0)
                     <div
                         class="absolute top-3 right-3 text-rose-600 text-[9px] font-black z-10 animate-pulse bg-white px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm">
@@ -75,8 +75,8 @@
                 @click="activeTab = 'order'; currentStatus = 'menunggu'; window.location.href = '?tab=order&status=menunggu'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'menunggu'
-                                                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
                 <div class="mb-3 sm:mb-4">
                     <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'menunggu' ? 'bg-white shadow-sm text-amber-500 border border-amber-100' : 'bg-amber-50 text-amber-500'">
@@ -100,8 +100,8 @@
                 @click="activeTab = 'order'; currentStatus = 'konfirmasi'; window.location.href = '?tab=order&status=konfirmasi'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'konfirmasi'
-                                                                    ? 'bg-emerald-50 border-emerald-500 shadow-xl shadow-emerald-100 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-emerald-200 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-emerald-50 border-emerald-500 shadow-xl shadow-emerald-100 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-emerald-200 shadow-md shadow-gray-200/50'">
                 @if(($orderKonfirmasiCount ?? 0) > 0)
                     <div class="absolute top-3 right-3 flex h-5 w-5">
                         <span
@@ -134,8 +134,8 @@
             <button @click="activeTab = 'order'; currentStatus = 'sewa'; window.location.href = '?tab=order&status=sewa'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'sewa'
-                                                                    ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-amber-50 border-amber-500 shadow-xl shadow-amber-100 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-amber-200 shadow-md shadow-gray-200/50'">
                 @if(($rentKonfirmasiCount ?? 0) > 0)
                     <div
                         class="absolute top-3 right-3 flex h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-lg items-center justify-center shadow-md shadow-amber-200 animate-bounce">
@@ -166,8 +166,8 @@
                 @click="activeTab = 'riwayat'; currentStatus = 'active'; window.location.href = '?tab=riwayat&status=active'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'active'
-                                                                    ? 'bg-[#36B2B2]/5 border-[#36B2B2] shadow-xl shadow-[#36B2B2]/10 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-[#36B2B2]/20 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-[#36B2B2]/5 border-[#36B2B2] shadow-xl shadow-[#36B2B2]/10 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-[#36B2B2]/20 shadow-md shadow-gray-200/50'">
                 <div class="mb-3 sm:mb-4">
                     <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'active' ? 'bg-white shadow-sm text-[#36B2B2] border border-teal-100' : 'bg-[#36B2B2]/10 text-[#36B2B2]'">
@@ -192,8 +192,8 @@
                 @click="activeTab = 'riwayat'; currentStatus = 'rejected'; window.location.href = '?tab=riwayat&status=rejected'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'rejected'
-                                                                    ? 'bg-slate-50 border-slate-500 shadow-xl shadow-slate-100 -translate-y-1'
-                                                                    : 'bg-white border-gray-50 hover:border-slate-200 shadow-md shadow-gray-200/50'">
+                                                                                            ? 'bg-slate-50 border-slate-500 shadow-xl shadow-slate-100 -translate-y-1'
+                                                                                            : 'bg-white border-gray-50 hover:border-slate-200 shadow-md shadow-gray-200/50'">
                 <div class="mb-3 sm:mb-4">
                     <div class="inline-flex p-2 sm:p-2.5 rounded-2xl transition-all duration-500"
                         :class="currentStatus === 'rejected' ? 'bg-white shadow-sm text-slate-500 border border-slate-200' : 'bg-slate-50 text-slate-500'">
@@ -275,9 +275,9 @@
                 <div class="flex items-center gap-3">
                     <span class="w-1.5 h-6 bg-[#36B2B2] rounded-full"></span>
                     <h3 class="text-base sm:text-lg md:text-xl font-black text-gray-900 whitespace-nowrap" x-text="
-                                                                            activeTab === 'order' ? 'Antrean Verifikasi' :
-                                                                            (currentStatus === 'active' ? 'Basis Data Penyewa' : 'Arsip Penolakan')
-                                                                        "></h3>
+                                                                                                    activeTab === 'order' ? 'Antrean Verifikasi' :
+                                                                                                    (currentStatus === 'active' ? 'Basis Data Penyewa' : 'Arsip Penolakan')
+                                                                                                "></h3>
                 </div>
 
                 <template x-if="activeTab === 'riwayat'">
@@ -369,22 +369,22 @@
                                                                 {{ $pending->name }}
                                                             </div>
                                                             <div x-data="{ 
-                                                                                                                                                    expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                                                                    now: new Date().getTime(),
-                                                                                                                                                    timer: '',
-                                                                                                                                                    init() {
-                                                                                                                                                        this.updateTimer();
-                                                                                                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                                                                                    },
-                                                                                                                                                    updateTimer() {
-                                                                                                                                                        let diff = this.expiryTime - this.now;
-                                                                                                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                                                                    }
-                                                                                                                                                }"
+                                                                                                                                                                                                    expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                    now: new Date().getTime(),
+                                                                                                                                                                                                    timer: '',
+                                                                                                                                                                                                    init() {
+                                                                                                                                                                                                        this.updateTimer();
+                                                                                                                                                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    updateTimer() {
+                                                                                                                                                                                                        let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                }"
                                                                 class="px-2 py-0.5 bg-rose-500 text-white text-[9px] font-black rounded-lg shadow-sm animate-pulse">
                                                                 <span x-text="timer"></span>
                                                             </div>
@@ -472,22 +472,22 @@
                                         <div class="flex items-center justify-between mt-1 pt-2 border-t border-gray-200/50">
                                             <span class="text-[10px] font-semibold text-gray-500 uppercase">Sisa Waktu</span>
                                             <div x-data="{ 
-                                                                                                        expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                        now: new Date().getTime(),
-                                                                                                        timer: '',
-                                                                                                        init() {
-                                                                                                            this.updateTimer();
-                                                                                                            setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                                        },
-                                                                                                        updateTimer() {
-                                                                                                            let diff = this.expiryTime - this.now;
-                                                                                                            if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                                            let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                            let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                            this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                        }
-                                                                                                    }"
+                                                                                                                                                        expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                        now: new Date().getTime(),
+                                                                                                                                                        timer: '',
+                                                                                                                                                        init() {
+                                                                                                                                                            this.updateTimer();
+                                                                                                                                                            setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                        },
+                                                                                                                                                        updateTimer() {
+                                                                                                                                                            let diff = this.expiryTime - this.now;
+                                                                                                                                                            if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                            let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                            let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                            this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                        }
+                                                                                                                                                    }"
                                                 class="px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded-md animate-pulse">
                                                 <span x-text="timer"></span>
                                             </div>
@@ -535,23 +535,25 @@
                                 </div>
                                 <div>
                                     <h4 class="text-sm font-black text-gray-900 leading-none" x-text="
-                                                                                        currentStatus === 'verif' ? 'Verifikasi Order Baru' :
+                                                                                                                      currentStatus === 'verif' ? 'Verifikasi Order Baru' :
                                                                                         (currentStatus === 'menunggu' ? 'Menunggu Pembayaran' : 
-                                                                                        (currentStatus === 'konfirmasi' ? 'Konfirmasi Bukti Transfer' : 'Riwayat Pembatalan'))
-                                                                                    "></h4>
+                                                                                        (currentStatus === 'konfirmasi' ? 'Konfirmasi Bukti Transfer' : 
+                                                                                        (currentStatus === 'sewa' ? 'Verifikasi Bayar Sewa' : 'Riwayat Pembatalan')))
+                                                                                                            "></h4>
                                     <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1" x-text="
-                                                                                        currentStatus === 'verif' ? 'Pesanan baru yang baru masuk' :
+                                                                                                                      currentStatus === 'verif' ? 'Pesanan baru yang baru masuk' :
                                                                                         (currentStatus === 'menunggu' ? 'Pesanan diterima & menunggu bukti bayar' : 
-                                                                                        (currentStatus === 'konfirmasi' ? 'Pembayaran yang perlu Anda konfirmasi' : 'Riwayat pesanan yang dibatalkan atau ditolak'))
-                                                                                    "></p>
+                                                                                        (currentStatus === 'konfirmasi' ? 'Pembayaran yang perlu Anda konfirmasi' : 
+                                                                                        (currentStatus === 'sewa' ? 'Pembayaran sewa penyewa aktif' : 'Riwayat pesanan yang dibatalkan atau ditolak')))
+                                                                                                            "></p>
                                 </div>
                             </div>
                             <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border"
                                 :class="{
-                                                                                    'bg-rose-100 text-rose-700 border-rose-200': currentStatus === 'verif',
-                                                                                    'bg-amber-100 text-amber-700 border-amber-200': currentStatus === 'menunggu',
-                                                                                    'bg-emerald-100 text-emerald-700 border-emerald-200': currentStatus === 'konfirmasi'
-                                                                                }">
+                                                                                                            'bg-rose-100 text-rose-700 border-rose-200': currentStatus === 'verif',
+                                                                                                            'bg-amber-100 text-amber-700 border-amber-200': currentStatus === 'menunggu',
+                                                                                                            'bg-emerald-100 text-emerald-700 border-emerald-200': currentStatus === 'konfirmasi'
+                                                                                                        }">
                                 {{ count($orderTransaksi ?? []) }} Data
                             </span>
                         </div>
@@ -563,15 +565,16 @@
                                     <tr
                                         class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] bg-gray-50/50">
                                         <th class="px-8 py-5">User</th>
-                                        <th class="px-8 py-5">WhatsApp</th>
                                         <th class="px-8 py-5">No. Kamar</th>
                                         <th class="px-8 py-5">Harga</th>
+                                        <th class="px-8 py-5">Metode</th>
+                                        <th class="px-8 py-5">Tgl Bayar</th>
                                         @if($statusFilter === 'gagal')
                                             <th class="px-8 py-5">Keterangan Gagal</th>
                                         @else
                                             <th class="px-8 py-5">Catatan</th>
                                         @endif
-                                        <th class="px-8 py-5">Tanggal</th>
+                                        <th class="px-8 py-5">Tanggal Order</th>
                                         <th class="px-8 py-5 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -591,50 +594,50 @@
                                                             </div>
                                                             @if($order->status === 'pending')
                                                                 <div x-data="{ 
-                                                                                                                                                                                            expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                                                                                                            now: new Date().getTime(),
-                                                                                                                                                                                            timer: '',
-                                                                                                                                                                                            init() {
-                                                                                                                                                                                                this.updateTimer();
-                                                                                                                                                                                                setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                                                                                                                            },
-                                                                                                                                                                                            updateTimer() {
-                                                                                                                                                                                                let diff = this.expiryTime - this.now;
-                                                                                                                                                                                                if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                                                                                                                                let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                                                                                                                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                                                                                                                let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                                                                                                                this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                                                                                                            }
-                                                                                                                                                                                        }"
+                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                                                                                    now: new Date().getTime(),
+                                                                                                                                                                                                                                                                    timer: '',
+                                                                                                                                                                                                                                                                    init() {
+                                                                                                                                                                                                                                                                        this.updateTimer();
+                                                                                                                                                                                                                                                                        setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                                                                    updateTimer() {
+                                                                                                                                                                                                                                                                        let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                                                                                        if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                                                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                }"
                                                                     class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
                                                                     <span x-text="timer"></span>
                                                                 </div>
                                                             @elseif($order->status === 'verified' && $order->bukti_pembayaran)
                                                                 {{-- Countdown Timer for Owner to Confirm Payment --}}
                                                                 <div x-data="{ 
-                                                                                                                                                                                            expiryTime: new Date('{{ optional($order->tanggal_pembayaran)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                                                                                                            now: new Date().getTime(),
-                                                                                                                                                                                            timer: '',
-                                                                                                                                                                                            init() {
-                                                                                                                                                                                                this.updateTimer();
-                                                                                                                                                                                                setInterval(() => {
-                                                                                                                                                                                                    this.now = new Date().getTime();
-                                                                                                                                                                                                    this.updateTimer();
-                                                                                                                                                                                                }, 1000);
-                                                                                                                                                                                            },
-                                                                                                                                                                                            updateTimer() {
-                                                                                                                                                                                                let diff = this.expiryTime - this.now;
-                                                                                                                                                                                                if (diff <= 0) {
-                                                                                                                                                                                                    this.timer = 'EXPIRED';
-                                                                                                                                                                                                    return;
-                                                                                                                                                                                                }
-                                                                                                                                                                                                let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                                                                                                                let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                                                                                                                let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                                                                                                                this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                                                                                                            }
-                                                                                                                                                                                        }"
+                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ optional($order->tanggal_pembayaran)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                                                                                    now: new Date().getTime(),
+                                                                                                                                                                                                                                                                    timer: '',
+                                                                                                                                                                                                                                                                    init() {
+                                                                                                                                                                                                                                                                        this.updateTimer();
+                                                                                                                                                                                                                                                                        setInterval(() => {
+                                                                                                                                                                                                                                                                            this.now = new Date().getTime();
+                                                                                                                                                                                                                                                                            this.updateTimer();
+                                                                                                                                                                                                                                                                        }, 1000);
+                                                                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                                                                    updateTimer() {
+                                                                                                                                                                                                                                                                        let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                                                                                        if (diff <= 0) {
+                                                                                                                                                                                                                                                                            this.timer = 'EXPIRED';
+                                                                                                                                                                                                                                                                            return;
+                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                        let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                                                                                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                                                                                        let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                                                                                        this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                }"
                                                                     class="px-2 py-0.5 bg-red-600 text-red-50 text-[9px] font-black rounded-md animate-pulse">
                                                                     <span x-text="timer"></span>
                                                                 </div>
@@ -655,6 +658,20 @@
                                                     {{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
                                             </td>
                                             <td class="px-8 py-6">
+                                                <span
+                                                    class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest {{ $order->metode_pembayaran === 'manual' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-blue-50 text-blue-600 border border-blue-100' }}">
+                                                    {{ $order->metode_pembayaran }}
+                                                </span>
+                                            </td>
+                                            <td class="px-8 py-6">
+                                                @if($order->metode_pembayaran === 'manual' && $order->tanggal_pembayaran)
+                                                    <span
+                                                        class="text-xs font-black text-amber-600">{{ \Carbon\Carbon::parse($order->tanggal_pembayaran)->format('d/m/Y') }}</span>
+                                                @else
+                                                    <span class="text-xs text-gray-400 font-bold">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-8 py-6">
                                                 @if($statusFilter === 'gagal')
                                                     <div class="flex flex-col gap-1">
                                                         <span
@@ -673,7 +690,7 @@
                                             </td>
                                             <td class="px-8 py-6 text-center">
                                                 <div class="flex items-center justify-center gap-2">
-                                                    @if($order->status === 'pending')
+                                                    @if($order->status === 'pending' || ($order->status === 'verified' && $order->tipe === 'sewa'))
                                                         @if($order->tipe === 'sewa')
                                                             <div class="flex items-center gap-2">
                                                                 <form method="POST"
@@ -722,7 +739,7 @@
                                                         @endif
                                                     @elseif($order->status === 'verified')
                                                         @if($order->bukti_pembayaran)
-                                                            @if($statusFilter === 'konfirmasi')
+                                                            @if($statusFilter === 'konfirmasi' || $statusFilter === 'sewa')
                                                                 <div class="flex items-center gap-2">
                                                                     <form method="POST"
                                                                         action="{{ route('admin.order.confirm', $order->id) }}">
@@ -759,12 +776,77 @@
                                                                 </button>
                                                             @endif
                                                         @else
-                                                            <span
-                                                                class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tight">Menunggu
-                                                                Bukti</span>
-                                                            @if($order->batas_bayar)
-                                                                <span class="text-[8px] font-medium text-gray-400 italic">Hingga:
-                                                                    {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
+                                                            @if($order->metode_pembayaran === 'manual')
+                                                                <div class="flex flex-col gap-2">
+                                                                    <form method="POST"
+                                                                        action="{{ route('admin.order.confirm', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Konfirmasi Pembayaran Manual?', 'Terima pembayaran tunai/manual dari penyewa ini?').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                            ✓ Konfirmasi Bayar
+                                                                        </button>
+                                                                    </form>
+                                                                    <span
+                                                                        class="text-[9px] font-bold text-amber-600 uppercase tracking-tight text-center">Bayar
+                                                                        Offline</span>
+                                                                    @if($order->batas_bayar)
+                                                                        <div x-data="{
+                                                                                                    target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                                    display: '--:--:--',
+                                                                                                    init() {
+                                                                                                        this.update();
+                                                                                                        setInterval(() => this.update(), 1000);
+                                                                                                    },
+                                                                                                    update() {
+                                                                                                        const now = new Date().getTime();
+                                                                                                        const diff = this.target - now;
+                                                                                                        if (diff <= 0) {
+                                                                                                            this.display = 'WAKTU HABIS';
+                                                                                                            return;
+                                                                                                        }
+                                                                                                        const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                        this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                                    }
+                                                                                                }" class="flex flex-col items-center">
+                                                                            <span
+                                                                                class="text-[9px] font-black text-rose-500 font-mono tracking-tighter"
+                                                                                x-text="display"></span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            @else
+                                                                <span
+                                                                    class="px-4 py-1.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase tracking-tight">Menunggu
+                                                                    Bukti</span>
+                                                                <div x-data="{
+                                                                                            target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                            display: '--:--:--',
+                                                                                            init() {
+                                                                                                this.update();
+                                                                                                setInterval(() => this.update(), 1000);
+                                                                                            },
+                                                                                            update() {
+                                                                                                const now = new Date().getTime();
+                                                                                                const diff = this.target - now;
+                                                                                                if (diff <= 0) {
+                                                                                                    this.display = 'WAKTU HABIS';
+                                                                                                    return;
+                                                                                                }
+                                                                                                const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                            }
+                                                                                        }" class="mt-1 flex flex-col items-center">
+                                                                    <span
+                                                                        class="text-[10px] font-black text-rose-500 font-mono tracking-tighter"
+                                                                        x-text="display"></span>
+                                                                    <span class="text-[8px] font-medium text-gray-400 italic">Hingga:
+                                                                        {{ \Carbon\Carbon::parse($order->batas_bayar)->format('d M, H:i') }}</span>
+                                                                </div>
                                                             @endif
                                                         @endif
                                                     @elseif($order->status === 'paid')
@@ -819,22 +901,22 @@
                                                         {{ $order->kamar->nomor_kamar ?? '-' }}</span>
                                                     @if($order->status === 'pending')
                                                         <div x-data="{ 
-                                                                                                                                                expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
-                                                                                                                                                now: new Date().getTime(),
-                                                                                                                                                timer: '',
-                                                                                                                                                init() {
-                                                                                                                                                    this.updateTimer();
-                                                                                                                                                    setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
-                                                                                                                                                },
-                                                                                                                                                updateTimer() {
-                                                                                                                                                    let diff = this.expiryTime - this.now;
-                                                                                                                                                    if (diff <= 0) { this.timer = 'EXPIRED'; return; }
-                                                                                                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                                                                    this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                                                                }
-                                                                                                                                            }"
+                                                                                                                                                                                                                        expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                                        now: new Date().getTime(),
+                                                                                                                                                                                                                        timer: '',
+                                                                                                                                                                                                                        init() {
+                                                                                                                                                                                                                            this.updateTimer();
+                                                                                                                                                                                                                            setInterval(() => { this.now = new Date().getTime(); this.updateTimer(); }, 1000);
+                                                                                                                                                                                                                        },
+                                                                                                                                                                                                                        updateTimer() {
+                                                                                                                                                                                                                            let diff = this.expiryTime - this.now;
+                                                                                                                                                                                                                            if (diff <= 0) { this.timer = 'EXPIRED'; return; }
+                                                                                                                                                                                                                            let h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                                                                                                                                                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                                                                                                                                                            let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                                                                                                                                                            this.timer = `${h}j ${m}m ${s}d`;
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                    }"
                                                             class="px-1.5 py-0.5 bg-red-50 text-red-600 text-[9px] font-bold rounded animate-pulse">
                                                             <span x-text="timer"></span>
                                                         </div>
@@ -843,9 +925,16 @@
                                             </div>
                                         </div>
                                         <div class="text-right shrink-0">
-                                            <span class="text-[9px] text-gray-400 font-semibold block uppercase">Total</span>
+                                            <span class="text-[9px] text-gray-400 font-semibold block uppercase">Total &
+                                                Metode</span>
                                             <span
                                                 class="text-sm font-bold text-[#36B2B2]">Rp{{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
+                                            <div class="mt-1">
+                                                <span
+                                                    class="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest {{ $order->metode_pembayaran === 'manual' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700' }}">
+                                                    {{ $order->metode_pembayaran }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -855,6 +944,13 @@
                                             <span
                                                 class="font-medium text-gray-700 ml-2 text-right">{{ optional($order->created_at)->format('d M Y') }}</span>
                                         </div>
+                                        @if($order->metode_pembayaran === 'manual' && $order->tanggal_pembayaran)
+                                            <div class="flex justify-between items-center text-gray-600">
+                                                <span class="text-gray-500 font-medium whitespace-nowrap">Rencana Bayar:</span>
+                                                <span
+                                                    class="font-black text-amber-600 ml-2 text-right">{{ \Carbon\Carbon::parse($order->tanggal_pembayaran)->format('d M Y') }}</span>
+                                            </div>
+                                        @endif
                                         @if($statusFilter === 'gagal')
                                             <div
                                                 class="flex justify-between items-start text-gray-600 mt-1 pt-2 border-t border-gray-200/60">
@@ -928,7 +1024,7 @@
                                             @endif
                                         @elseif($order->status === 'verified')
                                             @if($order->bukti_pembayaran)
-                                                @if($statusFilter === 'konfirmasi')
+                                                @if($statusFilter === 'konfirmasi' || $statusFilter === 'sewa')
                                                     <div class="flex gap-2">
                                                         <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}"
                                                             class="flex-1">
@@ -966,15 +1062,77 @@
                                                     </div>
                                                 @endif
                                             @else
-                                                <div class="flex items-center justify-between">
-                                                    <span
-                                                        class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase">Menunggu
-                                                        Bukti</span>
-                                                    @if($order->batas_bayar)
-                                                        <span class="text-[10px] font-medium text-gray-400">Hingga:
-                                                            {{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
-                                                    @endif
-                                                </div>
+                                                @if($order->metode_pembayaran === 'manual')
+                                                    <div class="flex flex-col w-full gap-2">
+                                                        <form method="POST" action="{{ route('admin.order.confirm', $order->id) }}">
+                                                            @csrf
+                                                            <button type="button"
+                                                                @click="window.swalConfirm('Konfirmasi Pembayaran Manual?', 'Terima pembayaran tunai/manual dari penyewa ini?').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                class="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-white hover:bg-emerald-600 transition-colors uppercase tracking-wide">
+                                                                Konfirmasi Bayar
+                                                            </button>
+                                                        </form>
+                                                        @if($order->batas_bayar)
+                                                            <div x-data="{
+                                                                                        target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                        display: '--:--:--',
+                                                                                        init() {
+                                                                                            this.update();
+                                                                                            setInterval(() => this.update(), 1000);
+                                                                                        },
+                                                                                        update() {
+                                                                                            const now = new Date().getTime();
+                                                                                            const diff = this.target - now;
+                                                                                            if (diff <= 0) {
+                                                                                                this.display = 'WAKTU HABIS';
+                                                                                                return;
+                                                                                            }
+                                                                                            const m = Math.floor(diff / (1000 * 60));
+                                                                                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                            this.display = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                        }
+                                                                                    }"
+                                                                class="flex flex-col items-center border-t border-amber-100 pt-1 mt-1">
+                                                                <span class="text-[9px] font-black text-rose-500 font-mono"
+                                                                    x-text="display"></span>
+                                                                <span class="text-[8px] font-bold text-gray-400 mt-0.5">Hingga:
+                                                                    {{ \Carbon\Carbon::parse($order->batas_bayar)->format('d M, H:i') }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <div class="flex items-center justify-between">
+                                                        <span
+                                                            class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase">Menunggu
+                                                            Bukti</span>
+                                                        @if($order->batas_bayar)
+                                                            <div x-data="{
+                                                                                        target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                        display: '--:--:--',
+                                                                                        init() {
+                                                                                            this.update();
+                                                                                            setInterval(() => this.update(), 1000);
+                                                                                        },
+                                                                                        update() {
+                                                                                            const now = new Date().getTime();
+                                                                                            const diff = this.target - now;
+                                                                                            if (diff <= 0) {
+                                                                                                this.display = 'WAKTU HABIS';
+                                                                                                return;
+                                                                                            }
+                                                                                            const m = Math.floor(diff / (1000 * 60));
+                                                                                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                                            this.display = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                        }
+                                                                                    }" class="flex flex-col items-end">
+                                                                <span class="text-[10px] font-black text-rose-500 font-mono"
+                                                                    x-text="display"></span>
+                                                                <span
+                                                                    class="text-[9px] font-medium text-gray-400 italic">{{ \Carbon\Carbon::parse($order->batas_bayar)->format('H:i, d M') }}</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             @endif
                                         @elseif($order->status === 'paid')
                                             <span

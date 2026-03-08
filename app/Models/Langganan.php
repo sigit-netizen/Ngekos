@@ -15,7 +15,9 @@ class Langganan extends Model
         'tanggal_pembayaran',
         'jatuh_tempo',
         'status',
-        'jumlah_kamar'
+        'jumlah_kamar',
+        'bukti_pembayaran',
+        'metode_pembayaran'
     ];
 
     protected $casts = [

@@ -29,6 +29,7 @@ class LaporanPembayaranController extends Controller
         $monthFilter = $request->get('month');
         $statusFilter = $request->get('status');
         $search = $request->get('search');
+        $durationTypeFilter = $request->get('duration_type');
 
         // Fetch Users who have at least one paid transaction for this kos
         $query = \App\Models\User::where('id_kos', $kos->id)
@@ -61,13 +62,19 @@ class LaporanPembayaranController extends Controller
             $expiryDate = null;
 
             if ($latestTrx) {
-                $duration = $latestTrx->durasi_sewa ?? 1;
-                $unit = $latestTrx->tipe_durasi ?? 'bulan';
-
-                if ($unit === 'bulan') {
-                    $expiryDate = $paymentDate->copy()->addMonths($duration);
+                if ($latestTrx->jatuh_tempo) {
+                    $expiryDate = Carbon::parse($latestTrx->jatuh_tempo);
                 } else {
-                    $expiryDate = $paymentDate->copy()->addDays($duration);
+                    $duration = $latestTrx->durasi_sewa ?? 1;
+                    $type = $latestTrx->tipe_durasi ?? 'bulan';
+
+                    if ($type === 'hari') {
+                        $expiryDate = $paymentDate->copy()->addDays($duration);
+                    } elseif ($type === 'minggu') {
+                        $expiryDate = $paymentDate->copy()->addWeeks($duration);
+                    } else { // Default to 'bulan' or any other unrecognized type
+                        $expiryDate = $paymentDate->copy()->addDays($duration * 30);
+                    }
                 }
             }
 
@@ -127,6 +134,12 @@ class LaporanPembayaranController extends Controller
             $allTenants = $allTenants->where('computed_status', $statusFilter);
         }
 
+        if ($durationTypeFilter) {
+            $allTenants = $allTenants->filter(function ($user) use ($durationTypeFilter) {
+                return $user->latest_trx && $user->latest_trx->tipe_durasi === $durationTypeFilter;
+            });
+        }
+
         // Manual Pagination
         $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
         $perPage = 10;
@@ -147,6 +160,7 @@ class LaporanPembayaranController extends Controller
             'selectedYear' => $yearFilter,
             'selectedMonth' => $monthFilter,
             'selectedStatus' => $statusFilter,
+            'selectedDurationType' => $durationTypeFilter,
             'search' => $search,
             'kos' => $kos
         ]);

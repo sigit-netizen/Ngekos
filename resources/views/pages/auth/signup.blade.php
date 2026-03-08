@@ -59,16 +59,16 @@
                     onsubmit="if(!document.querySelector('input[name=id_plans]').value){ window.swalToast('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!', 'warning'); return false; }">
                     @csrf
                     <div class="space-y-5" x-data="{ 
-                                                    selectedRole: '{{ old('id_plans') }}',
-                                                    roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
-                                                    planType: '{{ old('plan_type') }}',
-                                                    planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
-                                                    packageType: '{{ old('package_type') }}',
-                                                    packageText: '{{ old('package_type') ? str_replace('_', ' ', ucwords(old('package_type'))) : 'Pilih paket durasi...' }}',
-                                                    isOpenRole: false,
-                                                    isOpenPlan: false,
-                                                    isOpenPackage: false
-                                                }">
+                                                                selectedRole: '{{ old('id_plans') }}',
+                                                                roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
+                                                                planType: '{{ old('plan_type') }}',
+                                                                planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
+                                                                packageType: 'monthly',
+                                                            packageText: 'Bulanan (Monthly)',
+                                                            isOpenRole: false,
+                                                            isOpenPlan: false,
+                                                            isOpenPackage: false
+                                                        }">
 
                         <div class="group">
                             <label
@@ -262,25 +262,25 @@
                                         </button>
                                         <ul x-show="isOpenPlan"
                                             class="absolute z-30 mt-1 w-full rounded-xl bg-white shadow-lg border border-gray-100 py-2 text-sm overflow-hidden min-w-[250px]">
-                                            <li @click="planType = 'pro'; planText = 'Pro Plan'; isOpenPlan = false"
+                                            <li @click="planType = 'pro'; planText = 'Pro Plan'; selectedRole = '2'; isOpenPlan = false"
                                                 class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
                                                 <div class="font-bold text-gray-900 text-sm">Pro Plan</div>
                                                 <div class="text-[10px] text-gray-500 italic">Standar pengelolaan kos daring
                                                 </div>
                                             </li>
-                                            <li @click="planType = 'premium'; planText = 'Premium Plan'; isOpenPlan = false"
+                                            <li @click="planType = 'premium'; planText = 'Premium Plan'; selectedRole = '3'; isOpenPlan = false"
                                                 class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
                                                 <div class="font-bold text-amber-600 text-sm">Premium Plan</div>
                                                 <div class="text-[10px] text-gray-500 italic">Laporan keuangan & tagihan
                                                     sistem</div>
                                             </li>
-                                            <li @click="planType = 'pro_perkamar'; planText = 'Pro Per Kamar'; isOpenPlan = false"
+                                            <li @click="planType = 'pro_perkamar'; planText = 'Pro Per Kamar'; selectedRole = '5'; isOpenPlan = false"
                                                 class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
                                                 <div class="font-bold text-gray-900 text-sm">Pro Per Kamar</div>
                                                 <div class="text-[10px] text-gray-500 italic">Optimasi pengelolaan unit
                                                     kamar</div>
                                             </li>
-                                            <li @click="planType = 'premium_perkamar'; planText = 'Premium Per Kamar'; isOpenPlan = false"
+                                            <li @click="planType = 'premium_perkamar'; planText = 'Premium Per Kamar'; selectedRole = '4'; isOpenPlan = false"
                                                 class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors">
                                                 <div class="font-bold text-amber-600 text-sm">Premium Per Kamar</div>
                                                 <div class="text-[10px] text-gray-500 italic">Manajemen unit premium
@@ -288,6 +288,15 @@
                                             </li>
                                         </ul>
                                     </div>
+                                </div>
+
+                                <!-- Package Duration Dropdown (Muncul jika pilih Premium) -->
+                                <div x-show="planType === 'premium' || planType === 'premium_perkamar'"
+                                    x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 transform -translate-y-4"
+                                    x-transition:enter-end="opacity-100 transform translate-y-0" class="group"
+                                    @click.outside="isOpenPackage = false">
+                                    <input type="hidden" name="package_type" x-model="packageType">
                                 </div>
 
                                 <!-- Field Jumlah Kamar (Muncul jika pilih Per Kamar) -->
