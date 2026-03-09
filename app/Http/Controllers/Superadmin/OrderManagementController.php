@@ -181,7 +181,12 @@ class OrderManagementController extends Controller
             $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
             $user->save();
 
-            // 3. Create active Langganan record
+            // 3. Deactivate existing active subscriptions
+            \App\Models\Langganan::where('id_user', $user->id)
+                ->where('status', 'active')
+                ->update(['status' => 'expired']);
+
+            // 4. Create active Langganan record
             $langgananNames = [
                 'pro' => 'MEMBER PRO',
                 'premium' => 'MEMBER PREMIUM',
@@ -235,6 +240,14 @@ class OrderManagementController extends Controller
 
     public function verifyPacket(Langganan $subscription)
     {
+        // Deactivate existing active subscriptions for this user
+        if ($subscription->user) {
+            \App\Models\Langganan::where('id_user', $subscription->id_user)
+                ->where('id', '!=', $subscription->id)
+                ->where('status', 'active')
+                ->update(['status' => 'expired']);
+        }
+
         $subscription->update([
             'status' => 'active',
             'tanggal_pembayaran' => now('Asia/Jakarta'),

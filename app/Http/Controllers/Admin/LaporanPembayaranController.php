@@ -20,8 +20,14 @@ class LaporanPembayaranController extends Controller
             return view('member.laporan_pembayaran', [
                 'title' => 'Laporan Pembayaran',
                 'role' => 'admin',
-                'tenants' => collect(),
-                'metrics' => $this->emptyMetrics()
+                'tenants' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10),
+                'metrics' => $this->emptyMetrics(),
+                'selectedYear' => $request->get('year', date('Y')),
+                'selectedMonth' => $request->get('month'),
+                'selectedStatus' => $request->get('status'),
+                'selectedDurationType' => $request->get('duration_type'),
+                'search' => $request->get('search'),
+                'kos' => null
             ]);
         }
 
@@ -113,21 +119,6 @@ class LaporanPembayaranController extends Controller
                 ->whereYear('created_at', $yearFilter)
                 ->when($monthFilter, fn($q) => $q->whereMonth('created_at', $monthFilter))
                 ->sum('jumlah_bayar'),
-            'paid_count' => Transaksi::where('kode_kos', $kos->kode_kos)
-                ->where('status', 'paid')
-                ->whereYear('created_at', $yearFilter)
-                ->when($monthFilter, fn($q) => $q->whereMonth('created_at', $monthFilter))
-                ->count(),
-            'pending_count' => Transaksi::where('kode_kos', $kos->kode_kos)
-                ->where('status', 'pending')
-                ->whereYear('created_at', $yearFilter)
-                ->when($monthFilter, fn($q) => $q->whereMonth('created_at', $monthFilter))
-                ->count(),
-            'failed_count' => Transaksi::where('kode_kos', $kos->kode_kos)
-                ->whereIn('status', ['failed', 'rejected'])
-                ->whereYear('created_at', $yearFilter)
-                ->when($monthFilter, fn($q) => $q->whereMonth('created_at', $monthFilter))
-                ->count(),
         ];
 
         if ($statusFilter) {
@@ -171,12 +162,9 @@ class LaporanPembayaranController extends Controller
         return [
             'total_penyewa' => 0,
             'penyewa_aktif' => 0,
-            'kamar_terisi' => 0,
+            'masa_tenggang' => 0,
+            'sewa_habis' => 0,
             'total_omzet' => 0,
-            'total_transactions' => 0,
-            'paid_count' => 0,
-            'pending_count' => 0,
-            'failed_count' => 0,
         ];
     }
 }

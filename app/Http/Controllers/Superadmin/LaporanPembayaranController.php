@@ -18,7 +18,13 @@ class LaporanPembayaranController extends Controller
         $search = $request->get('search');
 
         // Fetch query with filters
+        // Only show the LATEST active subscription per user to avoid stacking
+        $latestActiveIds = Langganan::selectRaw('MAX(id)')
+            ->where('status', 'active')
+            ->groupBy('id_user');
+
         $query = Langganan::with(['jenis_langganan', 'user'])
+            ->whereIn('id', $latestActiveIds)
             ->whereHas('user', function ($q) use ($search) {
                 $q->role(['admin', 'nonaktif'])->with('statusUser');
                 if ($search) {

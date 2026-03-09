@@ -11,7 +11,7 @@
 
         <!-- Horizontal Compact Filters -->
         <form action="{{ route('admin.laporan_pembayaran') }}" method="GET"
-            class="grid grid-cols-1 md:grid-cols-12 lg:grid-cols-12 gap-4 items-end bg-gray-50/80 p-5 rounded-2xl border border-gray-100/50 shadow-inner">
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end bg-gray-50/80 p-5 rounded-2xl border border-gray-100/50 shadow-inner">
             <!-- Search Penyewa -->
             <div class="md:col-span-6 lg:col-span-3">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penyewa</label>
@@ -77,7 +77,7 @@
             </div>
 
             <!-- Actions -->
-            <div class="md:col-span-12 lg:col-span-12 xl:col-span-2 xl:flex-none flex gap-2">
+            <div class="sm:col-span-2 lg:col-span-12 xl:col-span-2 xl:flex-none flex gap-2">
                 <button type="submit"
                     class="flex-[2] xl:w-28 h-11 bg-[#36B2B2] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2b8f8f] hover:shadow-lg hover:shadow-[#36B2B2]/20 transition-all active:scale-95 flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,90 +94,90 @@
     </div>
 
     <!-- Standardized Stats Widgets -->
-    <div class="flex flex-row flex-nowrap gap-4 mb-8 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide" data-aos="fade-up" data-aos-delay="50">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8" data-aos="fade-up" data-aos-delay="50">
         <!-- Total Penyewa -->
-        <div class="flex-1 min-w-[200px] group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
+        <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Penyewa</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Penyewa</p>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl font-black text-gray-900">{{ $metrics['total_penyewa'] }}</span>
-                        <span class="text-[10px] text-gray-400 font-medium">Orang</span>
+                        <span class="text-xl sm:text-2xl font-black text-gray-900">{{ $metrics['total_penyewa'] }}</span>
+                        <span class="text-[9px] sm:text-[10px] text-gray-400 font-medium">Orang</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Penyewa Aktif -->
-        <div class="flex-1 min-w-[200px] group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-[#36B2B2]">
+        <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-[#36B2B2]">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-[#36B2B2]/10 flex items-center justify-center text-[#36B2B2] group-hover:bg-[#36B2B2]/20 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#36B2B2]/10 flex items-center justify-center text-[#36B2B2] group-hover:bg-[#36B2B2]/20 transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Masa Aktif</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Masa Aktif</p>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl font-black text-[#36B2B2]">{{ $metrics['penyewa_aktif'] }}</span>
-                        <span class="text-[10px] text-[#36B2B2]/60 font-medium">Lancar</span>
+                        <span class="text-xl sm:text-2xl font-black text-[#36B2B2]">{{ $metrics['penyewa_aktif'] }}</span>
+                        <span class="text-[9px] sm:text-[10px] text-[#36B2B2]/60 font-medium">Lancar</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Masa Tenggang -->
-        <div class="flex-1 min-w-[200px] group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
+        <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Masa Tenggang</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Masa Tenggang</p>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl font-black text-amber-600">{{ $metrics['masa_tenggang'] }}</span>
-                        <span class="text-[10px] text-amber-400 font-medium">Hampir Habis</span>
+                        <span class="text-xl sm:text-2xl font-black text-amber-600">{{ $metrics['masa_tenggang'] }}</span>
+                        <span class="text-[9px] sm:text-[10px] text-amber-400 font-medium">Hampir Habis</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Sewa Habis -->
-        <div class="flex-1 min-w-[200px] group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-red-500">
+        <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-red-500">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Sewa Habis</p>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Sewa Habis</p>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl font-black text-red-600">{{ $metrics['sewa_habis'] }}</span>
-                        <span class="text-[10px] text-red-400 font-medium">Expired</span>
+                        <span class="text-xl sm:text-2xl font-black text-red-600">{{ $metrics['sewa_habis'] }}</span>
+                        <span class="text-[9px] sm:text-[10px] text-red-400 font-medium">Expired</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Total Omzet -->
-        <div class="flex-1 min-w-[240px] group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-emerald-500">
+        <div class="sm:col-span-2 lg:col-span-1 xl:col-span-1 group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-emerald-500">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-100 transition-colors">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM17 16v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2m3-12V4a1 1 0 011-1h2a1 1 0 011 1v2m-4 0h4"></path>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Omzet</p>
-                    <span class="text-xl font-black text-emerald-600">Rp {{ number_format($metrics['total_omzet'], 0, ',', '.') }}</span>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Omzet</p>
+                    <span class="text-lg sm:text-xl font-black text-emerald-600">Rp {{ number_format($metrics['total_omzet'], 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -209,10 +209,10 @@
                 <thead>
                     <tr class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                         <th class="px-8 py-5">Nama Penyewa</th>
-                        <th class="px-6 py-5">Unit Kamar</th>
-                        <th class="px-6 py-5">Tgl Terakhir Bayar</th>
+                        <th class="px-6 py-5 hidden md:table-cell">Unit Kamar</th>
+                        <th class="px-6 py-5 hidden lg:table-cell">Tgl Terakhir Bayar</th>
                         <th class="px-6 py-5">Sisa Durasi</th>
-                        <th class="px-6 py-5">Jatuh Tempo</th>
+                        <th class="px-6 py-5 hidden sm:table-cell">Jatuh Tempo</th>
                         <th class="px-8 py-5 text-center">Status</th>
                     </tr>
                 </thead>
@@ -223,7 +223,7 @@
                                 <div class="font-black text-gray-900">{{ $tenant->name ?? 'User Terhapus' }}</div>
                                 <div class="text-[10px] text-gray-400">{{ $tenant->email ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-5">
+                            <td class="px-6 py-5 hidden md:table-cell">
                                 @if($tenant->kamar)
                                     <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-tighter">
                                         KM {{ $tenant->kamar->nomor_kamar }}
@@ -232,7 +232,7 @@
                                     <span class="text-[10px] text-gray-300 italic font-bold uppercase">N/A</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-5 text-[11px] font-bold text-gray-600 uppercase">
+                            <td class="px-6 py-5 text-[11px] font-bold text-gray-600 uppercase hidden lg:table-cell">
                                 {{ $tenant->latest_trx ? $tenant->latest_trx->tanggal_pembayaran->translatedFormat('d M Y') : '-' }}
                             </td>
                             <td class="px-6 py-5">
@@ -257,7 +257,7 @@
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-6 py-5 text-[11px] font-black text-gray-900 uppercase">
+                            <td class="px-6 py-5 text-[11px] font-black text-gray-900 uppercase hidden sm:table-cell">
                                 {{ $tenant->expiry_date ? $tenant->expiry_date->translatedFormat('d F Y') : '-' }}
                             </td>
                             <td class="px-8 py-5 text-center">
