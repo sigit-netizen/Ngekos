@@ -114,6 +114,22 @@
 
                     <div class="border-t border-gray-100 my-1 mx-2"></div>
 
+                    <button type="button" onclick="subscribeUserToPush()" id="push-notification-btn"
+                        class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-bold text-gray-700 rounded-xl hover:bg-[#36B2B2]/10 hover:text-[#36B2B2] transition-colors text-left group">
+                        <div id="push-notification-icon-wrapper"
+                            class="p-1.5 rounded-lg bg-gray-50 group-hover:bg-[#36B2B2] group-hover:text-white transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path id="push-notification-icon-path" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                </path>
+                            </svg>
+                        </div>
+                        <span id="push-notification-text">Aktifkan Notifikasi</span>
+                    </button>
+
+                    <div class="border-t border-gray-100 my-1 mx-2"></div>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
@@ -138,41 +154,41 @@
 @push('modals')
     <!-- Global Profile Modal (Root Level) -->
     <div x-cloak x-data="{ 
-                                            verifyPassword: '', 
-                                            isVerifying: false, 
-                                            errorMsg: '',
-                                            mode: 'verify', // 'verify' or 'profile'
-                                            async handleVerify() {
-                                                this.isVerifying = true;
-                                                this.errorMsg = '';
-                                                try {
-                                                    const response = await fetch('{{ route('profile.verify-password') }}', {
-                                                        method: 'POST',
-                                                        headers: {
-                                                            'Content-Type': 'application/json',
-                                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                        },
-                                                        body: JSON.stringify({ password: this.verifyPassword })
-                                                    });
-                                                    const data = await response.json();
-                                                    if (data.success) {
-                                                        this.mode = 'profile';
+                                                    verifyPassword: '', 
+                                                    isVerifying: false, 
+                                                    errorMsg: '',
+                                                    mode: 'verify', // 'verify' or 'profile'
+                                                    async handleVerify() {
+                                                        this.isVerifying = true;
+                                                        this.errorMsg = '';
+                                                        try {
+                                                            const response = await fetch('{{ route('profile.verify-password') }}', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                                },
+                                                                body: JSON.stringify({ password: this.verifyPassword })
+                                                            });
+                                                            const data = await response.json();
+                                                            if (data.success) {
+                                                                this.mode = 'profile';
+                                                                this.verifyPassword = '';
+                                                            } else {
+                                                                this.errorMsg = data.message;
+                                                            }
+                                                        } catch (e) {
+                                                            this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
+                                                        } finally {
+                                                            this.isVerifying = false;
+                                                        }
+                                                    },
+                                                    reset() {
+                                                        this.mode = 'verify';
                                                         this.verifyPassword = '';
-                                                    } else {
-                                                        this.errorMsg = data.message;
+                                                        this.errorMsg = '';
                                                     }
-                                                } catch (e) {
-                                                    this.errorMsg = 'Terjadi kesalahan. Silakan coba lagi.';
-                                                } finally {
-                                                    this.isVerifying = false;
-                                                }
-                                            },
-                                            reset() {
-                                                this.mode = 'verify';
-                                                this.verifyPassword = '';
-                                                this.errorMsg = '';
-                                            }
-                                        }" x-show="$store.profile.isOpen"
+                                                }" x-show="$store.profile.isOpen"
         x-init="document.body.appendChild($el); $watch('$store.profile.isOpen', value => { if(!value) reset() })"
         x-effect="document.body.style.overflow = $store.profile.isOpen ? 'hidden' : ''"
         style="position: fixed; z-index: 2147483647;" x-transition:enter="transition ease-out duration-300"

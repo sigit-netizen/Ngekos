@@ -33,6 +33,10 @@ Route::get('/pending', function () {
     return view('pending.dashboard');
 })->middleware('auth')->name('pending.dashboard');
 
+Route::post('/push-subscription', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])
+    ->middleware('auth')
+    ->name('push-subscription');
+
 // Protected Admin Dashboard
 Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(function () {
     Route::get('/admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');

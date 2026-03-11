@@ -12,6 +12,20 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- PWA Manifest & Service Worker Registration -->
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').then(function (registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function (err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -266,5 +280,94 @@ window.addEventListener('resize', checkMobile);">
 </body>
 
 @stack('scripts')
+
+<!-- Push Notification Setup Script -->
+<script>
+    function updatePushUI(isSubscribed) {
+        const btn = document.getElementById('push-notification-btn');
+        const iconWrapper = document.getElementById('push-notification-icon-wrapper');
+        const text = document.getElementById('push-notification-text');
+
+        if (!btn || !iconWrapper || !text) return;
+
+        if (isSubscribed) {
+            text.innerText = 'Notifikasi Aktif';
+            btn.classList.add('text-[#36B2B2]', 'bg-[#36B2B2]/5');
+            iconWrapper.classList.remove('bg-gray-50');
+            iconWrapper.classList.add('bg-[#36B2B2]', 'text-white');
+        } else {
+            text.innerText = 'Aktifkan Notifikasi';
+            btn.classList.remove('text-[#36B2B2]', 'bg-[#36B2B2]/5');
+            iconWrapper.classList.add('bg-gray-50');
+            iconWrapper.classList.remove('bg-[#36B2B2]', 'text-white');
+        }
+    }
+
+    async function checkSubscription() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            return;
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        updatePushUI(!!subscription);
+    }
+
+    // Run check on load
+    document.addEventListener('DOMContentLoaded', checkSubscription);
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    async function subscribeUserToPush() {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                throw new Error('Notification permission denied');
+            }
+
+            const registration = await navigator.serviceWorker.ready;
+            const vapidPublicKey = '{{ env('VAPID_PUBLIC_KEY') }}';
+            const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: convertedVapidKey
+            });
+
+            const response = await fetch('{{ route('push-subscription') }}', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(subscription)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save subscription on server');
+            }
+
+            updatePushUI(true);
+            window.swalToast('Notifikasi berhasil diaktifkan!', 'success');
+        } catch (error) {
+            console.error('Push Subscription Error:', error);
+            window.swalToast('Gagal mengaktifkan notifikasi: ' + error.message, 'error');
+        }
+    }
+</script>
 
 </html>

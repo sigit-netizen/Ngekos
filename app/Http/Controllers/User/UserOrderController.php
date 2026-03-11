@@ -272,7 +272,7 @@ class UserOrderController extends Controller
             $initialJatuhTempo->addDays($duration * 30);
         }
 
-        Transaksi::create([
+        $transaksi = Transaksi::create([
             'jumlah_bayar' => $request->jumlah_bayar,
             'tanggal_pembayaran' => $request->metode_pembayaran === 'manual' ? $request->batas_bayar : null,
             'status' => $tipe === Transaksi::TYPE_SEWA ? 'verified' : 'pending',
@@ -288,6 +288,16 @@ class UserOrderController extends Controller
             'bukti_pembayaran' => null,
             'jatuh_tempo' => $initialJatuhTempo,
         ]);
+
+        $owner = $kamar->kos->user;
+        if ($owner) {
+            $owner->notify(new \App\Notifications\OrderMasukNotification([
+                'nama' => $user->name,
+                'kos' => $kamar->kos->nama_kos,
+                'kamar' => $kamar->nomor_kamar,
+                'jumlah' => $request->jumlah_bayar
+            ]));
+        }
 
         $message = $isRentPayment ? 'Pembayaran sewa berhasil dikirim! Segera unggah bukti pembayaran di menu Order.' : 'Order berhasil dikirim! Menunggu verifikasi admin.';
         return redirect()->route('user.order')->with('success', $message);
