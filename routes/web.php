@@ -179,41 +179,93 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/superadmin/user/{user}/deactivate', [\App\Http\Controllers\Superadmin\LaporanPembayaranController::class, 'deactivateUser'])->name('superadmin.user.deactivate');
 });
 
-// Registration Pending Status Page (public, no auth required)
+// Registration Pending Status Page (Secure via Session)
 Route::get('/registration/pending', function (\Illuminate\Http\Request $request) {
-    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
-        ->whereIn('status', ['pending', 'verified', 'konfirmasi'])
-        ->first();
-
-    if (!$pendingUser) {
+    $pendingUserId = session('pending_user_id');
+    
+    if (!$pendingUserId) {
         return redirect()->route('login');
     }
 
-    return view('pending.dashboardPanding', ['pendingUser' => $pendingUser]);
+    $pendingUser = \App\Models\PendingUser::find($pendingUserId);
+
+    if (!$pendingUser) {
+        session()->forget('pending_user_id');
+        return redirect()->route('login')->with('success', 'Pendaftaran Anda telah disetujui! Silakan masuk ke akun Anda.');
+    }
+
+    $plans = \Illuminate\Support\Facades\DB::table('plans')
+        ->whereNotIn('nama_plans', ['Member', 'Superadmin'])
+        ->get();
+
+    // Calculate total payment
+    $totalPembayaran = 0;
+    if ($pendingUser->plan_type) {
+        $planName = trim($pendingUser->plan_type);
+        $searchKey = $planName;
+        
+        // Map simple names to database names if needed
+        if (strtolower($planName) === 'pro') $searchKey = 'MEMBER PRO';
+        if (strtolower($planName) === 'premium') $searchKey = 'MEMBER PREMIUM';
+
+        $langganan = \Illuminate\Support\Facades\DB::table('jenis_langganans')
+            ->whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($searchKey) . '%'])
+            ->first();
+
+        if ($langganan) {
+            $totalPembayaran = (float) $langganan->harga;
+            if (str_contains(strtolower($planName), 'kamar')) {
+                $totalPembayaran *= ($pendingUser->jumlah_kamar ?: 1);
+            }
+        }
+    }
+
+    if (!$pendingUser || !in_array($pendingUser->status, ['pending', 'verified', 'konfirmasi'])) {
+        return redirect()->route('login');
+    }
+
+    return view('pending.dashboardPanding', [
+        'pendingUser' => $pendingUser,
+        'plans' => $plans,
+        'totalPembayaran' => $totalPembayaran
+    ]);
 })->name('registration.pending');
 
 Route::post('/registration/upload-proof', [\App\Http\Controllers\Auth\PendingUserController::class, 'uploadProof'])->name('registration.upload-proof');
 
 Route::post('/registration/cancel', function (\Illuminate\Http\Request $request) {
-    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
-        ->where('status', 'pending')
-        ->first();
+    $pendingUserId = session('pending_user_id');
 
-    if ($pendingUser) {
+    if (!$pendingUserId) {
+        return redirect()->route('login');
+    }
+
+    $pendingUser = \App\Models\PendingUser::find($pendingUserId);
+
+    if ($pendingUser && $pendingUser->status === 'pending') {
         $pendingUser->delete();
+        session()->forget('pending_user_id');
         return redirect('/')->with('success', 'Pendaftaran Anda telah dibatalkan.');
     }
     return redirect()->route('login');
 })->name('registration.cancel');
 
-// Registration Rejected Status Page (public, no auth required)
-Route::get('/registration/rejected', function (\Illuminate\Http\Request $request) {
-    $pendingUser = \App\Models\PendingUser::where('email', $request->email)
-        ->where('status', 'rejected')
-        ->first();
+Route::post('/registration/step-one', [\App\Http\Controllers\Auth\PendingUserDashboardController::class, 'stepOne'])->name('registration.step-one');
+Route::post('/registration/send-otp', [\App\Http\Controllers\Auth\PendingUserDashboardController::class, 'sendOtp'])->name('registration.send-otp');
+Route::post('/registration/verify-otp', [\App\Http\Controllers\Auth\PendingUserDashboardController::class, 'verifyOtp'])->name('registration.verify-otp');
 
-    if (!$pendingUser) {
-        return redirect()->route('login')->with('error', 'Data tidak ditemukan.');
+// Registration Rejected Status Page (Secure via Session)
+Route::get('/registration/rejected', function (\Illuminate\Http\Request $request) {
+    $pendingUserId = session('pending_user_id');
+
+    if (!$pendingUserId) {
+        return redirect()->route('login');
+    }
+
+    $pendingUser = \App\Models\PendingUser::find($pendingUserId);
+
+    if (!$pendingUser || $pendingUser->status !== 'rejected') {
+        return redirect()->route('login');
     }
 
     return view('pending.dashboardDitolak', ['pendingUser' => $pendingUser]);

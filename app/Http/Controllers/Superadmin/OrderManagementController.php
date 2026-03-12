@@ -120,19 +120,15 @@ class OrderManagementController extends Controller
                 // 2. Role & Plan Logic
                 $user->id_plans = 1;
 
-                // Link to kos via kode_kos
-                $isAssignedToKos = false;
+                // Assign appropriate role
                 if ($pendingUser->kode_kos) {
                     $kos = \App\Models\Kos::where('kode_kos', $pendingUser->kode_kos)->first();
                     if ($kos) {
                         $user->id_kos = $kos->id;
-                        $isAssignedToKos = true;
+                        $user->assignRole('users'); // Penyewa
+                    } else {
+                        $user->assignRole('user'); // User Umum
                     }
-                }
-
-                // Assign appropriate role
-                if ($isAssignedToKos) {
-                    $user->assignRole('users'); // Penyewa
                 } else {
                     $user->assignRole('user'); // User Umum
                 }
@@ -167,16 +163,15 @@ class OrderManagementController extends Controller
             ]);
 
             // 2. Role & Plan Logic
-            $planType = $pendingUser->plan_type;
-            $map = [
-                'pro' => 2,
-                'premium' => 3,
-                'premium_perkamar' => 4,
-                'pro_perkamar' => 5
-            ];
-
-            if (isset($map[$planType])) {
-                $user->id_plans = $map[$planType];
+            $planName = trim($pendingUser->plan_type);
+            
+            // Map plan names to IDs (Case-insensitive)
+            $plan = \Illuminate\Support\Facades\DB::table('plans')
+                ->whereRaw('LOWER(nama_plans) = ?', [strtolower($planName)])
+                ->first();
+            
+            if ($plan) {
+                $user->id_plans = $plan->id;
             }
 
             $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
@@ -188,25 +183,22 @@ class OrderManagementController extends Controller
                 ->update(['status' => 'expired']);
 
             // 4. Create active Langganan record
-            $langgananNames = [
-                'pro' => 'MEMBER PRO',
-                'premium' => 'MEMBER PREMIUM',
-                'pro_perkamar' => 'PER KAMAR PRO',
-                'premium_perkamar' => 'PER KAMAR PREMIUM'
-            ];
+            // Match the plan name precisely with Jenis Langganan
+            $searchKey = $planName;
+            if (strtolower($planName) === 'pro') $searchKey = 'MEMBER PRO';
+            if (strtolower($planName) === 'premium') $searchKey = 'MEMBER PREMIUM';
 
-            if (isset($langgananNames[$planType])) {
-                $jenis = \App\Models\JenisLangganan::where('nama', $langgananNames[$planType])->first();
-                if ($jenis) {
-                    \App\Models\Langganan::create([
-                        'id_user' => $user->id,
-                        'id_langganan' => $jenis->id,
-                        'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
-                        'status' => 'active',
-                        'tanggal_pembayaran' => now('Asia/Jakarta'),
-                        'jatuh_tempo' => now('Asia/Jakarta')->addDays(28),
-                    ]);
-                }
+            $jenis = \App\Models\JenisLangganan::whereRaw('LOWER(nama) LIKE ?', ['%' . strtolower($searchKey) . '%'])->first();
+            
+            if ($jenis) {
+                \App\Models\Langganan::create([
+                    'id_user' => $user->id,
+                    'id_langganan' => $jenis->id,
+                    'jumlah_kamar' => $pendingUser->jumlah_kamar ?? 0,
+                    'status' => 'active',
+                    'tanggal_pembayaran' => now('Asia/Jakarta'),
+                    'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
+                ]);
             }
 
             // 4. Automatically create a default Kos record

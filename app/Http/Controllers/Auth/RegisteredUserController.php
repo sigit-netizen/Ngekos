@@ -32,42 +32,25 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'numeric', 'unique:users,nik'],
-            'nomor_wa' => ['required', 'numeric', 'unique:users,nomor_wa'],
-            'tanggal_lahir' => ['required', 'date'],
-            'alamat' => ['required', 'string'],
-            'id_plans' => ['required', 'integer', 'in:1,2,3,4,5'], // 1: Anak Kos, 2-5: various Landlord Plans
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'id_plans' => ['required', 'integer', 'in:1,2'], // 1: Anak Kos, 2: Pemilik Kos
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:pending_users,email'],
             'password' => ['required', Rules\Password::defaults()],
-            'plan_type' => ['nullable', 'string', 'required_unless:id_plans,1'],
-            'package_type' => ['nullable', 'string', 'required_if:plan_type,premium,plan_type,premium_perkamar'],
-            'jumlah_kamar' => ['nullable', 'integer', 'min:1'],
-            'kode_kos' => ['nullable', 'numeric', 'exists:kos,kode_kos'],
-        ], [
-            'kode_kos.exists' => 'Kode kos tidak ditemukan. Pastikan kode kos yang Anda masukkan benar.',
+            // Optional fields (for later completion)
+            'nik' => ['nullable', 'numeric', 'unique:users,nik', 'unique:pending_users,nik'],
+            'nomor_wa' => ['nullable', 'numeric', 'unique:users,nomor_wa', 'unique:pending_users,nomor_wa'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'alamat' => ['nullable', 'string'],
         ]);
 
         \App\Models\PendingUser::create([
             'name' => $request->name,
-            'nik' => $request->nik,
-            'nomor_wa' => $request->nomor_wa,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'alamat' => $request->alamat,
             'id_plans' => $request->id_plans,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'plan_type' => $request->plan_type,
-            'package_type' => $request->package_type,
-            'jumlah_kamar' => $request->jumlah_kamar ?? 0,
-            'kode_kos' => $request->kode_kos,
             'status' => 'pending',
+            // Other fields remain null/default
         ]);
 
-        // Registration event might not be needed yet as they are pending
-        // but keeping it for potential listeners
-        // event(new Registered($user));
-
-        // Membuang user kembali ke halaman login dengan menyertakan session pemberitahuan sukses
         return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Akun Anda sedang dalam antrian verifikasi admin. Mohon tunggu konfirmasi selanjutnya.');
     }
 }

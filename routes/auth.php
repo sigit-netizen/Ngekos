@@ -37,11 +37,11 @@ Route::get('/verify-device', [\App\Http\Controllers\Auth\DeviceOtpController::cl
     ->name('otp.verify');
 
 Route::post('/verify-device', [\App\Http\Controllers\Auth\DeviceOtpController::class, 'verify'])
-    ->middleware('guest')
+    ->middleware(['guest', 'throttle:3,1'])
     ->name('otp.verify.post');
 
 Route::post('/verify-device/resend', [\App\Http\Controllers\Auth\DeviceOtpController::class, 'resend'])
-    ->middleware('guest')
+    ->middleware(['guest', 'throttle:1,1'])
     ->name('otp.resend');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])

@@ -55,28 +55,16 @@
                         Isi data berikut untuk mendaftar!
                     </p>
                 </div>
-                <form method="POST" action="{{ route('register') }}"
-                    onsubmit="if(!document.querySelector('input[name=id_plans]').value){ window.swalToast('Silakan pilih Mendaftar Sebagai (Peran) terlebih dahulu!', 'warning'); return false; }">
+                <form method="POST" action="{{ route('register') }}">
                     @csrf
-                    <div class="space-y-5" x-data="{ 
-                                                                selectedRole: '{{ old('id_plans') }}',
-                                                                roleText: '{{ old('id_plans') == '1' ? 'Anak Kos' : (old('id_plans') == '2' ? 'Pemilik Kos' : 'Pilih peran...') }}',
-                                                                planType: '{{ old('plan_type') }}',
-                                                                planText: '{{ old('plan_type') == 'pro' ? 'Pro Plan' : (old('plan_type') == 'premium' ? 'Premium Plan' : 'Pilih tipe plan...') }}',
-                                                                packageType: 'monthly',
-                                                            packageText: 'Bulanan (Monthly)',
-                                                            isOpenRole: false,
-                                                            isOpenPlan: false,
-                                                            isOpenPackage: false
-                                                        }">
+                    <div class="space-y-5" x-data="{ selectedRole: '{{ old('id_plans', '1') }}' }">
 
+                        <!-- Nama Lengkap -->
                         <div class="group">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
+                            <label class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Nama Lengkap<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}"
-                                placeholder="Masukkan nama lengkap"
+                            <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="Masukkan nama lengkap"
                                 class="h-12 w-full rounded-xl border {{ $errors->has('name') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300"
                                 required />
                             @error('name')
@@ -84,271 +72,68 @@
                             @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <div class="group">
-                                <label
-                                    class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                    NIK<span class="text-red-500 ml-1">*</span>
-                                </label>
-                                <input type="number" id="nik" name="nik" value="{{ old('nik') }}" placeholder="Masukkan NIK"
-                                    class="h-12 w-full rounded-xl border {{ $errors->has('nik') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300"
-                                    required />
-                                @error('nik')
-                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="group">
-                                <label
-                                    class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                    Nomor WhatsApp<span class="text-red-500 ml-1">*</span>
-                                </label>
-                                <input type="number" id="nomor_wa" name="nomor_wa" value="{{ old('nomor_wa') }}"
-                                    placeholder="08..." required
-                                    class="h-12 w-full rounded-xl border {{ $errors->has('nomor_wa') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
-                                @error('nomor_wa')
-                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-
+                        <!-- Role Selection (Radio Buttons) -->
                         <div class="group">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                Tanggal Lahir<span class="text-red-500 ml-1">*</span>
-                            </label>
-                            <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
-                                required
-                                class="h-12 w-full rounded-xl border {{ $errors->has('tanggal_lahir') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
-                            @error('tanggal_lahir')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="group">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                Alamat Domisili<span class="text-red-500 ml-1">*</span>
-                            </label>
-                            <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap" required
-                                class="w-full rounded-xl border {{ $errors->has('alamat') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} p-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300">{{ old('alamat') }}</textarea>
-                            @error('alamat')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Role Selection (Dropdown) -->
-                        <div class="group" @click.outside="isOpenRole = false">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
+                            <label class="mb-3 block text-sm font-semibold text-gray-700">
                                 Mendaftar Sebagai<span class="text-red-500 ml-1">*</span>
                             </label>
-
-                            <div class="relative">
-                                <!-- Hidden Input to Store Selected Value -->
-                                <input type="hidden" name="id_plans" x-model="selectedRole" required>
-
-                                <!-- Custom Select Button -->
-                                <button type="button" @click="isOpenRole = !isOpenRole"
-                                    class="relative h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 text-left text-sm text-gray-800 focus:border-[#36B2B2] focus:bg-white focus:ring-4 focus:ring-[#36B2B2]/10 focus:outline-none transition-all duration-300 shadow-sm"
-                                    :class="{ 'text-gray-800': selectedRole, 'text-gray-400': !selectedRole, 'bg-white border-[#36B2B2] ring-4 ring-[#36B2B2]/10': isOpenRole }">
-                                    <span x-text="roleText" class="block truncate"></span>
-                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-                                        <svg class="h-5 w-5 text-gray-400 transition-transform duration-300"
-                                            :class="{ 'rotate-180': isOpenRole }" xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd"
-                                                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </button>
-
-                                <!-- Dropdown Options -->
-                                <ul x-show="isOpenRole" x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 translate-y-2"
-                                    x-transition:enter-end="opacity-100 translate-y-0"
-                                    x-transition:leave="transition ease-in duration-150"
-                                    x-transition:leave-start="opacity-100 translate-y-0"
-                                    x-transition:leave-end="opacity-0 translate-y-2"
-                                    class="absolute z-20 mt-1 w-full rounded-xl bg-white/95 backdrop-blur-xl shadow-lg border border-gray-100 py-2 text-sm text-gray-700 max-h-60 overflow-auto focus:outline-none ring-1 ring-black ring-opacity-5"
-                                    style="display: none;">
-
-                                    <li @click="selectedRole = '1'; roleText = 'Anak Kos'; isOpenRole = false; planType = ''; packageType = ''"
-                                        class="group relative cursor-pointer select-none py-3 pl-4 pr-9 hover:bg-gray-50 hover:text-[#36B2B2] transition-colors"
-                                        :class="{ 'bg-gray-50 text-[#36B2B2] font-medium': selectedRole === '1' }">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="flex-shrink-0 h-8 w-8 rounded-lg bg-[#36B2B2]/10 flex items-center justify-center text-[#36B2B2]">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span class="block font-medium">Anak Kos</span>
-                                                <span class="block text-xs text-gray-500 group-hover:text-gray-600">Saya
-                                                    ingin mencari dan menyewa kos</span>
-                                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Penyewa / Anak Kos -->
+                                <label class="relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300"
+                                    :class="selectedRole === '1' ? 'border-[#36B2B2] bg-[#36B2B2]/5 ring-2 ring-[#36B2B2]/10' : 'border-gray-100 bg-gray-50/50 hover:border-gray-200'">
+                                    <input type="radio" name="id_plans" value="1" x-model="selectedRole" class="sr-only" required>
+                                    <div class="flex w-full items-center gap-3">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors"
+                                            :class="selectedRole === '1' ? 'bg-[#36B2B2] text-white' : 'bg-gray-200 text-gray-400'">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
                                         </div>
-                                        <span x-show="selectedRole === '1'"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-4 text-[#36B2B2]">
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </span>
-                                    </li>
-
-                                    <div class="border-t border-gray-100 my-1"></div>
-
-                                    <li @click="selectedRole = '2'; roleText = 'Pemilik Kos'; isOpenRole = false"
-                                        class="group relative cursor-pointer select-none py-3 pl-4 pr-9 hover:bg-gray-50 hover:text-[#36B2B2] transition-colors"
-                                        :class="{ 'bg-gray-50 text-[#36B2B2] font-medium': selectedRole === '2' }">
-                                        <div class="flex items-center gap-3">
-                                            <div
-                                                class="flex-shrink-0 h-8 w-8 rounded-lg bg-[#36B2B2]/10 flex items-center justify-center text-[#36B2B2]">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span class="block font-medium">Pemilik Kos</span>
-                                                <span class="block text-xs text-gray-500 group-hover:text-gray-600">Saya
-                                                    ingin menyewakan dan mengelola kos</span>
-                                            </div>
-                                        </div>
-                                        <span x-show="selectedRole === '2'"
-                                            class="absolute inset-y-0 right-0 flex items-center pr-4 text-[#36B2B2]">
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
-
-
-
-                            <!-- Additional Fields for Pemilik Kos -->
-                            <div x-show="selectedRole === '2'" x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 transform -translate-y-4"
-                                x-transition:enter-end="opacity-100 transform translate-y-0" class="mt-4 space-y-4">
-
-                                <!-- Plan Type Dropdown -->
-                                <div class="group" @click.outside="isOpenPlan = false">
-                                    <label class="mb-2 block text-sm font-semibold text-[#36B2B2]">
-                                        Tipe Plan (Subscription)<span class="text-red-500 ml-1">*</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="hidden" name="plan_type" x-model="planType">
-                                        <button type="button" @click="isOpenPlan = !isOpenPlan"
-                                            class="relative h-12 w-full rounded-xl border border-[#36B2B2]/30 bg-[#36B2B2]/5 px-4 text-left text-sm text-gray-800 transition-all duration-300">
-                                            <span x-text="planText"></span>
-                                            <span
-                                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
-                                                <svg class="h-5 w-5 text-[#36B2B2]" :class="{ 'rotate-180': isOpenPlan }"
-                                                    fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                        d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" />
-                                                </svg>
-                                            </span>
-                                        </button>
-                                        <ul x-show="isOpenPlan"
-                                            class="absolute z-30 mt-1 w-full rounded-xl bg-white shadow-lg border border-gray-100 py-2 text-sm overflow-hidden min-w-[250px]">
-                                            <li @click="planType = 'pro'; planText = 'Pro Plan'; selectedRole = '2'; isOpenPlan = false"
-                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
-                                                <div class="font-bold text-gray-900 text-sm">Pro Plan</div>
-                                                <div class="text-[10px] text-gray-500 italic">Standar pengelolaan kos daring
-                                                </div>
-                                            </li>
-                                            <li @click="planType = 'premium'; planText = 'Premium Plan'; selectedRole = '3'; isOpenPlan = false"
-                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
-                                                <div class="font-bold text-amber-600 text-sm">Premium Plan</div>
-                                                <div class="text-[10px] text-gray-500 italic">Laporan keuangan & tagihan
-                                                    sistem</div>
-                                            </li>
-                                            <li @click="planType = 'pro_perkamar'; planText = 'Pro Per Kamar'; selectedRole = '5'; isOpenPlan = false"
-                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors border-b border-gray-50">
-                                                <div class="font-bold text-gray-900 text-sm">Pro Per Kamar</div>
-                                                <div class="text-[10px] text-gray-500 italic">Optimasi pengelolaan unit
-                                                    kamar</div>
-                                            </li>
-                                            <li @click="planType = 'premium_perkamar'; planText = 'Premium Per Kamar'; selectedRole = '4'; isOpenPlan = false"
-                                                class="px-4 py-3 hover:bg-[#36B2B2]/10 cursor-pointer transition-colors">
-                                                <div class="font-bold text-amber-600 text-sm">Premium Per Kamar</div>
-                                                <div class="text-[10px] text-gray-500 italic">Manajemen unit premium
-                                                    terlengkap</div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- Package Duration Dropdown (Muncul jika pilih Premium) -->
-                                <div x-show="planType === 'premium' || planType === 'premium_perkamar'"
-                                    x-transition:enter="transition ease-out duration-300"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-4"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0" class="group"
-                                    @click.outside="isOpenPackage = false">
-                                    <input type="hidden" name="package_type" x-model="packageType">
-                                </div>
-
-                                <!-- Field Jumlah Kamar (Muncul jika pilih Per Kamar) -->
-                                <div x-show="planType === 'pro_perkamar' || planType === 'premium_perkamar'"
-                                    x-transition:enter="transition ease-out duration-300"
-                                    x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                    x-transition:enter-end="opacity-100 transform translate-y-0" class="group">
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
-                                        Jumlah Kamar<span class="text-red-500 ml-1">*</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" name="jumlah_kamar" min="1"
-                                            placeholder="Masukkan jumlah unit kamar"
-                                            class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 pl-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-[#36B2B2] focus:bg-white focus:outline-none transition-all duration-300"
-                                            :required="planType === 'pro_perkamar' || planType === 'premium_perkamar'" />
-                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                            </svg>
+                                        <div>
+                                            <p class="text-sm font-bold" :class="selectedRole === '1' ? 'text-[#36B2B2]' : 'text-gray-700'">Penyewa</p>
+                                            <p class="text-[10px] text-gray-500">Cari kos</p>
                                         </div>
                                     </div>
-                                    <p class="mt-1 text-[10px] text-gray-400 italic">Harga akan dikalikan dengan jumlah
-                                        kamar yang Anda kelola.</p>
-                                </div>
+                                </label>
 
-
+                                <!-- Pemilik Kos -->
+                                <label class="relative flex cursor-pointer rounded-xl border-2 p-4 transition-all duration-300"
+                                    :class="selectedRole === '2' ? 'border-[#36B2B2] bg-[#36B2B2]/5 ring-2 ring-[#36B2B2]/10' : 'border-gray-100 bg-gray-50/50 hover:border-gray-200'">
+                                    <input type="radio" name="id_plans" value="2" x-model="selectedRole" class="sr-only">
+                                    <div class="flex w-full items-center gap-3">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors"
+                                            :class="selectedRole === '2' ? 'bg-[#36B2B2] text-white' : 'bg-gray-200 text-gray-400'">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold" :class="selectedRole === '2' ? 'text-[#36B2B2]' : 'text-gray-700'">Pemilik</p>
+                                            <p class="text-[10px] text-gray-500">Kelola kos</p>
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                             @error('id_plans')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
+                        <!-- Email -->
                         <div class="group">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
+                            <label class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Email<span class="text-red-500 ml-1">*</span>
                             </label>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}"
-                                placeholder="contoh@mail.com" required
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="contoh@mail.com" required
                                 class="h-12 w-full rounded-xl border {{ $errors->has('email') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                             @error('email')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Password Input -->
+                        <!-- Password -->
                         <div class="group">
-                            <label
-                                class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
+                            <label class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Password<span class="text-red-500 ml-1">*</span>
                             </label>
                             <div x-data="{ showPassword: false }" class="relative">
@@ -357,17 +142,12 @@
                                     class="h-12 w-full rounded-xl border {{ $errors->has('password') ? 'border-red-500 bg-red-50/50 focus:ring-0' : 'border-gray-200 bg-gray-50/50 focus:border-[#36B2B2] focus:ring-[#36B2B2]/10' }} py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none transition-all duration-300" />
                                 <button type="button" @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-4 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none">
-                                    <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                    <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                     </svg>
-                                    <svg x-show="showPassword" style="display: none;" class="w-5 h-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    <svg x-show="showPassword" style="display: none;" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </button>
                             </div>
@@ -378,19 +158,14 @@
 
                         <!-- Checkbox -->
                         <div x-data="{ checkboxToggle: false }" class="pt-1">
-                            <label for="checkboxLabelOne"
-                                class="flex cursor-pointer items-start text-sm font-normal text-gray-600 select-none group">
+                            <label for="checkboxLabelOne" class="flex cursor-pointer items-start text-sm font-normal text-gray-600 select-none group">
                                 <div class="relative mt-0.5">
-                                    <input type="checkbox" id="checkboxLabelOne" class="sr-only" required
-                                        @change="checkboxToggle = !checkboxToggle" />
+                                    <input type="checkbox" id="checkboxLabelOne" class="sr-only" required @change="checkboxToggle = !checkboxToggle" />
                                     <div :class="checkboxToggle ? 'border-[#36B2B2] bg-[#36B2B2]' : 'bg-white border-gray-300 group-hover:border-[#36B2B2]'"
                                         class="mr-3 flex h-5 w-5 items-center justify-center rounded border transition-colors duration-200">
-                                        <span :class="checkboxToggle ? 'opacity-100 scale-100' : 'opacity-0 scale-50'"
-                                            class="transition-all duration-200 ease-out">
-                                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <span :class="checkboxToggle ? 'opacity-100 scale-100' : 'opacity-0 scale-50'" class="transition-all duration-200 ease-out">
+                                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
                                         </span>
                                     </div>
@@ -410,16 +185,12 @@
                                 class="w-full relative flex items-center justify-center rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] px-4 py-4 text-sm font-bold text-white shadow-lg shadow-[#36b2b2]/30 hover:shadow-[#36b2b2]/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
                                 <span class="relative z-10 flex items-center gap-2">
                                     Daftar Sekarang
-                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </span>
                                 <!-- Hover flare effect -->
-                                <div
-                                    class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1s_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent">
-                                </div>
+                                <div class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1s_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                             </button>
                         </div>
                     </div>

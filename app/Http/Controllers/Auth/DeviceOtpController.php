@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 
 class DeviceOtpController extends Controller
 {
@@ -47,7 +48,7 @@ class DeviceOtpController extends Controller
             return redirect()->route('login');
 
         // Generate 6-digit OTP
-        $otp = rand(100000, 999999);
+        $otp = random_int(100000, 999999);
         $user->update([
             'otp' => $otp,
             'otp_expires_at' => now()->addMinutes(1) // 1 minute expiry as requested
@@ -102,12 +103,29 @@ class DeviceOtpController extends Controller
             return back()->with('error', 'Kode OTP sudah kadaluarsa. Silakan minta kode baru.');
         }
 
+        $throttleKey = 'otp-verify-' . $userId;
+        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            $hours = ceil($seconds / 3600);
+            return back()->with('error', "Terlalu banyak percobaan salah. Verifikasi ditangguhkan selama 24 jam. Silakan coba lagi dalam $hours jam.");
+        }
+
         // Check if correct (Relaxed comparison to avoid string/int type mismatch)
         if ($user->otp != $otpInput) {
-            return back()->with('error', 'Kode OTP salah.');
+            RateLimiter::hit($throttleKey, 86400); // Lock for 24 hours after 3 hits
+            
+            $remaining = RateLimiter::remaining($throttleKey, 3);
+            $message = 'Kode OTP salah.';
+            
+            if ($remaining === 1) {
+                $message .= ' Hati-hati, sisa 1 kesempatan lagi sebelum akun ditangguhkan 24 jam!';
+            }
+
+            return back()->with('error', $message);
         }
 
         // OTP is correct! Clear it and sessions
+        RateLimiter::clear($throttleKey);
         $user->update(['otp' => null, 'otp_expires_at' => null]);
 
         DB::table('sessions')->where('user_id', $user->id)->delete();
@@ -142,7 +160,13 @@ class DeviceOtpController extends Controller
             return response()->json(['success' => false], 403);
 
         $user = User::find($userId);
-        $otp = rand(100000, 999999);
+        $throttleKey = 'otp-resend-' . $userId;
+        if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
+            return back()->with('error', 'Harap tunggu 1 menit sebelum mengirim ulang kode.');
+        }
+        RateLimiter::hit($throttleKey, 60);
+
+        $otp = random_int(100000, 999999);
         $user->update([
             'otp' => $otp,
             'otp_expires_at' => now()->addMinutes(1)

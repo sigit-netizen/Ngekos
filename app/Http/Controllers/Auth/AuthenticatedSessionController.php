@@ -25,20 +25,37 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Check if user's registration is still in the staging area (pending_users)
-        $pendingUser = \App\Models\PendingUser::where('email', $request->email)->first();
+        // 1. Try normal authentication first
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-        if ($pendingUser) {
-            if (in_array($pendingUser->status, ['pending', 'verified', 'konfirmasi'])) {
-                return redirect()->route('registration.pending', ['email' => $pendingUser->email]);
+        if ($user) {
+            $request->authenticate();
+            // ... normal flow continues below ...
+        } else {
+            $pendingUser = \App\Models\PendingUser::where('email', $request->email)->first();
+            if ($pendingUser && \Illuminate\Support\Facades\Hash::check($request->password, $pendingUser->password)) {
+                // Securely store pending user info in session
+                session(['pending_user_id' => $pendingUser->id]);
+
+                if (in_array($pendingUser->status, ['pending', 'verified', 'konfirmasi'])) {
+                    return redirect()->route('registration.pending');
+                }
+
+                if ($pendingUser->status === 'rejected') {
+                    return redirect()->route('registration.rejected');
+                }
+            } else {
+                // If it was a pending session but user is now in 'users' table or deleted
+                $officialUser = \App\Models\User::where('email', $request->email)->first();
+                if ($officialUser && \Illuminate\Support\Facades\Hash::check($request->password, $officialUser->password)) {
+                    session()->forget('pending_user_id');
+                }
             }
 
-            if ($pendingUser->status === 'rejected') {
-                return redirect()->route('registration.rejected', ['email' => $pendingUser->email]);
-            }
+            // 3. Fallback to normal authenticate() which will handle rate limiting and throw error
+            $request->authenticate();
         }
 
-        $request->authenticate();
         $user = Auth::user();
 
         // Check if there are active sessions on OTHER devices

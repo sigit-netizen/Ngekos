@@ -74,6 +74,9 @@ class SubscriptionManagementController extends Controller
             }
         }
 
+        $kos = $user->kos()->first();
+        $currentRoomsCount = $kos ? $kos->kamars()->count() : 0;
+
         // If it's the admin/member routes, we use the specific billing view
         if (request()->is('admin/tagihan-sistem')) {
             return view('member.tagihan_sistem', [
@@ -87,6 +90,7 @@ class SubscriptionManagementController extends Controller
                 'computedStatus' => $computedStatus,
                 'graceDaysRemaining' => $graceDaysRemaining,
                 'matiDaysCount' => $matiDaysCount,
+                'currentRoomsCount' => $currentRoomsCount,
                 'role' => 'admin'
             ]);
         }
@@ -125,6 +129,17 @@ class SubscriptionManagementController extends Controller
 
         if ($existingPending && $existingPending->bukti_pembayaran && !$existingPending->updated_at->addDay()->isPast()) {
             return back()->with('error', 'Pesanan Anda sedang diverifikasi oleh Admin. Tunggu verifikasi selesai atau tunggu 24 jam hingga sistem reset otomatis.');
+        }
+
+        // Room count validation for "per kamar" plans
+        if (in_array($request->id_langganan, [4, 5])) {
+            $kos = $user->kos()->first();
+            $currentRoomsCount = $kos ? $kos->kamars()->count() : 0;
+            $requestedRooms = $request->jumlah_kamar ?? 0;
+
+            if ($requestedRooms < $currentRoomsCount) {
+                return back()->with('error', "Jumlah kamar dalam paket ($requestedRooms) tidak boleh kurang dari jumlah kamar yang telah Anda miliki ($currentRoomsCount). Silakan hapus beberapa kamar terlebih dahulu atau tambahkan jumlah kamar dalam paket.");
+            }
         }
 
         // Use updateOrCreate on the STAGING table

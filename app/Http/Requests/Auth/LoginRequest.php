@@ -42,18 +42,29 @@ class LoginRequest extends FormRequest
             ->first();
 
         if (!$user) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), 86400);
+            $remaining = RateLimiter::remaining($this->throttleKey(), 5);
+            $message = 'Email tidak terdaftar.';
+            if ($remaining === 1) {
+                $message = 'Email tidak terdaftar. Hati-hati, sisa 1 kesempatan lagi!';
+            }
 
             throw ValidationException::withMessages([
-                'email' => 'Email tidak terdaftar.',
+                'email' => $message,
             ]);
         }
 
         if (!\Illuminate\Support\Facades\Hash::check($this->password, $user->password)) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), 86400);
+
+            $remaining = RateLimiter::remaining($this->throttleKey(), 5);
+            $message = 'Password salah.';
+            if ($remaining === 1) {
+                $message = 'Password salah. Hati-hati, sisa 1 kesempatan lagi!';
+            }
 
             throw ValidationException::withMessages([
-                'password' => 'Password salah.',
+                'password' => $message,
             ]);
         }
 
@@ -76,12 +87,10 @@ class LoginRequest extends FormRequest
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+        $hours = ceil($seconds / 3600);
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => "Terlalu banyak percobaan login. Akun ditangguhkan selama 24 jam. Silakan coba lagi dalam $hours jam.",
         ]);
     }
 

@@ -484,6 +484,10 @@
                             <input type="number" name="jumlah_kamar" min="1" :disabled="!isPerKamar"
                                 value="{{ max(1, $subscription?->jumlah_kamar ?? 1) }}"
                                 class="w-full rounded-xl border-gray-100 bg-gray-50 text-sm font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 transition-all">
+                            <p class="text-[10px] text-gray-500 mt-2 italic">
+                                * Anda saat ini memiliki <span class="font-bold text-[#36B2B2]">{{ $currentRoomsCount }} Kamar</span>.
+                                Jumlah paket tidak boleh kurang dari ini.
+                            </p>
                         </div>
 
                         <button type="submit" 
