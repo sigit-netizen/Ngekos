@@ -14,8 +14,8 @@ class JenisLanggananSeeder extends Seeder
     {
         $data = [
             ['nama' => 'MEMBER BIASA', 'harga' => 0],
-            ['nama' => 'MEMBER PREMIUM', 'harga' => 50000],
             ['nama' => 'MEMBER PRO', 'harga' => 80000],
+            ['nama' => 'MEMBER PREMIUM', 'harga' => 50000],
             ['nama' => 'PER KAMAR PREMIUM', 'harga' => 3000],
             ['nama' => 'PER KAMAR PRO', 'harga' => 5000],
         ];

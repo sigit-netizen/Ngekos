@@ -19,7 +19,7 @@ self.addEventListener('push', function (e) {
             actions: msg.actions || [],
             requireInteraction: true, // Notification stays until clicked
             vibrate: [200, 100, 200],
-            tag: 'order-notification' // Prevent duplicate notifications
+            tag: 'order-notification-' + Date.now() // Assign unique tag so they don't overwrite
         };
 
         e.waitUntil(

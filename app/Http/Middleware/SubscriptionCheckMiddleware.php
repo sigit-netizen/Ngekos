@@ -59,6 +59,11 @@ class SubscriptionCheckMiddleware
             return $next($request);
         }
 
+        // Bypass for billing page - always accessible
+        if ($request->is('admin/tagihan-sistem*')) {
+            return $next($request);
+        }
+
         // CRITICAL: Handle Pending/Rejected Status
         if ($user->status !== 'active') {
             // If REJECTED, logout and notify
@@ -72,20 +77,6 @@ class SubscriptionCheckMiddleware
             // If PENDING, redirect to dedicated pending dashboard (if not already there)
             if ($user->status === 'pending' && !$request->is('pending')) {
                 return redirect()->route('pending.dashboard');
-            }
-        }
-
-        // Enforce active subscription for Admin/Member
-        if ($user->hasRole('admin')) {
-            $hasActiveSubscription = \App\Models\Langganan::where('id_user', $user->id)
-                ->where('status', 'active')
-                ->exists();
-
-            if (!$hasActiveSubscription) {
-                if ($request->is('admin*')) {
-                    Auth::logout();
-                    return redirect()->route('login')->with('error', 'Akun Anda sedang menunggu verifikasi admin. Silakan coba lagi nanti.');
-                }
             }
         }
 

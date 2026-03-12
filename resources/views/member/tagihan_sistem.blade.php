@@ -2,16 +2,20 @@
 
 @section('dashboard-content')
     <div x-data="{ 
-                showUploadModal: false, 
-                selectedPlanName: '{{ addslashes($subscription?->jenis_langganan?->nama ?? '') }}',
-                selectedPlanAmount: {{ $subscription?->jenis_langganan?->harga ?? 0 }},
-                previewUrl: null,
-                isPerKamar: false,
-                checkPlan(el) {
-                    if(!el) return;
-                    this.isPerKamar = el.options[el.selectedIndex].text.toLowerCase().includes('kamar');
-                }
-            }"
+                        showUploadModal: false, 
+                        selectedPlanName: '{{ addslashes(($pendingSubscription ?? $subscription)?->jenis_langganan?->nama ?? '') }}',
+                        selectedPlanAmount: {{ 
+                            $pendingSubscription
+        ? (in_array($pendingSubscription->id_langganan, [4, 5]) ? $pendingSubscription->jenis_langganan->harga * $pendingSubscription->jumlah_kamar : $pendingSubscription->jenis_langganan->harga)
+        : ($subscription?->jenis_langganan?->harga ?? 0) 
+                        }},
+                        previewUrl: null,
+                        isPerKamar: false,
+                        checkPlan(el) {
+                            if(!el) return;
+                            this.isPerKamar = el.options[el.selectedIndex].text.toLowerCase().includes('kamar');
+                        }
+                    }"
         x-init="$watch('showUploadModal', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/50 mb-8" data-aos="fade-up">
@@ -24,63 +28,77 @@
             @if($pendingSubscription->bukti_pembayaran)
                 {{-- Waiting for Verification State --}}
                 <div class="bg-emerald-50 rounded-[2.5rem] p-10 sm:p-16 shadow-xl shadow-emerald-900/5 mb-10 overflow-hidden relative group border-2 border-emerald-100"
-                    data-aos="fade-down"
-                    x-data="{
-                        deadline: {{ $pendingSubscription->updated_at->addDay()->timestamp * 1000 }},
-                        remaining: '00:00:00',
-                        updateTimer() {
-                            let now = new Date().getTime();
-                            let diff = this.deadline - now;
-                            if (diff <= 0) {
-                                this.remaining = '00:00:00';
-                                return;
-                            }
-                            let h = Math.floor(diff / (1000 * 60 * 60));
-                            let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                            let s = Math.floor((diff % (1000 * 60)) / 1000);
-                            this.remaining = 
-                                String(h).padStart(2, '0') + ':' + 
-                                String(m).padStart(2, '0') + ':' + 
-                                String(s).padStart(2, '0');
-                        }
-                    }"
-                    x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
+                    data-aos="fade-down" x-data="{
+                                                deadline: {{ $pendingSubscription->updated_at->addDay()->timestamp * 1000 }},
+                                                remaining: '00:00:00',
+                                                updateTimer() {
+                                                    let now = new Date().getTime();
+                                                    let diff = this.deadline - now;
+                                                    if (diff <= 0) {
+                                                        this.remaining = '00:00:00';
+                                                        return;
+                                                    }
+                                                    let h = Math.floor(diff / (1000 * 60 * 60));
+                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                    this.remaining = 
+                                                        String(h).padStart(2, '0') + ':' + 
+                                                        String(m).padStart(2, '0') + ':' + 
+                                                        String(s).padStart(2, '0');
+                                                }
+                                            }" x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
                     {{-- Decorative background elements --}}
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-100/50 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-emerald-200/50 transition-colors duration-700"></div>
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-emerald-100/50 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-emerald-200/50 transition-colors duration-700">
+                    </div>
                     <div class="absolute bottom-0 left-0 w-48 h-48 bg-emerald-100/30 rounded-full -ml-24 -mb-24 blur-2xl"></div>
 
                     <div class="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
-                        <div class="w-24 h-24 bg-white rounded-[2rem] shadow-xl shadow-emerald-200/50 flex items-center justify-center mb-8 relative group-hover:scale-110 transition-transform duration-500">
+                        <div
+                            class="w-24 h-24 bg-white rounded-[2rem] shadow-xl shadow-emerald-200/50 flex items-center justify-center mb-8 relative group-hover:scale-110 transition-transform duration-500">
                             {{-- Pulse effect --}}
                             <div class="absolute inset-0 bg-emerald-400 rounded-[2rem] animate-ping opacity-20"></div>
-                            
-                            <svg class="w-12 h-12 text-emerald-500 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                            <svg class="w-12 h-12 text-emerald-500 relative z-10" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
 
                         <h3 class="text-3xl font-black text-emerald-950 uppercase tracking-tighter mb-4">Bukti Terkirim! 🚀</h3>
                         <div class="h-1.5 w-20 bg-emerald-400 rounded-full mb-8"></div>
-                        
+
                         <p class="text-emerald-900 text-lg font-bold leading-relaxed mb-6">
-                            Terima kasih! Bukti pembayaran Anda untuk paket <span class="bg-emerald-200/50 px-2 py-1 rounded text-emerald-950">{{ $pendingSubscription->jenis_langganan->nama }}</span> sudah kami terima.
+                            Terima kasih! Bukti pembayaran Anda untuk paket <span
+                                class="bg-emerald-200/50 px-2 py-1 rounded text-emerald-950">{{ $pendingSubscription->jenis_langganan->nama }}</span>
+                            sudah kami terima.
                         </p>
 
-                        <div class="flex flex-col items-center gap-4">
-                            <div class="bg-white/60 backdrop-blur-sm px-8 py-4 rounded-2xl border border-emerald-100 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-emerald-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
+                            <div
+                                class="bg-white/60 backdrop-blur-sm px-8 py-4 rounded-2xl border border-emerald-100 flex items-center gap-3">
+                                <svg class="w-5 h-5 text-emerald-600 animate-spin" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                                    </circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
                                 </svg>
-                                <span class="text-sm font-black text-emerald-900 uppercase tracking-widest">Menunggu Konfirmasi Admin</span>
+                                <span class="text-sm font-black text-emerald-900 uppercase tracking-widest">Menunggu Konfirmasi
+                                    Admin</span>
                             </div>
 
-                            <div class="flex items-center gap-2 bg-emerald-950 text-emerald-400 px-6 py-2 rounded-full shadow-lg border border-emerald-800">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="text-lg font-black tracking-widest font-mono" x-text="remaining">00:00:00</span>
-                            </div>
+                        </div>
+
+                        <div
+                            class="mt-4 flex items-center gap-2 bg-emerald-950 text-emerald-400 px-6 py-2 rounded-full shadow-lg border border-emerald-800">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-lg font-black tracking-widest font-mono" x-text="remaining">00:00:00</span>
                         </div>
 
                         <p class="mt-8 text-xs text-emerald-700/60 font-medium italic">
@@ -110,13 +128,17 @@
                                 </div>
                             </div>
 
-                            <p class="text-blue-800 text-lg font-semibold mb-10 leading-relaxed">
-                                Anda telah memilih paket <span
-                                    class="text-blue-600 font-extrabold underline decoration-blue-200 underline-offset-4">{{ $pendingSubscription->jenis_langganan->nama }}</span>.
-                                Silakan lakukan pembayaran sebesar <span class="text-gray-900 font-black">Rp
-                                    {{ number_format($pendingSubscription->jenis_langganan->harga, 0, ',', '.') }}</span> ke salah satu
-                                rekening di bawah ini:
-                            </p>
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-10">
+                                <p class="text-blue-800 text-lg font-semibold leading-relaxed">
+                                    Anda telah memilih paket <span
+                                        class="text-blue-600 font-extrabold underline decoration-blue-200 underline-offset-4">{{ $pendingSubscription->jenis_langganan->nama }}</span>.
+                                    Silakan lakukan pembayaran sebesar <span class="text-gray-900 font-black">Rp
+                                        {{ number_format(in_array($pendingSubscription->id_langganan, [4, 5]) ? $pendingSubscription->jenis_langganan->harga * $pendingSubscription->jumlah_kamar : $pendingSubscription->jenis_langganan->harga, 0, ',', '.') }}</span>
+                                    ke salah satu
+                                    rekening di bawah ini:
+                                </p>
+
+                            </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div
@@ -138,7 +160,9 @@
                             <div
                                 class="bg-white rounded-[2.5rem] p-10 text-center shadow-xl relative overflow-hidden group/card h-full flex flex-col justify-center border-2 border-blue-100">
                                 {{-- Decorative light circle --}}
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-10 -mt-10 blur-2xl opacity-50"></div>
+                                <div
+                                    class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-10 -mt-10 blur-2xl opacity-50">
+                                </div>
 
                                 <div
                                     class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-blue-100">
@@ -169,9 +193,11 @@
 
         {{-- Rejected Notification --}}
         @if($pendingSubscription?->status == 'rejected')
-            <div class="bg-rose-50 border-l-4 border-rose-500 p-6 mb-10 rounded-r-[2rem] shadow-sm shadow-rose-900/5" data-aos="fade-down">
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-6 mb-10 rounded-r-[2rem] shadow-sm shadow-rose-900/5"
+                data-aos="fade-down">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-rose-200">
+                    <div
+                        class="w-12 h-12 bg-rose-500 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-rose-200">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -179,7 +205,8 @@
                     <div>
                         <h4 class="text-rose-900 font-black uppercase tracking-tight mb-1">Pembayaran Paket Ditolak</h4>
                         <p class="text-rose-800 text-sm font-medium leading-relaxed">
-                            Maaf, bukti pembayaran Anda ditolak oleh admin. Silakan periksa kembali nominal atau kualitas foto bukti bayar Anda, lalu ajukan kembali.
+                            Maaf, bukti pembayaran Anda ditolak oleh admin. Silakan periksa kembali nominal atau kualitas foto
+                            bukti bayar Anda, lalu ajukan kembali.
                         </p>
                     </div>
                 </div>
@@ -248,7 +275,7 @@
                             </svg>
                             Paket Aktif Saat Ini
                         </h3>
-                         @if($subscription)
+                        @if($subscription)
                             @if($computedStatus == 'active')
                                 <span
                                     class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-green-50 text-green-600 border border-green-100 uppercase tracking-tighter">
@@ -459,11 +486,39 @@
                                 class="w-full rounded-xl border-gray-100 bg-gray-50 text-sm font-bold focus:border-[#36B2B2] focus:ring-[#36B2B2]/10 transition-all">
                         </div>
 
-                        <button type="submit"
-                            class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all active:scale-95 shadow-lg shadow-gray-200 mt-2">
-                            Proses Pembelian
+                        <button type="submit" 
+                                @if($pendingSubscription?->status == 'pending' && $pendingSubscription->bukti_pembayaran && !$pendingSubscription->updated_at->addDay()->isPast()) disabled @endif 
+                                class="w-full py-4 rounded-xl font-bold transition-all active:scale-95 shadow-lg mt-2 flex items-center justify-center gap-2
+                                @if($pendingSubscription?->status == 'pending' && $pendingSubscription->bukti_pembayaran && !$pendingSubscription->updated_at->addDay()->isPast())
+                                    bg-gray-100 text-gray-400 cursor-not-allowed shadow-none
+                                @else
+                                    bg-gray-900 text-white hover:bg-black shadow-gray-200
+                                @endif">
+                            @if($pendingSubscription?->status == 'pending' && $pendingSubscription->bukti_pembayaran && !$pendingSubscription->updated_at->addDay()->isPast())
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span>Sedang Diverifikasi...</span>
+                            @else
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>{{ $pendingSubscription && $pendingSubscription->status == 'pending' ? 'Ganti Pesanan' : 'Proses Pembelian' }}</span>
+                            @endif
                         </button>
-                        <p class="text-[9px] text-gray-400 text-center">Tersedia via Transfer Bank & E-Wallet</p>
+
+                        @if($pendingSubscription?->status == 'pending' && $pendingSubscription->bukti_pembayaran && !$pendingSubscription->updated_at->addDay()->isPast())
+                            <p class="text-[9px] text-rose-500 font-black text-center mt-3 uppercase tracking-tighter">
+                                Pesanan Anda sedang diproses oleh sistem!
+                            </p>
+                        @elseif($pendingSubscription?->status == 'pending' && !$pendingSubscription->bukti_pembayaran)
+                            <p class="text-[9px] text-amber-500 font-black text-center mt-3 uppercase tracking-tighter">
+                                Anda bisa mengganti paket sebelum membayar!
+                            </p>
+                        @endif
+                        <p class="text-[9px] text-gray-400 text-center mt-2">Tersedia via Transfer Bank & E-Wallet</p>
                     </form>
                 </div>
             </div>
@@ -592,14 +647,15 @@
                                         JPEG. Max: 500MB</p>
                                 </div>
 
-                                <button type="submit" 
-                                    :disabled="!previewUrl"
+                                <button type="submit" :disabled="!previewUrl"
                                     class="w-full py-5 rounded-[1.5rem] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl"
                                     :class="previewUrl ? 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-blue-500/30' : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
                                     :style="previewUrl ? 'background-color: #2563eb !important; color: white !important;' : 'background-color: #f3f4f6 !important; color: #9ca3af !important;'">
                                     <span>Konfirmasi Pembayaran</span>
-                                    <svg class="w-5 h-5 transition-transform" :class="previewUrl ? 'translate-x-1' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                    <svg class="w-5 h-5 transition-transform" :class="previewUrl ? 'translate-x-1' : ''"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                 </button>
                             </form>
@@ -607,6 +663,6 @@
                     </div>
                 </div>
             </div>
-    </template>
-        </div>
+        </template>
+    </div>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Langganan;
+use App\Models\LanggananBaru;
 use App\Models\JenisLangganan;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,20 +19,25 @@ class SubscriptionManagementController extends Controller
         $user = Auth::user();
 
         // 1. Fetch user's current valid subscription (for display cards)
-        // We want the latest one that HAS been paid (to show accurate active/expired dates)
         $subscription = Langganan::with('jenis_langganan')
             ->where('id_user', $user->id)
             ->whereNotNull('tanggal_pembayaran')
             ->latest()
             ->first();
 
-        // 1b. Fetch any pending or rejected LATEST overall attempt
-        // Only show pending/rejected banner if it is the absolute latest record
-        // This prevents old rejected attempts from showing up after a new active one exists.
-        $latestOverall = Langganan::where('id_user', $user->id)->latest()->first();
-        $pendingSubscription = null;
-        if ($latestOverall && in_array($latestOverall->status, ['pending', 'rejected'])) {
-            $pendingSubscription = $latestOverall->load('jenis_langganan');
+        // 2. Fetch pending order from the NEW staging table
+        $pendingSubscription = LanggananBaru::with('jenis_langganan')
+            ->where('id_user', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        // --- AUTO RESET LOGIC (For Staging Table) ---
+        if ($pendingSubscription) {
+            $isExpired = $pendingSubscription->updated_at->addDay()->isPast();
+            if ($isExpired && !$pendingSubscription->bukti_pembayaran) {
+                $pendingSubscription->delete();
+                $pendingSubscription = null;
+            }
         }
 
         // 2. Fetch all available plans for purchasing/upgrading
@@ -112,21 +118,30 @@ class SubscriptionManagementController extends Controller
 
         $user = Auth::user();
 
-        // If there's already a pending subscription, delete it first to avoid duplicates
-        Langganan::where('id_user', $user->id)
+        // Prevent new purchase ONLY if proof is already uploaded and not yet expired
+        $existingPending = LanggananBaru::where('id_user', $user->id)
             ->where('status', 'pending')
-            ->delete();
+            ->first();
 
-        Langganan::create([
-            'id_user' => $user->id,
-            'id_langganan' => $request->id_langganan,
-            'jumlah_kamar' => $request->jumlah_kamar ?? 0,
-            'status' => 'pending', // Await payment confirmation
-            'tanggal_pembayaran' => null
-        ]);
+        if ($existingPending && $existingPending->bukti_pembayaran && !$existingPending->updated_at->addDay()->isPast()) {
+            return back()->with('error', 'Pesanan Anda sedang diverifikasi oleh Admin. Tunggu verifikasi selesai atau tunggu 24 jam hingga sistem reset otomatis.');
+        }
+
+        // Use updateOrCreate on the STAGING table
+        LanggananBaru::updateOrCreate(
+            ['id_user' => $user->id],
+            [
+                'id_langganan' => $request->id_langganan,
+                'jumlah_kamar' => $request->jumlah_kamar ?? 0,
+                'status' => 'pending',
+                'bukti_pembayaran' => null, // Reset proof when changing plan
+                'metode_pembayaran' => null,
+            ]
+        );
 
         return back()->with('success', 'Permintaan perubahan paket berhasil diajukan! Silakan lengkapi pembayaran.');
     }
+
 
     /**
      * Upload payment proof for a pending subscription.
@@ -139,9 +154,8 @@ class SubscriptionManagementController extends Controller
         ]);
 
         $user = Auth::user();
-        $subscription = Langganan::where('id_user', $user->id)
+        $subscription = LanggananBaru::where('id_user', $user->id)
             ->where('status', 'pending')
-            ->latest()
             ->first();
 
         if (!$subscription) {

@@ -57,7 +57,14 @@ class DeviceOtpController extends Controller
         session(['otp_channel' => $request->channel]);
 
         // FLASH dummy_otp so it shows in the view (test mode)
-        return redirect()->route('otp.verify')->with('dummy_otp', $otp);
+        // FLASH dummy_otp so it shows in the view (test mode)
+        if ($request->channel === 'whatsapp' && $user->nomor_wa) {
+            $fonnteService = app(\App\Services\FonnteService::class);
+            $message = "Kode OTP Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.";
+            $fonnteService->sendMessage($user->nomor_wa, $message);
+        }
+
+        return redirect()->route('otp.verify');
     }
 
     /**
@@ -141,6 +148,12 @@ class DeviceOtpController extends Controller
             'otp_expires_at' => now()->addMinutes(1)
         ]);
 
-        return redirect()->route('otp.verify')->with('dummy_otp', $otp)->with('success', 'Kode OTP baru telah dikirim!');
+        if (session('otp_channel') === 'whatsapp' && $user->nomor_wa) {
+            $fonnteService = app(\App\Services\FonnteService::class);
+            $message = "Kode OTP Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.";
+            $fonnteService->sendMessage($user->nomor_wa, $message);
+        }
+
+        return redirect()->route('otp.verify')->with('success', 'Kode OTP baru telah dikirim!');
     }
 }

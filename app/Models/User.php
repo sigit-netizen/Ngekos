@@ -129,17 +129,12 @@ class User extends Authenticatable
      */
     public function syncPlanRole()
     {
-        // Remove 'nonaktif' if present
-        if ($this->hasRole('nonaktif')) {
-            $this->removeRole('nonaktif');
-        }
+        // Roles associated with plans that should be swapped
+        $planRoles = ['pro', 'premium', 'per_kamar_premium', 'per_kamar_pro', 'nonaktif'];
 
-        // Ensure base admin role
-        if (!$this->hasRole('admin')) {
-            $this->assignRole('admin');
-        }
+        // Determine target roles
+        $rolesToKeep = ['admin'];
 
-        // Map plan IDs to roles
         $roleMap = [
             2 => 'pro',
             3 => 'premium',
@@ -148,11 +143,25 @@ class User extends Authenticatable
         ];
 
         if (isset($roleMap[$this->id_plans])) {
-            $targetRole = $roleMap[$this->id_plans];
-            if (!$this->hasRole($targetRole)) {
-                $this->assignRole($targetRole);
+            $rolesToKeep[] = $roleMap[$this->id_plans];
+        }
+
+        // Remove old plan roles that are NOT in the rolesToKeep list
+        foreach ($planRoles as $role) {
+            if (!in_array($role, $rolesToKeep) && $this->hasRole($role)) {
+                $this->removeRole($role);
             }
         }
+
+        // Add missing target roles
+        foreach ($rolesToKeep as $role) {
+            if (!$this->hasRole($role)) {
+                $this->assignRole($role);
+            }
+        }
+
+        // CRITICAL: Clear permission cache so changes reflect in sidebar immediately
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Superadmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Langganan;
+use App\Models\LanggananBaru;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -32,11 +33,11 @@ class OrderManagementController extends Controller
         $activeUserCount = User::role($userRoles)->where('status', 'active')->count();
         $rejectedUserCountFromUser = User::role($userRoles)->where('status', 'rejected')->count();
 
-        $packetCounts = Langganan::selectRaw("
-            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-            SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
-            SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
-        ")->first();
+        $packetCounts = (object)[
+            'pending' => LanggananBaru::where('status', 'pending')->count(),
+            'active' => Langganan::where('status', 'active')->count(),
+            'rejected' => Langganan::where('status', 'rejected')->count(),
+        ];
 
         // 1. Pending Member (From PendingUser Table)
         $pendingMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'pending')->latest()->paginate(10, ['*'], 'member_p');
@@ -65,8 +66,8 @@ class OrderManagementController extends Controller
             $activeUsers = User::role('users')->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'user_a');
         }
 
-        // 5. Pending Paket (Eager load to avoid N+1)
-        $pendingPackets = Langganan::with(['user', 'jenis_langganan'])->where('status', 'pending')->latest()->paginate(10, ['*'], 'packet_p');
+        // 5. Pending Paket (From STAGING table)
+        $pendingPackets = LanggananBaru::with(['user', 'jenis_langganan'])->where('status', 'pending')->latest()->paginate(10, ['*'], 'packet_p');
 
         // 6. Active/Rejected Paket
         $activePackets = Langganan::with(['user', 'jenis_langganan'])->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'packet_a');
@@ -238,37 +239,49 @@ class OrderManagementController extends Controller
         return back()->with('success', 'Pendaftaran oleh ' . $pendingUser->name . ' berhasil ditolak!');
     }
 
-    public function verifyPacket(Langganan $subscription)
+    public function verifyPacket($id)
     {
-        // Deactivate existing active subscriptions for this user
-        if ($subscription->user) {
-            \App\Models\Langganan::where('id_user', $subscription->id_user)
-                ->where('id', '!=', $subscription->id)
-                ->where('status', 'active')
-                ->update(['status' => 'expired']);
-        }
+        $staging = LanggananBaru::findOrFail($id);
 
-        $subscription->update([
-            'status' => 'active',
-            'tanggal_pembayaran' => now('Asia/Jakarta'),
-            'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
-        ]);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($staging) {
+            // Update or create the SINGLE record in the main Langganan table
+            $subscription = Langganan::updateOrCreate(
+                ['id_user' => $staging->id_user],
+                [
+                    'id_langganan' => $staging->id_langganan,
+                    'jumlah_kamar' => $staging->jumlah_kamar,
+                    'status' => 'active',
+                    'bukti_pembayaran' => $staging->bukti_pembayaran,
+                    'metode_pembayaran' => $staging->metode_pembayaran,
+                    'tanggal_pembayaran' => now('Asia/Jakarta'),
+                    'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
+                ]
+            );
 
-        // Auto-reactivate user if packet is verified and sync plan ID
-        if ($subscription->user) {
-            $subscription->user->id_plans = $subscription->id_langganan;
-            $subscription->user->save();
-            $subscription->user->activateStatus();
-        }
+            // Auto-reactivate user and sync plan ID
+            if ($subscription->user) {
+                $subscription->user->id_plans = $subscription->id_langganan;
+                $subscription->user->save();
+                $subscription->user->activateStatus();
+            }
 
-        return back()->with('success', 'Paket member berhasil diverifikasi!');
+            // Delete from staging
+            $staging->delete();
+
+            return back()->with('success', 'Paket member berhasil diverifikasi dan diaktifkan!');
+        });
     }
 
-    public function rejectPacket(Langganan $subscription)
+    public function rejectPacket($id)
     {
-        $subscription->update([
+        $staging = LanggananBaru::findOrFail($id);
+
+        $staging->update([
             'status' => 'rejected',
         ]);
+
+        // Optionally delete it immediately or wait for manual deletion/auto-reset
+        // $staging->delete();
 
         return back()->with('success', 'Transaksi paket ditolak!');
     }

@@ -37,40 +37,6 @@
 
                 <form method="POST" action="{{ route('otp.verify.post') }}">
                     @csrf
-                    @if (session('dummy_otp'))
-                        <div class="mb-5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 shadow-sm"
-                            x-data="{ show: true }" x-show="show" x-transition.opacity>
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <div class="ml-3 flex-1 flex flex-col pt-1">
-                                    <p class="text-sm font-bold text-emerald-800 tracking-wide uppercase">
-                                        [TESTING MODE] DUMMY OTP:
-                                    </p>
-                                    <p class="text-3xl font-black text-emerald-900 mt-1 tracking-widest">
-                                        {{ session('dummy_otp') }}</p>
-                                </div>
-                                <div class="ml-auto pl-3">
-                                    <div class="-mx-1.5 -my-1.5">
-                                        <button type="button" @click="show = false"
-                                            class="inline-flex rounded-md p-1.5 text-emerald-500 hover:bg-emerald-100 focus:outline-none transition-colors">
-                                            <span class="sr-only">Tutup</span>
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
                     @if (session('error'))
                         <div class="mb-5 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-100 p-4 shadow-sm"
                             x-data="{ show: true }" x-show="show" x-transition.opacity>

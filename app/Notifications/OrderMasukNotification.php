@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
 
-class OrderMasukNotification extends Notification
+class OrderMasukNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
