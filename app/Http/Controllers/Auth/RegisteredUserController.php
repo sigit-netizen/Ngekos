@@ -51,6 +51,6 @@ class RegisteredUserController extends Controller
             // Other fields remain null/default
         ]);
 
-        return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Akun Anda sedang dalam antrian verifikasi admin. Mohon tunggu konfirmasi selanjutnya.');
+        return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silahkan Login menggunakan akun yang telah anda daftarkan.');
     }
 }

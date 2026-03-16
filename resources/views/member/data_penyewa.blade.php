@@ -63,6 +63,7 @@
                                 <th class="px-8 py-6 text-[11px] font-black text-gray-400 uppercase tracking-widest">Unit Kamar</th>
                                 <th class="px-8 py-6 text-[11px] font-black text-gray-400 uppercase tracking-widest">Mulai Sewa</th>
                                 <th class="px-8 py-6 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+                                <th class="px-8 py-6 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
@@ -107,8 +108,10 @@
                                         @endif
                                     </td>
                                     <td class="px-8 py-6">
-                                        <p class="text-xs font-black text-gray-600 tracking-tight">{{ $penyewa->created_at->format('d M Y') }}</p>
-                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{{ $penyewa->created_at->diffForHumans() }}</p>
+                                        <p class="text-xs font-black text-gray-600 tracking-tight">{{ \Carbon\Carbon::parse($penyewa->mulai_sewa)->format('d M Y') }}</p>
+                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                                            {{ \Carbon\Carbon::parse($penyewa->mulai_sewa)->isToday() ? 'Hari Ini' : \Carbon\Carbon::parse($penyewa->mulai_sewa)->diffForHumans() }}
+                                        </p>
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         @if($status === 'rejected')
@@ -117,6 +120,22 @@
                                             <span class="px-5 py-2 bg-emerald-500 text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-emerald-100 border border-emerald-400/20">AKTIF</span>
                                         @endif
                                     </td>
+                                    @if($status === 'active')
+                                        <td class="px-8 py-6 text-center">
+                                            <button type="button" 
+                                                onclick="confirmEviction('{{ $penyewa->id }}', '{{ $penyewa->name }}')"
+                                                class="px-5 py-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest border border-red-100 transition-all active:scale-95 whitespace-nowrap">
+                                                Keluarkan
+                                            </button>
+                                            <form id="evict-form-{{ $penyewa->id }}" action="{{ route('admin.penyewa.evict', $penyewa->id) }}" method="POST" class="hidden">
+                                                @csrf
+                                            </form>
+                                        </td>
+                                    @else
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="text-[9px] text-gray-300 font-bold uppercase italic">-</span>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -172,15 +191,15 @@
                             </div>
                             <div class="flex justify-between items-center text-[10px]">
                                 <span class="font-black text-gray-400 uppercase tracking-widest">
-                                    {{ $status === 'rejected' ? 'Waktu Tolak' : 'Bergabung' }}
+                                    {{ $status === 'rejected' ? 'Waktu Tolak' : 'Mulai Sewa' }}
                                 </span>
                                 <span class="font-bold text-gray-700">
-                                    {{ $penyewa->updated_at->format('d M Y') }}
+                                    {{ $status === 'rejected' ? $penyewa->updated_at->format('d M Y') : (\Carbon\Carbon::parse($penyewa->mulai_sewa)->isToday() ? 'Hari Ini' : \Carbon\Carbon::parse($penyewa->mulai_sewa)->format('d M Y')) }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="mt-6">
+                        <div class="mt-6 flex flex-col gap-3">
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $penyewa->nomor_wa) }}" target="_blank"
                                 class="w-full flex items-center justify-center gap-2 py-4 {{ $status === 'rejected' ? 'bg-gray-800' : 'bg-emerald-500' }} text-white font-black rounded-2xl shadow-lg active:scale-95 transition-all text-xs uppercase tracking-widest">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -188,6 +207,13 @@
                                 </svg>
                                 WhatsApp Penyewa
                             </a>
+                            @if($status === 'active')
+                                <button type="button" 
+                                    onclick="confirmEviction('{{ $penyewa->id }}', '{{ $penyewa->name }}')"
+                                    class="w-full py-4 bg-red-50 text-red-600 font-black rounded-2xl border border-red-100 shadow-sm active:scale-95 transition-all text-xs uppercase tracking-widest">
+                                    Keluarkan Dari Kamar
+                                </button>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -202,3 +228,19 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    function confirmEviction(id, name) {
+        window.swalConfirm(
+            'Konfirmasi Pengeluaran 🚪',
+            `Apakah Anda yakin ingin mengeluarkan ${name}? Kamar akan otomatis kosong dan penyewa akan kembali menjadi user umum.`,
+            'warning'
+        ).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('evict-form-' + id).submit();
+            }
+        });
+    }
+</script>
+@endpush

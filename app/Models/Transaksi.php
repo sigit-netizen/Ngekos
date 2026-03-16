@@ -89,6 +89,45 @@ class Transaksi extends Model
     }
 
     /**
+     * Check and evict tenants with "Dead" accounts (late > 3 days).
+     */
+    public static function checkDeadAccounts($kodeKos = null)
+    {
+        // Find users who are currently tenants (have id_kamar)
+        $query = User::whereNotNull('id_kamar');
+        
+        if ($kodeKos) {
+            $kos = Kos::where('kode_kos', $kodeKos)->first();
+            if ($kos) {
+                $query->where('id_kos', $kos->id);
+            }
+        }
+
+        $tenants = $query->get();
+
+        foreach ($tenants as $tenant) {
+            // Get latest paid rent transaction
+            $lastRent = self::where('id_user', $tenant->id)
+                ->where('status', 'paid')
+                ->whereIn('tipe', [self::TYPE_BOOKING, self::TYPE_SEWA])
+                ->latest()
+                ->first();
+
+            if ($lastRent && $lastRent->jatuh_tempo) {
+                $nowWib = now('Asia/Jakarta')->startOfDay();
+                $expiryWib = \Carbon\Carbon::parse($lastRent->jatuh_tempo)->timezone('Asia/Jakarta')->startOfDay();
+                
+                $daysDiff = (int) $nowWib->diffInDays($expiryWib, false);
+
+                // If late more than 2 days (Day -3 is Dead/Inactive)
+                if ($daysDiff < -2) {
+                    $tenant->evict();
+                }
+            }
+        }
+    }
+
+    /**
      * Check and cancel expired verified transactions.
      * Often called before listing orders to ensure up-to-date status.
      */

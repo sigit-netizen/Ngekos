@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::delete('/admin/kamar/{kamar}', [\App\Http\Controllers\Admin\KamarController::class, 'destroy'])->name('admin.kamar.destroy');
 
     Route::get('/admin/data-penyewa', [\App\Http\Controllers\Admin\PenyewaController::class, 'index'])->name('admin.data_penyewa');
+    Route::post('/admin/penyewa/{user}/evict', [\App\Http\Controllers\Admin\PenyewaController::class, 'evict'])->name('admin.penyewa.evict');
 
     Route::get('/admin/cabang-kos', function () {
         return view('member.cabang_kos', ['title' => 'Cabang Kos', 'role' => 'admin']);
@@ -198,6 +199,13 @@ Route::get('/registration/pending', function (\Illuminate\Http\Request $request)
         ->whereNotIn('nama_plans', ['Member', 'Superadmin'])
         ->get();
 
+    // Fetch Superadmin bank accounts for payment instructions
+    $superadminBanks = \App\Models\User::role('superadmin')
+        ->with('nomorBank')
+        ->get()
+        ->filter(fn($u) => $u->nomorBank)
+        ->map(fn($u) => $u->nomorBank);
+
     // Calculate total payment
     $totalPembayaran = 0;
     if ($pendingUser->plan_type) {
@@ -227,7 +235,8 @@ Route::get('/registration/pending', function (\Illuminate\Http\Request $request)
     return view('pending.dashboardPanding', [
         'pendingUser' => $pendingUser,
         'plans' => $plans,
-        'totalPembayaran' => $totalPembayaran
+        'totalPembayaran' => $totalPembayaran,
+        'superadminBanks' => $superadminBanks
     ]);
 })->name('registration.pending');
 

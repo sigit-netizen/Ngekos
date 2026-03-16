@@ -214,6 +214,7 @@
                         <th class="px-6 py-5">Sisa Durasi</th>
                         <th class="px-6 py-5 hidden sm:table-cell">Jatuh Tempo</th>
                         <th class="px-8 py-5 text-center">Status</th>
+                        <th class="px-8 py-5 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -269,6 +270,16 @@
                                     <span class="px-4 py-1.5 bg-red-600 text-white rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg shadow-red-100 animate-pulse">HABIS</span>
                                 @endif
                             </td>
+                            <td class="px-8 py-5 text-center">
+                                <button type="button" 
+                                    onclick="confirmEviction('{{ $tenant->id }}', '{{ $tenant->name }}')"
+                                    class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest border border-red-100 transition-all active:scale-95 whitespace-nowrap">
+                                    Keluarkan
+                                </button>
+                                <form id="evict-form-{{ $tenant->id }}" action="{{ route('admin.penyewa.evict', $tenant->id) }}" method="POST" class="hidden">
+                                    @csrf
+                                </form>
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -293,3 +304,19 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    function confirmEviction(id, name) {
+        window.swalConfirm(
+            'Konfirmasi Pengeluaran 🚪',
+            `Apakah Anda yakin ingin mengeluarkan ${name}? Kamar akan otomatis kosong dan penyewa akan kembali menjadi user umum.`,
+            'warning'
+        ).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('evict-form-' + id).submit();
+            }
+        });
+    }
+</script>
+@endpush

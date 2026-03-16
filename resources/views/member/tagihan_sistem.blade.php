@@ -141,18 +141,24 @@
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div
-                                    class="bg-white p-6 rounded-[2rem] border-2 border-blue-100 shadow-sm hover:border-blue-300 transition-all group/bank">
-                                    <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-3">BANK BCA</p>
-                                    <p class="text-2xl font-black text-gray-900 mb-1">1234567890</p>
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase">A.N NGEKOS INDONESIA</p>
-                                </div>
-                                <div
-                                    class="bg-white p-6 rounded-[2rem] border-2 border-indigo-100 shadow-sm hover:border-indigo-300 transition-all group/bank">
-                                    <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-3">DANA / OVO</p>
-                                    <p class="text-2xl font-black text-gray-900 mb-1">0812-3456-7890</p>
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase">A.N NGEKOS INDONESIA</p>
-                                </div>
+                                @forelse($superadminBanks as $bank)
+                                    <div class="bg-white p-6 rounded-[2rem] border-2 border-blue-100 shadow-sm hover:border-blue-300 transition-all group/bank">
+                                        <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-3">BANK {{ $bank->nama_bank }}</p>
+                                        <p class="text-2xl font-black text-gray-900 mb-1">{{ $bank->nomor_rekening }}</p>
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase">A.N {{ $bank->nama_pemilik }}</p>
+                                    </div>
+                                    @if($bank->nama_bank_2 && $bank->nomor_rekening_2)
+                                        <div class="bg-white p-6 rounded-[2rem] border-2 border-indigo-100 shadow-sm hover:border-indigo-300 transition-all group/bank">
+                                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-3">BANK {{ $bank->nama_bank_2 }}</p>
+                                            <p class="text-2xl font-black text-gray-900 mb-1">{{ $bank->nomor_rekening_2 }}</p>
+                                            <p class="text-[10px] font-bold text-gray-500 uppercase">A.N {{ $bank->nama_pemilik_2 }}</p>
+                                        </div>
+                                    @endif
+                                @empty
+                                    <div class="bg-amber-50 p-6 rounded-[2rem] border-2 border-amber-100 shadow-sm col-span-2">
+                                        <p class="text-xs font-bold text-amber-800">Nomor rekening belum diatur oleh admin. Silakan hubungi admin untuk informasi pembayaran.</p>
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
 

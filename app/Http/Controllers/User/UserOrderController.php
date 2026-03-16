@@ -22,7 +22,7 @@ class UserOrderController extends Controller
 
         // Get user's order history
         $orders = Transaksi::where('id_user', $user->id)
-            ->with(['kamar.kos'])
+            ->with(['kamar.kos.user.nomorBank'])
             ->latest()
             ->paginate(10);
 
@@ -114,7 +114,7 @@ class UserOrderController extends Controller
             'kamars' => function ($q) use ($hargaMin, $hargaMax, $tipeSewa) {
                 $q->where('status', 'tersedia')
                     ->whereDoesntHave('transaksis', function ($sub) {
-                        $sub->whereIn('status', ['pending', 'verified', 'paid']);
+                        $sub->whereIn('status', ['pending', 'verified']);
                     });
                 if ($tipeSewa) {
                     $q->where('tipe_durasi', $tipeSewa);
@@ -130,7 +130,7 @@ class UserOrderController extends Controller
             'favoritedBy' => function ($q) {
                 $q->where('users.id', auth()->id());
             },
-            'user'
+            'user.nomorBank'
         ])
             ->withMin('kamars as harga_termurah', 'harga')
             ->withMax('kamars as harga_termahal', 'harga');
@@ -169,6 +169,14 @@ class UserOrderController extends Controller
                 'alamat' => $kos->alamat,
                 'kota' => $kos->kota ?: $kos->nama_kota,
                 'no_rekening' => $kos->no_rekening,
+                'nomor_bank' => $kos->user->nomorBank ? [
+                    'nama_bank' => $kos->user->nomorBank->nama_bank,
+                    'nomor_rekening' => $kos->user->nomorBank->nomor_rekening,
+                    'nama_pemilik' => $kos->user->nomorBank->nama_pemilik,
+                    'nama_bank_2' => $kos->user->nomorBank->nama_bank_2,
+                    'nomor_rekening_2' => $kos->user->nomorBank->nomor_rekening_2,
+                    'nama_pemilik_2' => $kos->user->nomorBank->nama_pemilik_2,
+                ] : null,
                 'kategori' => $kos->kategori,
                 'foto' => $kos->foto,
                 'harga_termurah' => $kos->harga_termurah, // From withMin

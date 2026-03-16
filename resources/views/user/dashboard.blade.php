@@ -887,26 +887,99 @@
                                         </div>
 
                                         <!-- Owner Bank Account (Conditional for Py-Men) -->
-                                        <div class="mb-5 p-4 bg-blue-50 rounded-2xl border border-blue-100"
-                                            x-show="paymentMethod === 'pymen'" x-transition:enter="transition ease-out duration-300"
+                                        <div x-show="paymentMethod === 'pymen'" x-transition:enter="transition ease-out duration-300"
                                             x-transition:enter-start="opacity-0 -translate-y-2"
                                             x-transition:enter-end="opacity-100 translate-y-0"
                                             x-transition:leave="transition ease-in duration-200"
                                             x-transition:leave-start="opacity-100 translate-y-0"
-                                            x-transition:leave-end="opacity-0 -translate-y-2">
-                                            <label
-                                                class="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">
-                                                Nomor Rekening Pemilik
-                                            </label>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-base font-black text-gray-900"
-                                                    x-text="selectedKos.no_rekening || 'Belum diatur'"></span>
-                                                <span
-                                                    class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-blue-100 text-blue-600">BANK</span>
+                                            x-transition:leave-end="opacity-0 -translate-y-2" class="space-y-4">
+                                            
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="w-1.5 h-4 bg-[#36B2B2] rounded-full"></span>
+                                                <h4 class="text-[10px] font-black uppercase tracking-widest text-gray-900">Pembayaran Transfer</h4>
                                             </div>
-                                            <p class="text-[9px] font-medium text-gray-500 mt-2">Batas waktu pembayaran otomatis 3
-                                                hari
-                                                untuk metode Py-Men.</p>
+
+                                            <template x-if="selectedKos.nomor_bank">
+                                                <div class="space-y-3">
+                                                    <!-- Bank 1 -->
+                                                    <template x-if="selectedKos.nomor_bank.nomor_rekening">
+                                                        <div class="p-4 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 rounded-2xl border border-blue-100/50 relative overflow-hidden group/bank">
+                                                            <div class="absolute top-0 right-0 p-2 opacity-10">
+                                                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M2 20h20v-2H2v2zm2-4h2v-6H4v6zm5 0h2v-6H9v6zm5 0h2v-6h-2v6zm5 0h2v-6h-2v6zM2 9h20V7L12 2 2 7v2z"/>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="relative z-10">
+                                                                <div class="flex items-center justify-between mb-2">
+                                                                    <span class="text-[10px] font-black uppercase tracking-widest text-[#36B2B2]" x-text="selectedKos.nomor_bank.nama_bank"></span>
+                                                                    <button type="button" 
+                                                                        @click="navigator.clipboard.writeText(selectedKos.nomor_bank.nomor_rekening); 
+                                                                                Swal.fire({
+                                                                                    title: 'Tersalin!',
+                                                                                    text: 'Nomor rekening berhasil disalin',
+                                                                                    icon: 'success',
+                                                                                    toast: true,
+                                                                                    position: 'top-end',
+                                                                                    showConfirmButton: false,
+                                                                                    timer: 2000
+                                                                                })"
+                                                                        class="p-1.5 bg-white border border-blue-100 rounded-lg text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                                <p class="text-lg font-black text-gray-900 tracking-tight leading-none mb-1" x-text="selectedKos.nomor_bank.nomor_rekening"></p>
+                                                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest" x-text="'a.n ' + selectedKos.nomor_bank.nama_pemilik"></p>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    <!-- Bank 2 -->
+                                                    <template x-if="selectedKos.nomor_bank.nomor_rekening_2">
+                                                        <div class="p-4 bg-gradient-to-br from-emerald-50/50 to-teal-50/30 rounded-2xl border border-emerald-100/50 relative overflow-hidden group/bank">
+                                                            <div class="absolute top-0 right-0 p-2 opacity-10">
+                                                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M2 20h20v-2H2v2zm2-4h2v-6H4v6zm5 0h2v-6H9v6zm5 0h2v-6h-2v6zm5 0h2v-6h-2v6zM2 9h20V7L12 2 2 7v2z"/>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="relative z-10">
+                                                                <div class="flex items-center justify-between mb-2">
+                                                                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600" x-text="selectedKos.nomor_bank.nama_bank_2"></span>
+                                                                    <button type="button" 
+                                                                        @click="navigator.clipboard.writeText(selectedKos.nomor_bank.nomor_rekening_2);
+                                                                                Swal.fire({
+                                                                                    title: 'Tersalin!',
+                                                                                    text: 'Nomor rekening berhasil disalin',
+                                                                                    icon: 'success',
+                                                                                    toast: true,
+                                                                                    position: 'top-end',
+                                                                                    showConfirmButton: false,
+                                                                                    timer: 2000
+                                                                                })"
+                                                                        class="p-1.5 bg-white border border-emerald-100 rounded-lg text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">
+                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-3 8h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                                <p class="text-lg font-black text-gray-900 tracking-tight leading-none mb-1" x-text="selectedKos.nomor_bank.nomor_rekening_2"></p>
+                                                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest" x-text="'a.n ' + selectedKos.nomor_bank.nama_pemilik_2"></p>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+
+                                            <!-- Fallback if no account info -->
+                                            <template x-if="!selectedKos.nomor_bank || (!selectedKos.nomor_bank.nomor_rekening && !selectedKos.nomor_bank.nomor_rekening_2)">
+                                                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-center">
+                                                    <p class="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Perhatian</p>
+                                                    <p class="text-xs font-bold text-gray-900">Nomor rekening belum diatur oleh pemilik kos.</p>
+                                                </div>
+                                            </template>
+
+                                            <p class="text-[9px] font-medium text-gray-500 text-center">Batas waktu pembayaran otomatis 3 hari untuk metode Py-Men.</p>
                                         </div>
 
                                         <!-- Payment Deadline (Conditional for Manual) -->

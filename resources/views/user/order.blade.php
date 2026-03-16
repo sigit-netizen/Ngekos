@@ -11,7 +11,9 @@
                                                                         selectedOrderAmount: 0,
                                                                         showProof: false,
                                                                         proofUrl: '',
-                                                                        previewUrl: null
+                                                                        previewUrl: null,
+                                                                        bank1: { nama: '', norek: '', pemilik: '' },
+                                                                        bank2: { nama: '', norek: '', pemilik: '' }
                                                                     }"
         x-init="$watch('showUploadModal', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open')); 
                                                                                 $watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
@@ -273,7 +275,25 @@
                                 @elseif($order->status === 'verified' && !$order->bukti_pembayaran)
                                     <div class="flex flex-col gap-3">
                                         <button type="button"
-                                            @click="selectedOrderId = '{{ $order->id }}'; selectedOrderName = '{{ addslashes($order->kamar->kos->nama_kos ?? 'N/A') }}'; selectedOrderAmount = {{ $order->jumlah_bayar }}; showUploadModal = true"
+                                            @click="
+                                                selectedOrderId = '{{ $order->id }}'; 
+                                                selectedOrderName = '{{ addslashes($order->kamar->kos->nama_kos ?? 'N/A') }}'; 
+                                                selectedOrderAmount = {{ $order->jumlah_bayar }};
+                                                @php
+                                                    $bank = $order->kamar->kos->user->nomorBank ?? null;
+                                                @endphp
+                                                bank1 = { 
+                                                    nama: '{{ addslashes($bank->nama_bank ?? '') }}', 
+                                                    norek: '{{ addslashes($bank->nomor_rekening ?? '') }}', 
+                                                    pemilik: '{{ addslashes($bank->nama_pemilik ?? '') }}' 
+                                                };
+                                                bank2 = { 
+                                                    nama: '{{ addslashes($bank->nama_bank_2 ?? '') }}', 
+                                                    norek: '{{ addslashes($bank->nomor_rekening_2 ?? '') }}', 
+                                                    pemilik: '{{ addslashes($bank->nama_pemilik_2 ?? '') }}' 
+                                                };
+                                                showUploadModal = true
+                                            "
                                             class="px-8 py-3 bg-[#36B2B2] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-[#2d9696] transition-all active:scale-95 cursor-pointer shadow-lg shadow-[#36B2B2]/20">
                                             Unggah Bukti Bayar
                                         </button>
@@ -424,6 +444,47 @@
                                     <div class="text-xl font-black text-gray-900">Rp <span
                                             x-text="new Intl.NumberFormat('id-ID').format(selectedOrderAmount)"></span>
                                     </div>
+                                
+                                {{-- Bank Account Info --}}
+                                <div x-show="bank1.norek || bank2.norek" class="mb-8 space-y-4">
+                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Transfer Ke Rekening Pemilik</h4>
+                                    
+                                    <template x-if="bank1.norek">
+                                        <div class="p-5 bg-white border-2 border-gray-50 rounded-3xl shadow-sm hover:border-[#36B2B2]/30 transition-all group relative overflow-hidden">
+                                            <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <svg class="w-12 h-12 text-[#36B2B2]" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M4 10h16v8H4zM2 6h20v2H2zm2 14h16v2H4z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="relative z-10">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-[10px] font-black text-[#36B2B2] uppercase tracking-widest" x-text="bank1.nama"></span>
+                                                    <button type="button" @click="navigator.clipboard.writeText(bank1.norek); window.swalAlert('Copied!', 'Nomor rekening berhasil disalin', 'success')" class="text-[9px] font-bold text-gray-400 hover:text-[#36B2B2] transition-colors">SALIN</button>
+                                                </div>
+                                                <div class="text-lg font-black text-gray-900 tracking-tight" x-text="bank1.norek"></div>
+                                                <div class="text-[10px] font-bold text-gray-400 mt-1 uppercase" x-text="'A/N ' + bank1.pemilik"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="bank2.norek">
+                                        <div class="p-5 bg-white border-2 border-gray-50 rounded-3xl shadow-sm hover:border-[#36B2B2]/30 transition-all group relative overflow-hidden">
+                                            <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                                <svg class="w-12 h-12 text-[#36B2B2]" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M4 10h16v8H4zM2 6h20v2H2zm2 14h16v2H4z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="relative z-10">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-[10px] font-black text-[#36B2B2] uppercase tracking-widest" x-text="bank2.nama"></span>
+                                                    <button type="button" @click="navigator.clipboard.writeText(bank2.norek); window.swalAlert('Copied!', 'Nomor rekening berhasil disalin', 'success')" class="text-[9px] font-bold text-gray-400 hover:text-[#36B2B2] transition-colors">SALIN</button>
+                                                </div>
+                                                <div class="text-lg font-black text-gray-900 tracking-tight" x-text="bank2.norek"></div>
+                                                <div class="text-[10px] font-bold text-gray-400 mt-1 uppercase" x-text="'A/N ' + bank2.pemilik"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                                 </div>
 
                                 <div class="mb-6">

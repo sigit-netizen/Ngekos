@@ -18,6 +18,13 @@ class SubscriptionManagementController extends Controller
     {
         $user = Auth::user();
 
+        // Fetch Superadmin bank accounts for payment instructions
+        $superadminBanks = \App\Models\User::role('superadmin')
+            ->with('nomorBank')
+            ->get()
+            ->filter(fn($u) => $u->nomorBank)
+            ->map(fn($u) => $u->nomorBank);
+
         // 1. Fetch user's current valid subscription (for display cards)
         $subscription = Langganan::with('jenis_langganan')
             ->where('id_user', $user->id)
@@ -91,7 +98,8 @@ class SubscriptionManagementController extends Controller
                 'graceDaysRemaining' => $graceDaysRemaining,
                 'matiDaysCount' => $matiDaysCount,
                 'currentRoomsCount' => $currentRoomsCount,
-                'role' => 'admin'
+                'role' => 'admin',
+                'superadminBanks' => $superadminBanks
             ]);
         }
 

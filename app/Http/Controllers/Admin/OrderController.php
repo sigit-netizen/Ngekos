@@ -18,6 +18,12 @@ class OrderController extends Controller
         // Auto-cancel expired verified orders
         Transaksi::checkExpiry();
 
+        // Auto-evict dead accounts for this kos
+        $kos = Kos::where('id_user', $user->id)->first();
+        if ($kos) {
+            Transaksi::checkDeadAccounts($kos->kode_kos);
+        }
+
         // Auto-cancel expired registration requests
         \App\Models\PendingUser::checkExpiry();
 

@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // Jalankan pengingat jatuh tempo setiap jam 8 pagi
         $schedule->command('app:send-jatuh-tempo-notification')->dailyAt('08:00');
+
+        // Otomatis keluarkan penyewa mati (lewat 3 hari) setiap hari jam 1 malam
+        $schedule->command('app:evict-dead-accounts')->dailyAt('01:00');
     }
 
     /**

@@ -127,13 +127,46 @@
     const preloader = document.getElementById('preloader-overlay');
     if (!preloader) return;
 
-    window.addEventListener('load', function () {
+    // Fungsi untuk menyembunyikan preloader
+    const hidePreloader = () => {
       setTimeout(() => {
         preloader.classList.add('preloader-hidden');
         setTimeout(() => {
           preloader.style.display = 'none';
         }, 800);
-      }, 1200);
+      }, 500); // Penundaan singkat agar transisi terasa mulus
+    };
+
+    // Fungsi untuk menampilkan preloader
+    const showPreloader = () => {
+      preloader.style.display = 'flex';
+      preloader.classList.remove('preloader-hidden');
+    };
+
+    // Saat halaman selesai dimuat
+    window.addEventListener('load', hidePreloader);
+
+    // Saat berpindah halaman atau reload
+    window.addEventListener('beforeunload', (event) => {
+      // Jangan tampilkan jika link adalah anchor, wa, tel, atau mailto
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.tagName === 'A') {
+        const href = activeElement.getAttribute('href');
+        if (href && (href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('whatsapp:') || href.startsWith('tel:') || href.startsWith('mailto:'))) {
+          return;
+        }
+      }
+      showPreloader();
     });
+
+    // Handle BFCache (saat menekan tombol Back/Forward)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        hidePreloader();
+      }
+    });
+
+    // Opsional: Hilangkan setelah timeout jika navigasi gagal/lambat (safety net)
+    // setTimeout(hidePreloader, 10000); 
   })();
 </script>

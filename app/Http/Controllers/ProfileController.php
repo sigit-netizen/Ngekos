@@ -30,6 +30,12 @@ class ProfileController extends Controller
             'twitter' => 'nullable|string|max:255',
             'youtube' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
+            'nama_bank' => 'nullable|string|max:255',
+            'nomor_rekening' => 'nullable|string|max:255',
+            'nama_pemilik' => 'nullable|string|max:255',
+            'nama_bank_2' => 'nullable|string|max:255',
+            'nomor_rekening_2' => 'nullable|string|max:255',
+            'nama_pemilik_2' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
@@ -42,6 +48,19 @@ class ProfileController extends Controller
         $user->twitter = $request->twitter;
         $user->youtube = $request->youtube;
         $user->tiktok = $request->tiktok;
+
+        // Update/create bank account info
+        $user->nomorBank()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'nama_bank' => $request->nama_bank,
+                'nomor_rekening' => $request->nomor_rekening,
+                'nama_pemilik' => $request->nama_pemilik,
+                'nama_bank_2' => $request->nama_bank_2,
+                'nomor_rekening_2' => $request->nomor_rekening_2,
+                'nama_pemilik_2' => $request->nama_pemilik_2,
+            ]
+        );
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);

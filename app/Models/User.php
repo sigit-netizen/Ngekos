@@ -125,6 +125,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the date when the user started renting the current room.
+     * Calculated based on the oldest 'paid' transaction for the current id_kamar.
+     */
+    public function getMulaiSewaAttribute()
+    {
+        if (!$this->id_kamar) {
+            return $this->created_at;
+        }
+
+        $firstPayment = $this->transaksis()
+            ->where('status', 'paid')
+            ->where('id_kamar', $this->id_kamar)
+            ->oldest('tanggal_pembayaran')
+            ->first();
+
+        return $firstPayment ? $firstPayment->tanggal_pembayaran : $this->created_at;
+    }
+
+    /**
      * Restore user roles based on their current plan ID.
      */
     public function syncPlanRole()
@@ -190,8 +209,76 @@ class User extends Authenticatable
         $this->syncRoles(['nonaktif']);
     }
 
+    /**
+     * Evict tenant: clear room/kos association and release the room.
+     */
+    public function evict()
+    {
+        \DB::beginTransaction();
+        try {
+            // 1. Find ANY transactions that might be "locking" this user or rooms (pending, verified, paid)
+            $activeTransactions = \App\Models\Transaksi::where('id_user', $this->id)
+                ->whereIn('status', ['pending', 'verified', 'paid'])
+                ->get();
+
+            // 2. Release any rooms associated with these transactions
+            foreach ($activeTransactions as $tx) {
+                if ($tx->kamar) {
+                    $tx->kamar->update(['status' => 'tersedia']);
+                }
+            }
+
+            // 3. Mark those transactions as 'expired'
+            \App\Models\Transaksi::where('id_user', $this->id)
+                ->whereIn('status', ['pending', 'verified', 'paid'])
+                ->update(['status' => 'expired']);
+
+            // 4. Force release user's own room association just in case
+            if ($this->kamar) {
+                $this->kamar->update(['status' => 'tersedia']);
+            }
+
+            // 5. Clear user's room and kos association
+            $this->update([
+                'id_kamar' => null,
+                'id_kos' => null,
+                'status' => 'active', // Back to general active user
+            ]);
+
+            // 6. Reset Roles: Remove 'users' (tenant) and assign 'user' (general)
+            $this->syncRoles(['user']);
+
+            // 7. Ensure permissions are synced according to Gambar 2 (User Umum)
+            $userUmumPermissions = [
+                'menu.dashboard',
+                'menu.order',
+                'menu.profil',
+                'fitur.belum_sewa'
+            ];
+            
+            // Explicitly sync permissions for this specific user to match 'User Umum' state
+            // This will remove 'menu.aduan' and 'menu.jatuh_tempo' automatically
+            $this->syncPermissions($userUmumPermissions);
+
+            // Clear Spatie permission cache
+            app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+            \DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error("Eviction failed for user {$this->id}: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function favoritKos()
     {
         return $this->belongsToMany(Kos::class, 'favorits', 'id_user', 'id_kos')->withTimestamps();
+    }
+
+    public function nomorBank()
+    {
+        return $this->hasOne(NomorBank::class, 'user_id');
     }
 }
