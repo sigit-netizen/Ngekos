@@ -234,7 +234,13 @@ class User extends Authenticatable
                 ->update(['status' => 'expired']);
 
             // 4. Force release user's own room association just in case
+            $evictionData = null;
             if ($this->kamar) {
+                $evictionData = [
+                    'kos_name' => $this->kamar->kos->nama_kos ?? ($this->kosAnak->nama_kos ?? 'Kos'),
+                    'nomor_kamar' => $this->kamar->nomor_kamar ?? '-',
+                    'owner_phone' => $this->kamar->kos->user->nomor_wa ?? null,
+                ];
                 $this->kamar->update(['status' => 'tersedia']);
             }
 
@@ -244,6 +250,11 @@ class User extends Authenticatable
                 'id_kos' => null,
                 'status' => 'active', // Back to general active user
             ]);
+
+            // Notify Tenant
+            if ($evictionData && $this->nomor_wa) {
+                $this->notify(new \App\Notifications\EvictionNotification($evictionData));
+            }
 
             // 6. Reset Roles: Remove 'users' (tenant) and assign 'user' (general)
             $this->syncRoles(['user']);

@@ -588,9 +588,8 @@
                                                         {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
                                                     </div>
                                                     <div>
-                                                        <div class="flex items-center gap-2">
                                                             <div class="font-bold text-gray-900">
-                                                                {{ $order->user->name ?? 'N/A' }}
+                                                                {{ optional($order->user)->name ?? 'N/A' }}
                                                             </div>
                                                             @if($order->status === 'pending')
                                                                 <div x-data="{ 
@@ -644,14 +643,14 @@
                                                             @endif
                                                         </div>
                                                         <div class="text-[10px] text-gray-400 font-medium">
-                                                            {{ $order->user->email ?? '' }}
+                                                            {{ optional($order->user)->email ?? '' }}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span
-                                                    class="font-bold text-gray-700 text-sm">{{ $order->kamar->nomor_kamar ?? '-' }}</span>
+                                                    class="font-bold text-gray-700 text-sm">{{ optional($order->kamar)->nomor_kamar ?? '-' }}</span>
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span class="font-bold text-[#36B2B2] text-sm">Rp
@@ -691,61 +690,14 @@
                                             <td class="px-8 py-6 text-center">
                                                 <div class="flex items-center justify-center gap-2">
                                                     @if($order->status === 'pending' || ($order->status === 'verified' && $order->tipe === 'sewa'))
-                                                        @if($order->tipe === 'sewa')
-                                                            <div class="flex items-center gap-2">
-                                                                <form method="POST"
-                                                                    action="{{ route('admin.order.confirm', $order->id) }}">
-                                                                    @csrf
-                                                                    <button type="button"
-                                                                        @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                        class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
-                                                                        ✓ Konfirmasi
-                                                                    </button>
-                                                                </form>
-                                                                <form method="POST"
-                                                                    action="{{ route('admin.order.reject', $order->id) }}">
-                                                                    @csrf
-                                                                    <button type="button"
-                                                                        @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                        class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
-                                                                        Tolak
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                            @if($order->bukti_pembayaran)
-                                                                <button
-                                                                    @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                                    class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
-                                                                    Lihat Bukti
-                                                                </button>
-                                                            @endif
-                                                        @else
-                                                            <form method="POST" action="{{ route('admin.order.verify', $order->id) }}">
-                                                                @csrf
-                                                                <button type="button"
-                                                                    @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                    class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
-                                                                    ✓ Terima
-                                                                </button>
-                                                            </form>
-                                                            <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
-                                                                @csrf
-                                                                <button type="button"
-                                                                    @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
-                                                                    class="text-[10px] font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-widest">
-                                                                    Tolak
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    @elseif($order->status === 'verified')
-                                                        @if($order->bukti_pembayaran)
-                                                            @if($statusFilter === 'konfirmasi' || $statusFilter === 'sewa')
+                                                        <div class="flex flex-col items-center gap-2">
+                                                            @if($order->tipe === 'sewa')
                                                                 <div class="flex items-center gap-2">
                                                                     <form method="POST"
                                                                         action="{{ route('admin.order.confirm', $order->id) }}">
                                                                         @csrf
                                                                         <button type="button"
-                                                                            @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            @click="window.swalConfirm('Konfirmasi Pembayaran Sewa?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                                             class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
                                                                             ✓ Konfirmasi
                                                                         </button>
@@ -754,11 +706,128 @@
                                                                         action="{{ route('admin.order.reject', $order->id) }}">
                                                                         @csrf
                                                                         <button type="button"
-                                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            @click="window.swalConfirm('Tolak Pembayaran?', 'Pembayaran sewa ini akan ditolak.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
                                                                             class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
                                                                             Tolak
                                                                         </button>
                                                                     </form>
+                                                                </div>
+                                                                @if($order->bukti_pembayaran)
+                                                                    <button
+                                                                        @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                                        class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
+                                                                        Lihat Bukti
+                                                                    </button>
+                                                                @endif
+                                                            @else
+                                                                <div class="flex items-center gap-2">
+                                                                    <form method="POST" action="{{ route('admin.order.verify', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Terima Order?', 'Pesanan kamar ini akan disetujui dan penyewa bisa lanjut bayar.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                            ✓ Terima
+                                                                        </button>
+                                                                    </form>
+                                                                    <form method="POST" action="{{ route('admin.order.reject', $order->id) }}">
+                                                                        @csrf
+                                                                        <button type="button"
+                                                                            @click="window.swalConfirm('Tolak Order?', 'Pesanan ini akan dibatalkan.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                            class="text-[10px] font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-widest">
+                                                                            Tolak
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            @endif
+
+                                                            {{-- Countdown for Pending or Verified with Proof --}}
+                                                            @php
+                                                                $expiry = null;
+                                                                if($order->status === 'pending') {
+                                                                    $expiry = $order->created_at->addDay();
+                                                                } elseif($order->status === 'verified' && $order->bukti_pembayaran) {
+                                                                    $expiry = $order->updated_at->addDay();
+                                                                }
+                                                            @endphp
+
+                                                            @if($expiry)
+                                                                <div x-data="{
+                                                                    target: new Date('{{ $expiry->toIso8601String() }}').getTime(),
+                                                                    display: '--:--:--',
+                                                                    init() {
+                                                                        this.update();
+                                                                        setInterval(() => this.update(), 1000);
+                                                                    },
+                                                                    update() {
+                                                                        const now = new Date().getTime();
+                                                                        const diff = this.target - now;
+                                                                        if (diff <= 0) {
+                                                                            this.display = 'WAKTU HABIS';
+                                                                            return;
+                                                                        }
+                                                                        const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                        this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                    }
+                                                                }" class="flex flex-col items-center">
+                                                                    <span class="text-[9px] font-black text-rose-500 font-mono tracking-tighter" x-text="display"></span>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    @elseif($order->status === 'verified')
+                                                        @if($order->bukti_pembayaran)
+                                                            @if($statusFilter === 'konfirmasi' || $statusFilter === 'sewa')
+                                                                <div class="flex flex-col items-center gap-2">
+                                                                    <div class="flex items-center gap-2">
+                                                                        <form method="POST"
+                                                                            action="{{ route('admin.order.confirm', $order->id) }}">
+                                                                            @csrf
+                                                                            <button type="button"
+                                                                                @click="window.swalConfirm('Konfirmasi Pembayaran?', 'Pastikan uang sudah masuk ke rekening Anda.').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                                class="px-6 py-2 rounded-xl text-[11px] font-black bg-emerald-500 text-white hover:bg-emerald-600 transition-all shadow-sm hover:shadow-md active:scale-95 uppercase tracking-wider">
+                                                                                ✓ Konfirmasi
+                                                                            </button>
+                                                                        </form>
+                                                                        <form method="POST"
+                                                                            action="{{ route('admin.order.reject', $order->id) }}">
+                                                                            @csrf
+                                                                            <button type="button"
+                                                                                @click="window.swalConfirm('Tolak Pembayaran?', 'Pesanan ini akan dibatalkan dan kamar akan tersedia kembali.', 'warning').then(res => res.isConfirmed && $el.closest('form').submit())"
+                                                                                class="px-4 py-2 rounded-xl text-[10px] font-bold text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-red-100">
+                                                                                Tolak
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                    
+                                                                    <div x-data="{
+                                                                        target: new Date('{{ $order->updated_at->addDay()->toIso8601String() }}').getTime(),
+                                                                        display: '--:--:--',
+                                                                        init() {
+                                                                            this.update();
+                                                                            setInterval(() => this.update(), 1000);
+                                                                        },
+                                                                        update() {
+                                                                            const now = new Date().getTime();
+                                                                            const diff = this.target - now;
+                                                                            if (diff <= 0) {
+                                                                                this.display = 'WAKTU HABIS';
+                                                                                return;
+                                                                            }
+                                                                            const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                            const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                            this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                        }
+                                                                    }" class="flex flex-col items-center">
+                                                                        <span class="text-[9px] font-black text-rose-500 font-mono tracking-tighter" x-text="display"></span>
+                                                                    </div>
+
+                                                                    <button
+                                                                        @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                                        class="text-[10px] font-bold text-[#36B2B2] hover:underline uppercase tracking-widest mt-1">
+                                                                        Lihat Bukti
+                                                                    </button>
                                                                 </div>
                                                                 <button
                                                                     @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
@@ -1045,10 +1114,34 @@
                                                             </button>
                                                         </form>
                                                     </div>
-                                                    <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
-                                                        class="w-full py-2 text-xs font-bold text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-colors mt-1 uppercase tracking-wider">
-                                                        Lihat Bukti
-                                                    </button>
+                                                    <div class="flex flex-col items-center">
+                                                        <div x-data="{
+                                                            target: new Date('{{ $order->updated_at->addDay()->toIso8601String() }}').getTime(),
+                                                            display: '--:--:--',
+                                                            init() {
+                                                                this.update();
+                                                                setInterval(() => this.update(), 1000);
+                                                            },
+                                                            update() {
+                                                                const now = new Date().getTime();
+                                                                const diff = this.target - now;
+                                                                if (diff <= 0) {
+                                                                    this.display = 'WAKTU HABIS';
+                                                                    return;
+                                                                }
+                                                                const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                                this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                            }
+                                                        }" class="mb-1">
+                                                            <span class="text-[9px] font-black text-rose-500 font-mono tracking-tighter" x-text="display"></span>
+                                                        </div>
+                                                        <button @click="proofUrl = '{{ asset($order->bukti_pembayaran) }}'; showProof = true"
+                                                            class="w-full py-2 text-xs font-bold text-[#36B2B2] hover:bg-[#36B2B2]/5 rounded-xl transition-colors uppercase tracking-wider">
+                                                            Lihat Bukti
+                                                        </button>
+                                                    </div>
                                                 @else
                                                     <div class="flex items-center justify-between">
                                                         <span
@@ -1074,7 +1167,7 @@
                                                         </form>
                                                         @if($order->batas_bayar)
                                                             <div x-data="{
-                                                                                        target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                        target: new Date('{{ $order->batas_bayar ?: $order->tanggal_pembayaran }}').getTime(),
                                                                                         display: '--:--:--',
                                                                                         init() {
                                                                                             this.update();
@@ -1087,9 +1180,10 @@
                                                                                                 this.display = 'WAKTU HABIS';
                                                                                                 return;
                                                                                             }
-                                                                                            const m = Math.floor(diff / (1000 * 60));
+                                                                                            const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                                                                                             const s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                            this.display = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                            this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                                                                                         }
                                                                                     }"
                                                                 class="flex flex-col items-center border-t border-amber-100 pt-1 mt-1">
@@ -1107,7 +1201,7 @@
                                                             Bukti</span>
                                                         @if($order->batas_bayar)
                                                             <div x-data="{
-                                                                                        target: new Date('{{ $order->batas_bayar }}').getTime(),
+                                                                                        target: new Date('{{ $order->batas_bayar ?: $order->updated_at->addDay() }}').getTime(),
                                                                                         display: '--:--:--',
                                                                                         init() {
                                                                                             this.update();
@@ -1120,9 +1214,10 @@
                                                                                                 this.display = 'WAKTU HABIS';
                                                                                                 return;
                                                                                             }
-                                                                                            const m = Math.floor(diff / (1000 * 60));
+                                                                                            const h = Math.floor(diff / (1000 * 60 * 60));
+                                                                                            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                                                                                             const s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                            this.display = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                                                            this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                                                                                         }
                                                                                     }" class="flex flex-col items-end">
                                                                 <span class="text-[10px] font-black text-rose-500 font-mono"

@@ -117,30 +117,24 @@
 
                         @if($expiryTime)
                             <div x-data="{ 
-                                                                                                                                expiryTime: new Date('{{ $expiryTime->toIso8601String() }}').getTime(),
-                                                                                                                                now: new Date().getTime(),
-                                                                                                                                timer: '',
-                                                                                                                                init() {
-                                                                                                                                    this.updateTimer();
-                                                                                                                                    setInterval(() => {
-                                                                                                                                        this.now = new Date().getTime();
-                                                                                                                                        this.updateTimer();
-                                                                                                                                    }, 1000);
-                                                                                                                                },
-                                                                                                                                updateTimer() {
-                                                                                                                                    let diff = this.expiryTime - this.now;
-                                                                                                                                    if (diff <= 0) {
-                                                                                                                                        this.timer = 'EXPIRED';
-                                                                                                                                        return;
-                                                                                                                                    }
-                                                                                                                                    let h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                                                                    let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                                                                    let s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                                                                    this.timer = `${h}j ${m}m ${s}d`;
-                                                                                                                                }
-                                                                                                                            }"
+                                target: new Date('{{ $expiryTime->toIso8601String() }}').getTime(),
+                                display: '--:--:--',
+                                init() {
+                                    this.update();
+                                    setInterval(() => this.update(), 1000);
+                                },
+                                update() {
+                                    const now = new Date().getTime();
+                                    const diff = this.target - now;
+                                    if (diff <= 0) { this.display = 'WAKTU HABIS'; return; }
+                                    const h = Math.floor(diff / (1000 * 60 * 60));
+                                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                    this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                }
+                            }"
                                 class="px-2 py-1 bg-red-600 text-white rounded-lg animate-pulse ml-2 shadow-inner border border-red-400">
-                                <span x-text="timer" class="font-bold text-[11px] leading-none"></span>
+                                <span x-text="display" class="font-bold text-[11px] leading-none"></span>
                             </div>
                         @endif
                     </div>
@@ -194,25 +188,25 @@
                                         @if ($order->metode_pembayaran === 'manual' && $order->tanggal_pembayaran && in_array($order->status, ['pending', 'verified']))
                                             <div class="flex flex-col items-center gap-1 px-3 py-1.5 bg-rose-50 rounded-xl border border-rose-100"
                                                 x-data="{
-                                                                                        target: new Date('{{ $order->batas_bayar ?: $order->tanggal_pembayaran }}').getTime(),
-                                                                                        display: '--:--:--',
-                                                                                        init() {
-                                                                                            this.update();
-                                                                                            setInterval(() => this.update(), 1000);
-                                                                                        },
-                                                                                        update() {
-                                                                                            const now = new Date().getTime();
-                                                                                            const diff = this.target - now;
-                                                                                            if (diff <= 0) {
-                                                                                                this.display = 'BATAL OTOMATIS';
-                                                                                                return;
-                                                                                            }
-                                                                                            const h = Math.floor(diff / (1000 * 60 * 60));
-                                                                                            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                                            const s = Math.floor((diff % (1000 * 60)) / 1000);
-                                                                                            this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                                                                                        }
-                                                                                    }">
+                                                    target: new Date('{{ $order->batas_bayar ?: $order->tanggal_pembayaran }}').getTime(),
+                                                    display: '--:--:--',
+                                                    init() {
+                                                        this.update();
+                                                        setInterval(() => this.update(), 1000);
+                                                    },
+                                                    update() {
+                                                        const now = new Date().getTime();
+                                                        const diff = this.target - now;
+                                                        if (diff <= 0) {
+                                                            this.display = 'BATAL OTOMATIS';
+                                                            return;
+                                                        }
+                                                        const h = Math.floor(diff / (1000 * 60 * 60));
+                                                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                                                        this.display = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                                                    }
+                                                }">
                                                 <span
                                                     class="text-[8px] font-black text-rose-400 uppercase tracking-widest text-center">Sisa
                                                     Waktu Bayar</span>

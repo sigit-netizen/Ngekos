@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
+use App\Notifications\Channels\FonnteChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class OrderMasukNotification extends Notification implements ShouldQueue
 {
@@ -31,20 +32,51 @@ class OrderMasukNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return [WebPushChannel::class, 'database'];
+        return ['database', FonnteChannel::class, WebPushChannel::class];
     }
 
     public function toWebPush($notifiable, $notification)
     {
-        $messageObj = new WebPushMessage();
-
-        $messageObj->title('Order Kos Baru!')
+        return (new WebPushMessage)
+            ->title('Order Masuk Baru!')
             ->icon('/storage/logo/logo-icon.svg')
-            ->body($this->orderData ? 'Order baru dari ' . ($this->orderData['nama'] ?? 'User') . ' masuk.' : 'Ada order baru masuk, segera periksa!')
-            ->action('Lihat Order', 'view_order')
-            ->data(['url' => route('admin.order')]);
+            ->body("Ada pesanan baru dari " . ($this->orderData['nama'] ?? 'User') . " di " . ($this->orderData['kos'] ?? 'Kos') . ".")
+            ->action('Cek Dashboard', 'dashboard');
+    }
 
-        return $messageObj;
+    // WebPush removed
+
+    public function toFonnte($notifiable)
+    {
+        $nama = $this->orderData['nama'] ?? 'User';
+        $kos = $this->orderData['kos'] ?? 'Kos Anda';
+        $kamar = $this->orderData['kamar'] ?? '-';
+        $jumlah = number_format($this->orderData['jumlah'] ?? 0, 0, ',', '.');
+        $tipe = $this->orderData['tipe'] ?? 'order';
+        
+        $tag = ($tipe === 'sewa') ? 'PEMBAYARAN SEWA' : 'BOOKING BARU';
+        
+        // Dynamic message based on who is being notified
+        $ownerName = $this->orderData['owner_name'] ?? 'Pihak Kos';
+        
+        $message = "[NGEKOS.ID - NOTIFIKASI {$tag}]\n\n" .
+                   "Halo, ada {$tag} masuk!\n" .
+                   "---------------------------\n" .
+                   "Penyewa: {$nama}\n" .
+                   "Kos: {$kos}\n" .
+                   "Kamar: {$kamar}\n" .
+                   "Nominal: Rp {$jumlah}\n";
+        
+        if (isset($this->orderData['is_superadmin']) && $this->orderData['is_superadmin']) {
+            $message .= "Pemilik Kos: {$ownerName}\n";
+        }
+        
+        $message .= "---------------------------\n" .
+                    "Segera login ke dashboard untuk verifikasi.";
+
+        return [
+            'message' => $message
+        ];
     }
 
     /**

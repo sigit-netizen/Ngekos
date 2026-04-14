@@ -32,6 +32,18 @@ class PendingUserController extends Controller
                 'status' => 'konfirmasi',
             ]);
 
+            // Notify Superadmins
+            $superadmins = \App\Models\User::role('superadmin')->get();
+            foreach ($superadmins as $admin) {
+                if ($admin->nomor_wa) {
+                    $admin->notify(new \App\Notifications\BuktiPembayaranNotification([
+                        'type' => 'owner_reg',
+                        'name' => $pendingUser->name,
+                        'plan_name' => 'Owner Member',
+                    ]));
+                }
+            }
+
             return back()->with('success', 'Bukti pembayaran berhasil diunggah! Mohon tunggu verifikasi akhir dari admin.');
         }
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use App\Notifications\OwnerRegistrationNotification;
 
 class RegisteredUserController extends Controller
 {
@@ -44,12 +45,30 @@ class RegisteredUserController extends Controller
 
         \App\Models\PendingUser::create([
             'name' => $request->name,
-            'id_plans' => $request->id_plans,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'id_plans' => $request->id_plans,
             'status' => 'pending',
-            // Other fields remain null/default
         ]);
+
+        // Notify Superadmins if it's an owner registration
+        if ($request->id_plans == 2) {
+            $superadmins = User::where('id_plans', 6)->get();
+            $uniqueTargets = collect();
+            foreach ($superadmins as $admin) {
+                if ($admin->nomor_wa) {
+                    $uniqueTargets->put($admin->nomor_wa, $admin);
+                }
+            }
+            
+            foreach ($uniqueTargets as $admin) {
+                $admin->notify(new OwnerRegistrationNotification([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'plan' => 'Pemilik Kos'
+                ]));
+            }
+        }
 
         return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silahkan Login menggunakan akun yang telah anda daftarkan.');
     }

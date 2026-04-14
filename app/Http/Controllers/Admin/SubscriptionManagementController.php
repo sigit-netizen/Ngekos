@@ -199,6 +199,18 @@ class SubscriptionManagementController extends Controller
                 'metode_pembayaran' => $request->metode_pembayaran,
             ]);
 
+            // Notify Superadmins
+            $superadmins = \App\Models\User::role('superadmin')->get();
+            foreach ($superadmins as $admin) {
+                if ($admin->nomor_wa) {
+                    $admin->notify(new \App\Notifications\BuktiPembayaranNotification([
+                        'type' => 'owner_sub',
+                        'name' => $user->name,
+                        'plan_name' => $subscription->jenis_langganan->nama_paket ?? 'Member',
+                    ]));
+                }
+            }
+
             return back()->with('success', 'Bukti pembayaran berhasil diunggah! Hubungi admin untuk aktivasi cepat.');
         }
 

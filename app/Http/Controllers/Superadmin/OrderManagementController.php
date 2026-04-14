@@ -7,6 +7,7 @@ use App\Models\Langganan;
 use App\Models\LanggananBaru;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Notifications\OwnerPaymentNotification;
 
 class OrderManagementController extends Controller
 {
@@ -199,6 +200,23 @@ class OrderManagementController extends Controller
                     'tanggal_pembayaran' => now('Asia/Jakarta'),
                     'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
                 ]);
+
+                // Notify Superadmins
+                $superadmins = User::where('id_plans', 6)->get();
+                $uniqueTargets = collect();
+                foreach ($superadmins as $admin) {
+                    if ($admin->nomor_wa) {
+                        $uniqueTargets->put($admin->nomor_wa, $admin);
+                    }
+                }
+
+                foreach ($uniqueTargets as $admin) {
+                    $admin->notify(new OwnerPaymentNotification([
+                        'owner_name' => $user->name,
+                        'plan_name' => $planName,
+                        'jumlah' => 0 
+                    ]));
+                }
             }
 
             // 4. Automatically create a default Kos record
@@ -249,6 +267,24 @@ class OrderManagementController extends Controller
                     'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
                 ]
             );
+
+            // Notify Superadmins
+            $superadmins = User::where('id_plans', 6)->get();
+            $uniqueTargets = collect();
+            foreach ($superadmins as $admin) {
+                if ($admin->nomor_wa) {
+                    $uniqueTargets->put($admin->nomor_wa, $admin);
+                }
+            }
+
+            foreach ($uniqueTargets as $admin) {
+                $owner = $subscription->user;
+                $admin->notify(new OwnerPaymentNotification([
+                    'owner_name' => $owner ? $owner->name : 'N/A',
+                    'plan_name' => $subscription->jenis_langganan ? $subscription->jenis_langganan->nama : 'Member',
+                    'jumlah' => 0 
+                ]));
+            }
 
             // Auto-reactivate user and sync plan ID
             if ($subscription->user) {

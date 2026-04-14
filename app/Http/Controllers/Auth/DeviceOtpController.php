@@ -57,15 +57,28 @@ class DeviceOtpController extends Controller
         // Save channel to session for display
         session(['otp_channel' => $request->channel]);
 
-        // FLASH dummy_otp so it shows in the view (test mode)
-        // FLASH dummy_otp so it shows in the view (test mode)
+        // Send OTP
         if ($request->channel === 'whatsapp' && $user->nomor_wa) {
             $fonnteService = app(\App\Services\FonnteService::class);
             $message = "Kode OTP Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.";
-            $fonnteService->sendMessage($user->nomor_wa, $message);
+            $response = $fonnteService->sendMessage($user->nomor_wa, $message);
+            
+            if (!$response || (isset($response['status']) && $response['status'] == false)) {
+                return back()->with('error', 'Gagal mengirim OTP ke WhatsApp. ' . ($response['message'] ?? 'Silakan coba lagi.'));
+            }
+        } elseif ($request->channel === 'email') {
+            try {
+                \Illuminate\Support\Facades\Mail::raw("Kode OTP Anda adalah: {$otp}\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.", function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Kode Verifikasi OTP - Ngekos');
+                });
+            } catch (\Exception $e) {
+                \Log::error('OTP Email Error: ' . $e->getMessage());
+                return back()->with('error', 'Gagal mengirim OTP ke Email. Silakan coba metode lain.');
+            }
         }
 
-        return redirect()->route('otp.verify');
+        return redirect()->route('otp.verify')->with('success', 'Kode OTP telah dikirim!');
     }
 
     /**
@@ -175,7 +188,21 @@ class DeviceOtpController extends Controller
         if (session('otp_channel') === 'whatsapp' && $user->nomor_wa) {
             $fonnteService = app(\App\Services\FonnteService::class);
             $message = "Kode OTP Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.";
-            $fonnteService->sendMessage($user->nomor_wa, $message);
+            $response = $fonnteService->sendMessage($user->nomor_wa, $message);
+
+            if (!$response || (isset($response['status']) && $response['status'] == false)) {
+                return back()->with('error', 'Gagal mengirim ulang OTP ke WhatsApp. ' . ($response['message'] ?? 'Silakan coba lagi.'));
+            }
+        } elseif (session('otp_channel') === 'email') {
+            try {
+                \Illuminate\Support\Facades\Mail::raw("Kode OTP Anda adalah: {$otp}\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.", function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Kode Verifikasi OTP - Ngekos');
+                });
+            } catch (\Exception $e) {
+                \Log::error('OTP Email Resend Error: ' . $e->getMessage());
+                return back()->with('error', 'Gagal mengirim ulang OTP ke Email. Silakan coba metode lain.');
+            }
         }
 
         return redirect()->route('otp.verify')->with('success', 'Kode OTP baru telah dikirim!');

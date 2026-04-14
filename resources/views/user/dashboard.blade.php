@@ -846,24 +846,31 @@
                                             </div>
                                         </div>
 
-                                        <!-- Room Price (Read-only) -->
-                                        <div class="mb-5">
-                                            <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
-                                                Harga Kamar (Rp)
-                                            </label>
-                                            <input type="number" :value="selectedKamar.harga" disabled
-                                                class="w-full px-5 py-3.5 bg-gray-100 border-2 border-gray-100 rounded-xl outline-none font-bold text-gray-500 cursor-not-allowed">
+                                        <!-- Total Payment Amount (Fixed) -->
+                                        <div class="mb-6 p-5 bg-[#36B2B2]/5 rounded-[2rem] border-2 border-[#36B2B2]/20 shadow-sm relative overflow-hidden group">
+                                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                                <svg class="w-16 h-16 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="relative z-10">
+                                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-[#36B2B2] mb-1">
+                                                    Total Pembayaran (Harus Pas)
+                                                </label>
+                                                <div class="flex items-baseline gap-1.5">
+                                                    <span class="text-sm font-black text-[#36B2B2]">Rp</span>
+                                                    <span class="text-4xl font-black text-gray-900 tracking-tighter" 
+                                                          x-text="Number(selectedKamar.harga).toLocaleString('id-ID')"></span>
+                                                </div>
+                                                <p class="text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-widest flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Nominal tetap sesuai harga sewa kamar
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <!-- "Bayar Berapa" Input -->
-                                        <div class="mb-5">
-                                            <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
-                                                Bayar Berapa (Rp) <span class="text-rose-500">*</span>
-                                            </label>
-                                            <input type="number" x-model="jumlahBayar" required
-                                                placeholder="Masukkan nominal yang akan dibayar"
-                                                class="w-full px-5 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:border-[#36B2B2] focus:bg-white outline-none transition-all font-bold text-gray-800">
-                                        </div>
 
                                         <!-- Payment Method Selection -->
                                         <div class="mb-5">

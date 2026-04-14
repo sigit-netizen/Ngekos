@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Notifications\AduanFasilitasNotification;
 
 class FasilitasController extends Controller
 {
@@ -77,7 +78,7 @@ class FasilitasController extends Controller
         }
 
         try {
-            Aduan::create([
+            $aduan = Aduan::create([
                 'id_user' => $user->id,
                 'id_kos' => $request->id_kos,
                 'judul' => $request->judul,
@@ -85,6 +86,22 @@ class FasilitasController extends Controller
                 'kategori' => 'fasilitas',
                 'status' => 'belum_dibaca',
             ]);
+
+            // Notify Kos Owner
+            $kos = $aduan->kos;
+            if ($kos && $kos->user) {
+                $target = $kos->user;
+                $data = [
+                    'nama' => $user->name,
+                    'kos' => $kos->nama_kos,
+                    'judul' => $request->judul,
+                    'pesan' => $request->pesan,
+                    'kategori' => 'fasilitas'
+                ];
+                dispatch(function () use ($target, $data) {
+                    $target->notify(new AduanFasilitasNotification($data));
+                })->afterResponse();
+            }
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -130,7 +147,7 @@ class FasilitasController extends Controller
         }
 
         try {
-            Aduan::create([
+            $aduan = Aduan::create([
                 'id_user' => $user->id,
                 'id_kos' => $request->id_kos,
                 'judul' => $request->judul,
@@ -138,6 +155,19 @@ class FasilitasController extends Controller
                 'kategori' => 'tambah',
                 'status' => 'belum_dibaca',
             ]);
+
+            // Notify Kos Owner (Queued for speed)
+            $kos = $aduan->kos;
+            if ($kos && $kos->user) {
+                $target = $kos->user;
+                $target->notify(new AduanFasilitasNotification([
+                    'nama' => $user->name,
+                    'kos' => $kos->nama_kos,
+                    'judul' => $request->judul,
+                    'pesan' => $request->pesan,
+                    'kategori' => 'tambah'
+                ]));
+            }
 
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([

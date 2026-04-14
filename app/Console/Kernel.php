@@ -12,8 +12,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Jalankan pengingat jatuh tempo setiap jam 8 pagi
-        $schedule->command('app:send-jatuh-tempo-notification')->dailyAt('08:00');
+        // Send rent reminders 3 times a day (Morning, Afternoon, Evening)
+        $schedule->command('tenant:due-reminder')->dailyAt('08:00');
+        $schedule->command('tenant:due-reminder')->dailyAt('13:00');
+        $schedule->command('tenant:due-reminder')->dailyAt('18:00');
 
         // Otomatis keluarkan penyewa mati (lewat 3 hari) setiap hari jam 1 malam
         $schedule->command('app:evict-dead-accounts')->dailyAt('01:00');

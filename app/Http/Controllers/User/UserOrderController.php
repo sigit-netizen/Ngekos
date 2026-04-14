@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kos;
 use App\Models\Kamar;
 use App\Models\Transaksi;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserOrderController extends Controller
@@ -241,10 +242,21 @@ class UserOrderController extends Controller
         // Get kamar details
         $kamar = Kamar::findOrFail($request->id_kamar);
 
+        // ENSURE fixed payment: jumlah_bayar must exactly match kamar->harga
+        if ($request->jumlah_bayar != $kamar->harga) {
+            return back()->with('error', 'Nominal pembayaran tidak sesuai dengan harga kamar. Silakan coba lagi.');
+        }
+
         if (!$isRentPayment) {
-            // NEW: Check if the room is locked by someone else (pending, verified or paid)
+            // NEW: Check if the room is locked by someone else (pending, verified or paid within 24h)
             $lockedOrder = Transaksi::where('id_kamar', $request->id_kamar)
-                ->whereIn('status', ['pending', 'verified', 'paid'])
+                ->where(function ($q) {
+                    $q->whereIn('status', ['pending', 'verified'])
+                        ->orWhere(function ($sq) {
+                            $sq->where('status', 'paid')
+                                ->where('created_at', '>=', now()->subDay());
+                        });
+                })
                 ->first();
 
             if ($lockedOrder) {
@@ -297,13 +309,16 @@ class UserOrderController extends Controller
             'jatuh_tempo' => $initialJatuhTempo,
         ]);
 
+        // Notify Kos Owner (Queued for speed)
         $owner = $kamar->kos->user;
-        if ($owner) {
+        if ($owner && $owner->nomor_wa) {
             $owner->notify(new \App\Notifications\OrderMasukNotification([
                 'nama' => $user->name,
                 'kos' => $kamar->kos->nama_kos,
                 'kamar' => $kamar->nomor_kamar,
-                'jumlah' => $request->jumlah_bayar
+                'jumlah' => $request->jumlah_bayar,
+                'tipe' => $tipe,
+                'is_superadmin' => false
             ]));
         }
 
@@ -363,6 +378,17 @@ class UserOrderController extends Controller
                 $order,
                 'bukti_pembayaran'
             );
+
+            // Notify Kos Owner
+            $owner = $order->kamar->kos->user;
+            if ($owner && $owner->nomor_wa) {
+                $owner->notify(new \App\Notifications\BuktiPembayaranNotification([
+                    'type' => 'tenant_order',
+                    'name' => auth()->user()->name,
+                    'kos_name' => $order->kamar->kos->nama_kos,
+                    'amount' => $order->jumlah_bayar,
+                ]));
+            }
 
             return back()->with('success', 'Bukti pembayaran berhasil diunggah. Mohon tunggu konfirmasi admin.');
         }

@@ -8,6 +8,7 @@ use App\Models\Kamar;
 use App\Models\User;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use App\Notifications\OrderVerifiedNotification;
 
 class OrderController extends Controller
 {
@@ -203,6 +204,17 @@ class OrderController extends Controller
             // HOLD THE ROOM
             $kamar->update(['status' => 'terisi']);
 
+            // Notify Tenant (Queued for speed)
+            $orderUser = User::find($transaksi->id_user);
+            if ($orderUser) {
+                $orderUser->notify(new OrderVerifiedNotification([
+                    'status' => 'verified',
+                    'nama_kos' => $kos->nama_kos,
+                    'nomor_kamar' => $kamar->nomor_kamar,
+                    'kategori' => $transaksi->tipe
+                ]));
+            }
+
             \DB::commit();
             return back()->with('success', 'Order telah diterima! Kamar telah diblokir sementara. User memiliki waktu 24 jam untuk bayar.');
         } catch (\Exception $e) {
@@ -297,6 +309,18 @@ class OrderController extends Controller
                 ->update(['status' => 'rejected']);
 
             \DB::commit();
+
+            // Notify Tenant (Queued for speed)
+            $orderUser = User::find($transaksi->id_user);
+            if ($orderUser) {
+                $orderUser->notify(new OrderVerifiedNotification([
+                    'status' => 'paid',
+                    'nama_kos' => $kos->nama_kos,
+                    'nomor_kamar' => $kamar->nomor_kamar,
+                    'kategori' => $transaksi->tipe
+                ]));
+            }
+
             return back()->with('success', 'Pembayaran dikonfirmasi! Penyewa sekarang aktif.');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -336,6 +360,18 @@ class OrderController extends Controller
             }
 
             \DB::commit();
+
+            // Notify Tenant (Queued for speed)
+            $orderUser = User::find($transaksi->id_user);
+            if ($orderUser) {
+                $orderUser->notify(new OrderVerifiedNotification([
+                    'status' => 'rejected',
+                    'nama_kos' => $kos->nama_kos,
+                    'nomor_kamar' => $kamar ? $kamar->nomor_kamar : '-',
+                    'kategori' => $transaksi->tipe
+                ]));
+            }
+
             return back()->with('success', 'Order berhasil ditolak. Kamar sekarang tersedia kembali.');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -385,6 +421,15 @@ class OrderController extends Controller
             $pendingUser->update(['status' => 'verified']);
 
             \DB::commit();
+
+            // Notify Tenant (Queued for speed)
+            $userRecord->notify(new OrderVerifiedNotification([
+                'status' => 'verified',
+                'nama_kos' => $kos->nama_kos,
+                'nomor_kamar' => '-',
+                'kategori' => 'registrasi'
+            ]));
+
             return back()->with('success', "Akun {$userRecord->name} berhasil diverifikasi sebagai penyewa!");
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -407,6 +452,20 @@ class OrderController extends Controller
         }
 
         $pendingUser->update(['status' => 'rejected']);
+
+        // Notify Tenant (Queued for speed)
+        $notifiable = new \App\Models\User([
+            'name' => $pendingUser->name,
+            'email' => $pendingUser->email,
+            'nomor_wa' => $pendingUser->nomor_wa
+        ]);
+        $notifiable->notify(new OrderVerifiedNotification([
+            'status' => 'rejected',
+            'nama_kos' => $kos->nama_kos,
+            'nomor_kamar' => '-',
+            'kategori' => 'registrasi'
+        ]));
+
         return back()->with('success', 'Pendaftaran user berhasil ditolak.');
     }
 }
