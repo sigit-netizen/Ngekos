@@ -16,7 +16,7 @@
     @endphp
 
     <div x-data="{ activeTab: '{{ $tab }}', currentStatus: '{{ $statusFilter }}' }">
-        <!-- Stats Cards (Tabs) - 3 cards per row -->
+        <!-- Kartu Statistik (Tab) - 3 kartu per baris (Stats Cards (Tabs) - 3 cards per row) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <!-- 1. Verifikasi Akun Member (Admin) -->
             <button @click="activeTab = 'pending_member'; window.location.href = '?tab=pending_member'"
@@ -131,7 +131,7 @@
                 <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
             </button>
 
-            <!-- 4. Akun Member Status (Active/Rejected) -->
+            <!-- 4. Status Akun Member (Aktif/Ditolak) (Akun Member Status (Active/Rejected)) -->
             <button @click="activeTab = 'active_member'; window.location.href = '?tab=active_member&status=' + currentStatus"
                 class="relative p-6 rounded-3xl border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="activeTab === 'active_member' 
@@ -157,7 +157,7 @@
             </button>
 
 
-            <!-- 5. Akun User Status -->
+            <!-- 5. Status Akun User (Akun User Status) -->
             <button @click="activeTab = 'active_user'; window.location.href = '?tab=active_user&status=' + currentStatus"
                 class="relative p-6 rounded-3xl border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="activeTab === 'active_user' 
@@ -181,7 +181,7 @@
                 <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
             </button>
 
-            <!-- 6. Paket Status -->
+            <!-- 6. Status Paket (Paket Status) -->
             <button @click="activeTab = 'active_paket'; window.location.href = '?tab=active_paket&status=' + currentStatus"
                 class="relative p-6 rounded-3xl border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="activeTab === 'active_paket' 
@@ -204,11 +204,11 @@
             </button>
         </div>
 
-        <!-- Content Area -->
+        <!-- Area Konten (Content Area) -->
         <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden min-h-[500px]" data-aos="fade-up"
             data-aos-delay="100">
 
-            <!-- Tab Header with Filter -->
+            <!-- Kepala Tab dengan Filter (Tab Header with Filter) -->
             <div
                 class="px-8 py-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
                 <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
@@ -224,7 +224,7 @@
                         "></span>
                 </h3>
 
-                <!-- Status Filter for Verified Tabs -->
+                <!-- Filter Status untuk Tab Terverifikasi (Status Filter for Verified Tabs) -->
                 <template x-if="['active_member', 'active_user', 'active_paket'].includes(activeTab)">
                     <div class="flex items-center p-1.5 bg-gray-100/50 backdrop-blur-md border border-gray-200 rounded-2xl shadow-inner">
                         <button
@@ -243,9 +243,9 @@
                 </template>
             </div>
 
-            <!-- Tables Section -->
+            <!-- Bagian Tabel (Tables Section) -->
             <div class="p-0">
-                <!-- 1. Pending Members Table -->
+                <!-- 1. Tabel Member Tertunda (Pending Members Table) -->
                 <div x-show="activeTab === 'pending_member'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left whitespace-nowrap">
@@ -320,7 +320,7 @@
                     <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">{{ $pendingMembers->links() }}</div>
                 </div>
 
-                <!-- 1b. Pending Payment Members Table -->
+                <!-- 1b. Tabel Pembayaran Member Tertunda (Pending Payment Members Table) -->
                 <div x-show="activeTab === 'pending_payment_member'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left whitespace-nowrap">
@@ -386,7 +386,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Active/Rejected Members Table -->
+                <!-- 2. Tabel Member Aktif/Ditolak (Active/Rejected Members Table) -->
                 <div x-show="activeTab === 'active_member'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -437,7 +437,7 @@
                     <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">{{ $activeMembers->links() }}</div>
                 </div>
 
-                <!-- 3. Pending Users Table (Anak Kos) -->
+                <!-- 3. Tabel User Tertunda (Anak Kos) (Pending Users Table (Anak Kos)) -->
                 <div x-show="activeTab === 'pending_user'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -485,7 +485,7 @@
                     </div>
                 </div>
 
-                <!-- 4. Active/Rejected User Table -->
+                <!-- 4. Tabel User Aktif/Ditolak (Active/Rejected User Table) -->
                 <div x-show="activeTab === 'active_user'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -525,7 +525,7 @@
                     <div class="px-8 py-6 bg-gray-50/30 border-t border-gray-100">{{ $activeUsers->links() }}</div>
                 </div>
 
-                <!-- 5. Pending Packets Table -->
+                <!-- 5. Tabel Paket Tertunda (Pending Packets Table) -->
                 <div x-show="activeTab === 'pending_paket'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -641,7 +641,7 @@
                     </div>
                 </div>
 
-                <!-- 6. Active/Rejected Packet Table -->
+                <!-- 6. Tabel Paket Aktif/Ditolak (Active/Rejected Packet Table) -->
                 <div x-show="activeTab === 'active_paket'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -683,19 +683,19 @@
         </div>
     </div>
 
-    {{-- Rejection Reason Modal --}}
+    {{-- Modal Alasan Penolakan (Rejection Reason Modal) --}}
     <div x-data="{ open: false, rejectId: null, rejectName: '', rejectNik: '' }"
          @open-reject-modal.window="open = true; rejectId = $event.detail.id; rejectName = $event.detail.name; rejectNik = $event.detail.nik"
          x-show="open" x-cloak
          class="fixed inset-0 z-[100] flex items-center justify-center p-4">
 
-        {{-- Backdrop --}}
+        {{-- Latar Belakang (Backdrop) --}}
         <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
              @click="open = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-        {{-- Modal Content --}}
+        {{-- Konten Modal (Modal Content) --}}
         <div x-show="open" x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -704,7 +704,7 @@
              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
              class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
 
-            {{-- Header --}}
+            {{-- Kepala (Header) --}}
             <div class="p-6 border-b border-gray-100 bg-red-50/50">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -719,11 +719,11 @@
                 </div>
             </div>
 
-            {{-- Body --}}
+            {{-- Badan (Body) --}}
             <form :action="`{{ url('superadmin/order/user') }}/` + rejectId + `/reject`" method="POST" class="p-6 space-y-4">
                 @csrf
 
-                {{-- Info --}}
+                {{-- Informasi (Info) --}}
                 <div class="bg-gray-50 rounded-2xl p-4 space-y-2">
                     <div class="flex items-center gap-2 text-xs">
                         <span class="text-gray-400 font-bold">Nama:</span>
@@ -735,7 +735,7 @@
                     </div>
                 </div>
 
-                {{-- Rejection Reason --}}
+                {{-- Alasan Penolakan (Rejection Reason) --}}
                 <div>
                     <label class="block text-xs font-black text-gray-600 mb-2 uppercase tracking-wider">Alasan Penolakan <span class="text-red-500">*</span></label>
                     <select name="rejection_reason" required
@@ -753,7 +753,7 @@
                     </select>
                 </div>
 
-                {{-- Actions --}}
+                {{-- Aksi (Actions) --}}
                 <div class="flex items-center gap-3 pt-2">
                     <button type="button" @click="open = false"
                         class="flex-1 py-3 text-gray-600 font-bold rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm">
@@ -767,14 +767,14 @@
             </form>
         </div>
     </div>
-    <!-- Modal View Bukti Bayar -->
+    {{-- Modal Lihat Bukti Bayar (Modal View Bukti Bayar) --}}
     <div x-data="{ showProof: false, imageUrl: '' }" 
          x-show="showProof" 
          @open-proof-modal.window="showProof = true; imageUrl = $event.detail.url"
          x-cloak
          class="fixed inset-0 z-[200] overflow-y-auto flex items-center justify-center p-4">
         
-        <!-- Backdrop -->
+        <!-- Latar Belakang (Backdrop) -->
         <div x-show="showProof" 
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0"
@@ -794,7 +794,7 @@
             </svg>
         </button>
 
-        <!-- Image Container (Smaller) -->
+        <!-- Wadah Gambar (Lebih Kecil) (Image Container (Smaller)) -->
         <div x-show="showProof"
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"

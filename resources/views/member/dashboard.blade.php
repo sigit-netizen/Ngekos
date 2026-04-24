@@ -25,7 +25,7 @@
                                                                                 }
                                                                             }" class="relative isolate min-h-screen">
 
-        <!-- Section Title -->
+        <!-- Judul Bagian (Section Title) -->
         <div class="flex items-center justify-between mb-8" data-aos="fade-up">
             <div>
                 <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tight Level 1">Statistik & Detail Properti
@@ -58,7 +58,7 @@
                 </a>
             </div>
         @else
-            <!-- Notification Alert Card -->
+            <!-- Kartu Peringatan Notifikasi (Notification Alert Card) -->
             @php
                 $pendingRegistrations = $stats['pendingCount'] ?? 0;
                 $pendingPayments = $stats['orderKonfirmasiCount'] ?? 0;
@@ -69,7 +69,7 @@
             @if($totalAlerts > 0)
                 <div class="mb-8" data-aos="zoom-in">
                     <div class="relative overflow-hidden bg-gradient-to-r from-rose-500 to-rose-600 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl shadow-rose-200">
-                        <!-- Decorative Shapes -->
+                        <!-- Bentuk Dekoratif (Decorative Shapes) -->
                         <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
                         <div class="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
 
@@ -115,10 +115,10 @@
                     </div>
                 </div>
             @endif
-            <!-- Information Grid -->
+            <!-- Kisi Informasi (Information Grid) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8 relative">
 
-                <!-- Card 1: Nama Kos (Inline Edit) -->
+                <!-- Kartu 1: Nama Kos (Edit Langsung) (Nama Kos Inline Edit) -->
                 <div @click="if(editingField !== 'nama_kos') editingField = 'nama_kos'"
                     class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:border-[#36B2B2]/30 hover:shadow-xl group cursor-pointer"
                     :class="editingField === 'nama_kos' ? 'border-[#36B2B2] shadow-xl' : ''" data-aos="fade-up"
@@ -193,7 +193,7 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Alamat Properti (Inline Edit) -->
+                <!-- Kartu 2: Alamat Properti (Edit Langsung) (Alamat Inline Edit) -->
                 <div @click="if(editingField !== 'alamat') editingField = 'alamat'"
                     class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:border-indigo-200 hover:shadow-xl group cursor-pointer"
                     :class="editingField === 'alamat' ? 'border-indigo-400 shadow-xl' : ''" data-aos="fade-up"
@@ -250,7 +250,7 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Kota Properti (Inline Edit) -->
+                <!-- Kartu 3: Kota Properti (Edit Langsung) (Kota Inline Edit) -->
                 <div @click="if(editingField !== 'kota') editingField = 'kota'"
                     class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:border-cyan-200 hover:shadow-xl group cursor-pointer"
                     :class="editingField === 'kota' ? 'border-cyan-400 shadow-xl' : ''" data-aos="fade-up" data-aos-delay="300">
@@ -306,7 +306,7 @@
                     </div>
                 </div>
 
-                <!-- Card 4: Rentan Harga (Read Only) -->
+                <!-- Kartu 4: Rentang Harga (Hanya Baca) (Price Range Read Only) -->
                 <div class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-500 hover:border-amber-200 hover:shadow-xl group"
                     data-aos="fade-up" data-aos-delay="400">
                     <div class="relative z-[1]">
@@ -334,7 +334,7 @@
                     </div>
                 </div>
 
-                <!-- Card 5: Kode Kos (Inline Edit - Conditional) -->
+                <!-- Kartu 5: Kode Kos (Edit Langsung - Kondisional) (Kode Kos Inline Edit) -->
                 <div @click="if(!@json($kos->is_kode_kos_edited) && editingField !== 'kode_kos') editingField = 'kode_kos'"
                     class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-300 group"
                     :class="[
@@ -400,7 +400,7 @@
                     </div>
                 </div>
 
-                <!-- Card 6: Total Kamar (Read Only) -->
+                <!-- Kartu 6: Total Kamar (Hanya Baca) (Total Kamar Read Only) -->
                 <div class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-500 hover:border-violet-200 hover:shadow-xl group"
                     data-aos="fade-up" data-aos-delay="600">
                     <div class="relative z-[1]">
@@ -431,7 +431,7 @@
                     </div>
                 </div>
 
-                <!-- Card 7: Total Penyewa (Read Only) -->
+                <!-- Kartu 7: Total Penyewa (Hanya Baca) (Total Penyewa Read Only) -->
                 <div class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-500 hover:border-emerald-200 hover:shadow-xl group"
                     data-aos="fade-up" data-aos-delay="700">
                     <div class="relative z-[1]">
@@ -453,7 +453,7 @@
                     </div>
                 </div>
 
-                <!-- Card 8: Kategori (Inline Edit) -->
+                <!-- Kartu 8: Kategori (Edit Langsung) (Kategori Inline Edit) -->
                 <div @click="if(editingField !== 'kategori') editingField = 'kategori'"
                     class="relative overflow-visible bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:border-teal-200 hover:shadow-xl group cursor-pointer"
                     :class="editingField === 'kategori' ? 'border-teal-400 shadow-xl' : ''" data-aos="fade-up"
@@ -516,7 +516,7 @@
 
             </div>
 
-            <!-- Chart Section -->
+            <!-- Bagian Grafik (Chart Section) -->
             @if ($kos)
                 <div class="mt-8 sm:mt-12 bg-white rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-2 border-gray-100 shadow-sm transition-all hover:shadow-md"
                     data-aos="fade-up" data-aos-delay="800">
@@ -528,7 +528,7 @@
                         <div class="flex flex-wrap items-center gap-3">
                             <form action="{{ route('admin.dashboard') }}" method="GET" class="flex items-center gap-2"
                                 id="filterForm">
-                                <!-- Year Filter -->
+                                <!-- Filter Tahun (Year Filter) -->
                                 <select name="year" onchange="document.getElementById('filterForm').submit()"
                                     class="bg-gray-50 border-2 border-gray-100 text-gray-700 text-xs font-bold rounded-xl px-3 py-2 outline-none focus:border-[#36B2B2] transition-all">
                                     @foreach($years as $year)
@@ -536,7 +536,7 @@
                                     @endforeach
                                 </select>
 
-                                <!-- Month Filter -->
+                                <!-- Filter Bulan (Month Filter) -->
                                 <select name="month" onchange="document.getElementById('filterForm').submit()"
                                     class="bg-gray-50 border-2 border-gray-100 text-gray-700 text-xs font-bold rounded-xl px-3 py-2 outline-none focus:border-[#36B2B2] transition-all">
                                     <option value="">Semua Bulan</option>
@@ -594,7 +594,7 @@
                 if (ctx) {
                     const chartCtx = ctx.getContext('2d');
 
-                    // Create Gradient
+                    // Buat Gradien (Create Gradient) --}}
                     const gradient = chartCtx.createLinearGradient(0, 0, 0, 400);
                     gradient.addColorStop(0, 'rgba(54, 178, 178, 0.25)');
                     gradient.addColorStop(1, 'rgba(54, 178, 178, 0)');

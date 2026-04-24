@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 class CreatePushSubscriptionsTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      *
      * @return void
      */
@@ -25,7 +25,7 @@ class CreatePushSubscriptionsTable extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Batalkan migrasi.
      *
      * @return void
      */

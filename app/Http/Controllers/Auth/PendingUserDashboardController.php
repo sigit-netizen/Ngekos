@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\RateLimiter;
 class PendingUserDashboardController extends Controller
 {
     /**
-     * Step 1: Update basic profile (NIK, DOB, Alamat).
+     * Langkah 1: Perbarui profil dasar (NIK, Tanggal Lahir, Alamat).
      */
     public function stepOne(Request $request)
     {
@@ -53,7 +53,7 @@ class PendingUserDashboardController extends Controller
     }
 
     /**
-     * Step 2: Send OTP via WhatsApp and save package (Owners only).
+     * Langkah 2: Kirim OTP melalui WhatsApp dan simpan paket (Khusus Pemilik/Owner).
      */
     public function sendOtp(Request $request)
     {
@@ -66,10 +66,10 @@ class PendingUserDashboardController extends Controller
             'nomor_wa' => ['required', 'numeric', 'min_digits:10', 'unique:users,nomor_wa', 'unique:pending_users,nomor_wa,' . $pendingUser->id],
         ];
 
-        // Only Owners (id_plans == 2) need to choose a package
+        // Hanya Pemilik (id_plans == 2) yang perlu memilih paket
         if ($pendingUser->id_plans == 2) {
             $rules['plan_type'] = ['required', 'string'];
-            // If plan contains 'Kamar', jumlah_kamar is required and min 1
+            // Jika paket berisi 'Kamar', jumlah_kamar wajib diisi dan minimal 1
             if (str_contains(strtolower($request->plan_type), 'kamar')) {
                 $rules['jumlah_kamar'] = ['required', 'integer', 'min:1'];
             }
@@ -77,8 +77,8 @@ class PendingUserDashboardController extends Controller
 
         $request->validate($rules);
 
-        // Find id_plans from plans table
-        $idPlans = $pendingUser->id_plans; // default
+        // Cari id_plans dari tabel plans
+        $idPlans = $pendingUser->id_plans; // Standar (Default)
         if ($request->has('plan_type')) {
             $plan = \Illuminate\Support\Facades\DB::table('plans')
                 ->where('nama_plans', $request->plan_type)
@@ -88,14 +88,14 @@ class PendingUserDashboardController extends Controller
             }
         }
 
-        // Rate limit OTP sending...
+        // Pembatasan rate pengiriman OTP...
         $throttleKey = 'pending-otp-' . $pendingUserId;
         if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
             return back()->with('error', 'Harap tunggu 1 menit sebelum mengirim ulang kode.');
         }
         RateLimiter::hit($throttleKey, 60);
 
-        // Generate OTP
+        // Hasilkan OTP
         $otp = random_int(100000, 999999);
         
         $data = [
@@ -115,7 +115,7 @@ class PendingUserDashboardController extends Controller
 
         $pendingUser->update($data);
 
-        // Send OTP via Fonnte
+        // Kirim OTP melalui Fonnte
         $fonnteService = app(FonnteService::class);
         $message = "Kode OTP pendaftaran Ngekos Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Jangan berikan kode ini kepada siapapun.";
         $fonnteService->sendMessage($request->nomor_wa, $message);
@@ -124,7 +124,7 @@ class PendingUserDashboardController extends Controller
     }
 
     /**
-     * Step 3: Verify OTP and finalize.
+     * Langkah 3: Verifikasi OTP dan selesaikan.
      */
     public function verifyOtp(Request $request)
     {
@@ -145,12 +145,12 @@ class PendingUserDashboardController extends Controller
             return back()->with('error', 'Kode OTP salah.');
         }
 
-        // Finalize: Set status to 'menunggu_verifikasi' or keep 'pending' but mark as complete
-        // We will keep 'pending' for now but the dashboard UI will know it's complete because NIK and WA are filled & verified
+        // Selesaikan: Setel status ke 'menunggu_verifikasi' atau biarkan 'pending' tetapi tandai sebagai selesai
+        // Kami akan membiarkan 'pending' untuk saat ini tetapi UI dashboard akan tahu itu sudah selesai karena NIK dan WA sudah diisi & diverifikasi
         $pendingUser->update([
-            'otp' => null, // Clear OTP after success
+            'otp' => null, // Bersihkan OTP setelah berhasil
             'otp_expires_at' => null,
-            'status' => 'pending', // You might want a specific status like 'verified_data'
+            'status' => 'pending', // Anda mungkin menginginkan status spesifik seperti 'verified_data'
         ]);
 
         return back()->with('success', 'WhatsApp berhasil diverifikasi! Data Anda telah dikirim ke Super Admin untuk ditinjau.');

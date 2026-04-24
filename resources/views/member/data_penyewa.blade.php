@@ -1,8 +1,14 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
+    @php
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        /** @var \App\Models\Kos $kos */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator|\App\Models\User[] $penyewas */
+    @endphp
     <div class="pb-12 text-gray-800">
-        <!-- Header Section -->
+        <!-- Bagian Header (Header Section) -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10" data-aos="fade-up">
             <div class="flex-1">
                 <div
@@ -25,7 +31,7 @@
             </div>
         </div>
 
-        <!-- Status Tabs -->
+        <!-- Tab Status (Status Tabs) -->
         <div class="flex items-center gap-4 mb-8 bg-gray-100/50 p-1.5 rounded-[1.5rem] w-fit border border-gray-100" data-aos="fade-up">
             <a href="{{ route('admin.data_penyewa', ['status' => 'active']) }}" 
                 class="px-6 py-2.5 rounded-[1.2rem] text-xs font-black uppercase tracking-widest transition-all duration-300 {{ $status === 'active' ? 'bg-white text-[#36B2B2] shadow-sm border border-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
@@ -52,7 +58,7 @@
                 <p class="text-gray-500 mb-10 max-w-sm mx-auto font-medium">Saat ini belum ada penyewa yang terdaftar aktif di kos Anda.</p>
             </div>
         @else
-            {{-- Desktop Table View --}}
+            {{-- Tampilan Tabel Desktop (Desktop Table View) --}}
             <div class="hidden md:block bg-white border-2 border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm mb-6" data-aos="fade-up">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -68,6 +74,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-50">
                             @foreach($penyewas as $penyewa)
+                                @php /** @var \App\Models\User $penyewa */ @endphp
                                 <tr class="hover:bg-gray-50/80 transition-colors group">
                                     <td class="px-8 py-6">
                                         <div class="flex items-center gap-4">
@@ -143,11 +150,11 @@
                 </div>
             </div>
 
-            {{-- Mobile Card View --}}
+            {{-- Tampilan Kartu Mobile (Mobile Card View) --}}
             <div class="grid grid-cols-1 gap-5 md:hidden mb-10" data-aos="fade-up">
                 @foreach($penyewas as $penyewa)
                     <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm relative overflow-hidden group">
-                        <!-- Background Accent -->
+                        <!-- Aksen Latar Belakang (Background Accent) -->
                         <div class="absolute top-0 right-0 w-32 h-32 {{ $status === 'rejected' ? 'bg-red-500/5' : 'bg-[#36B2B2]/5' }} rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
                         
                         <div class="relative flex items-center gap-4 mb-6">
@@ -219,7 +226,7 @@
                 @endforeach
             </div>
 
-            <!-- Pagination -->
+            <!-- Paginasi (Pagination) -->
             @if($penyewas->hasPages())
                 <div class="px-8 py-6 bg-gray-50/50 border-t border-gray-100 rounded-b-[2.5rem]">
                     {{ $penyewas->links() }}

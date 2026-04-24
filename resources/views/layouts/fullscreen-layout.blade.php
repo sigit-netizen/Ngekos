@@ -39,7 +39,7 @@
             display: none !important;
         }
 
-        /* Modern SweetAlert2 UI - White & Gradient Border */
+        /* UI SweetAlert2 Modern - Putih & Gradasi Border (Modern SweetAlert2 UI - White & Gradient Border) */
         .modern-swal-popup {
             background-color: transparent !important;
             background-image: linear-gradient(white, white), linear-gradient(135deg, #36B2B2, #000000) !important;
@@ -114,14 +114,14 @@
             gap: 0.5rem !important;
         }
 
-        /* Dark Mode Consistency */
+        /* Konsistensi Mode Gelap (Dark Mode Consistency) */
         .dark .modern-swal-popup {
             background-image: linear-gradient(white, white), linear-gradient(135deg, #36B2B2, #000000) !important;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
         }
     </style>
 
-    <!-- Theme Store -->
+    <!-- Penyimpanan Tema (Theme Store) -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
@@ -198,7 +198,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-    <!-- Global Helpers -->
+    <!-- Pembantu Global (Global Helpers) -->
     <script>
         window.swalConfirm = (title, text, icon = 'question') => {
             return Swal.fire({
@@ -241,7 +241,7 @@
         };
     </script>
 
-    <!-- Apply dark mode immediately to prevent flash -->
+    <!-- Terapkan mode gelap segera untuk mencegah kilatan cahaya (Apply dark mode immediately to prevent flash) -->
     <script>
         (function () {
             const savedTheme = localStorage.getItem('theme');
@@ -281,7 +281,7 @@ window.addEventListener('resize', checkMobile);">
 
 @stack('scripts')
 
-<!-- Push Notification Setup Script -->
+<!-- Skrip Pengaturan Notifikasi Push (Push Notification Setup Script) -->
 <script>
     function updatePushUI(isSubscribed) {
         const btn = document.getElementById('push-notification-btn');

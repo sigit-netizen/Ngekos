@@ -47,29 +47,29 @@ class DashboardController extends Controller
                 $stats['sisaKuota'] = $stats['limitKamar'] - $stats['totalKamar'];
             }
 
-            // Count for 'Konfirmasi' (Sudah upload bukti tapi belum dikonfirmasi admin) - Initial Booking
+            // Jumlah untuk 'Konfirmasi' (Sudah unggah bukti tapi belum dikonfirmasi admin) - Pemesanan Awal (Initial Booking)
             $stats['orderKonfirmasiCount'] = Transaksi::where('kode_kos', $kos->kode_kos)
                 ->where('status', 'verified')
                 ->where('tipe', Transaksi::TYPE_BOOKING)
                 ->whereNotNull('bukti_pembayaran')
                 ->count();
 
-            // Count for 'Konfirmasi' - Recurring Rent
+            // Jumlah untuk 'Konfirmasi' - Sewa Berulang (Recurring Rent)
             $stats['rentKonfirmasiCount'] = Transaksi::where('kode_kos', $kos->kode_kos)
                 ->whereIn('status', ['pending', 'verified'])
                 ->where('tipe', Transaksi::TYPE_SEWA)
                 ->count();
 
-            // Count pending penyewa from pending_users table who registered with this kos's kode_kos
+            // Hitung penyewa tertunda dari tabel pending_users yang mendaftar dengan kode_kos kos ini
             $stats['pendingCount'] = PendingUser::where('kode_kos', $kos->kode_kos)
                 ->where('status', 'pending')
                 ->count();
         }
 
-        // Available years for filter (2026 - 2035)
+        // Tahun yang tersedia untuk filter (2026 - 2035)
         $years = range(2026, 2035);
 
-        // Data for Tenant Chart
+        // Data untuk Grafik Penyewa
         $chartData = $this->getChartData($kos, $request);
 
         return view('member.dashboard', [
@@ -98,7 +98,7 @@ class DashboardController extends Controller
         $now = Carbon::now();
 
         if ($month) {
-            // Data per day for selected month
+            // Data per hari untuk bulan yang dipilih
             $targetMonth = Carbon::create($year, $month);
             $daysInMonth = $targetMonth->daysInMonth;
 
@@ -106,7 +106,7 @@ class DashboardController extends Controller
                 $date = Carbon::create($year, $month, $i);
                 $labels[] = $i;
 
-                // If date is in the future, return null to break the line
+                // Jika tanggal ada di masa depan, kembalikan null untuk memutus garis grafik
                 if ($date->gt($now->endOfDay())) {
                     $data[] = null;
                     continue;
@@ -123,12 +123,12 @@ class DashboardController extends Controller
                 $data[] = $count;
             }
         } else {
-            // Data per month for selected year
+            // Data per bulan untuk tahun yang dipilih
             for ($i = 1; $i <= 12; $i++) {
                 $date = Carbon::create($year, $i)->endOfMonth();
                 $labels[] = Carbon::create($year, $i)->translatedFormat('M');
 
-                // If the start of this month is in the future, return null
+                // Jika awal bulan ini ada di masa depan, kembalikan null
                 if (Carbon::create($year, $i, 1)->gt($now)) {
                     $data[] = null;
                     continue;

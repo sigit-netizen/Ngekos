@@ -4,14 +4,14 @@
     <div
         class="relative min-h-screen bg-gradient-to-b from-slate-50/80 to-white overflow-hidden py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-inter">
 
-        <!-- Decorative Background Elements -->
+        <!-- Elemen Latar Belakang Dekoratif (Decorative Background Elements) -->
         <div class="absolute top-10 left-10 w-72 h-72 bg-[#36B2B2]/10 rounded-full blur-3xl -z-10 animate-float"></div>
         <div class="absolute bottom-20 right-10 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl -z-10 animate-float"
             style="animation-delay: 1.5s;"></div>
 
         <div class="w-full max-w-[480px] z-10">
 
-            <!-- Logo Section -->
+            <!-- Bagian Logo (Logo Section) -->
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
                     class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
@@ -20,7 +20,7 @@
                 <p class="mt-3 text-sm font-medium text-gray-500">Selamat datang kembali di Ngekos</p>
             </div>
 
-            <!-- Glassmorphism Card -->
+            <!-- Kartu Glassmorphism (Glassmorphism Card) -->
             <div class="bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl shadow-gray-200/60 border border-gray-100 p-8 sm:p-10 transform transition-all duration-500 hover:shadow-[#36b2b2]/5"
                 data-aos="fade-up" data-aos-duration="1000">
 
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 mb-6">
-                    <!-- Google Sign In Button -->
+                    <!-- Tombol Masuk Google (Google Sign In Button) -->
                     <button
                         class="flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-100 transition-all hover:bg-gray-100 hover:border-gray-200 hover:shadow-sm">
                         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +51,7 @@
                         </svg>
                         Google
                     </button>
-                    <!-- X (Twitter) Sign In Button -->
+                    <!-- Tombol Masuk X (Twitter) (X Twitter Sign In Button) -->
                     <button
                         class="flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-100 transition-all hover:bg-gray-100 hover:border-gray-200 hover:shadow-sm">
                         <svg width="18" class="fill-current text-gray-900" height="18" viewBox="0 0 21 20" fill="none"
@@ -63,7 +63,7 @@
                     </button>
                 </div>
 
-                <!-- Divider -->
+                <!-- Pembatas (Divider) -->
                 <div class="relative py-4 mb-2 flex items-center justify-center">
                     <div class="absolute inset-0 flex items-center">
                         <div class="w-full border-t border-gray-100"></div>
@@ -141,7 +141,7 @@
                     @endif
 
                     <div class="space-y-5">
-                        <!-- Email Input -->
+                        <!-- Input Email (Email Input) -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
@@ -155,7 +155,7 @@
                             @enderror
                         </div>
 
-                        <!-- Password Input -->
+                        <!-- Input Kata Sandi (Password Input) -->
                         <div class="group">
                             <label
                                 class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
@@ -186,7 +186,7 @@
                             @enderror
                         </div>
 
-                        <!-- Checkbox & Forgot Password -->
+                        <!-- Checkbox & Lupa Kata Sandi (Checkbox & Forgot Password) -->
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
                             <div x-data="{ checkboxToggle: false }">
                                 <label for="checkboxLabelOne"
@@ -215,7 +215,7 @@
                             </a>
                         </div>
 
-                        <!-- Submit Button -->
+                        <!-- Tombol Submit (Submit Button) -->
                         <div class="pt-4">
                             <button type="submit"
                                 class="w-full relative flex items-center justify-center rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] px-4 py-4 text-sm font-bold text-white shadow-lg shadow-[#36b2b2]/30 hover:shadow-[#36b2b2]/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
@@ -227,7 +227,7 @@
                                             d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </span>
-                                <!-- Hover flare effect -->
+                                <!-- Efek kilauan saat hover (Hover flare effect) -->
                                 <div
                                     class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1s_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent">
                                 </div>
@@ -247,7 +247,7 @@
 
             </div>
 
-            <!-- Back formatting like welcome section -->
+            <!-- Format kembali seperti bagian welcome (Back formatting like welcome section) -->
             <div class="mt-8 text-center">
                 <a href="/"
                     class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white/50 hover:bg-white border border-gray-200 rounded-full text-xs font-semibold text-gray-600 hover:text-[#36B2B2] transition shadow-sm backdrop-blur-sm group">
@@ -264,7 +264,7 @@
     </div>
 
     <style>
-        /* Floating Animation */
+        /* Animasi Mengambang (Floating Animation) */
         @keyframes float {
 
             0%,
@@ -281,7 +281,7 @@
             animation: float 4s ease-in-out infinite;
         }
 
-        /* Shimmer Button Effect */
+        /* Efek Kilau Tombol (Shimmer Button Effect) */
         @keyframes shimmer {
             100% {
                 transform: translateX(100%);

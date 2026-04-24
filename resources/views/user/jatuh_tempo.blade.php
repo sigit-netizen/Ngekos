@@ -6,7 +6,7 @@
         <p class="text-gray-500 text-sm">Selalu perhatikan tanggal pembayaran dan sisa tempo sewa Anda agar tidak terkena denda.</p>
     </div>
 
-    {{-- Notification Banner --}}
+    {{-- Banner Notifikasi (Notification Banner) --}}
     @if($computedStatus == 'grace')
         <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-r-xl shadow-sm" data-aos="fade-down">
             <div class="flex items-center">
@@ -44,10 +44,10 @@
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="100">
-        <!-- Active Package Card -->
+        <!-- Kartu Paket Aktif (Active Package Card) -->
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-                <!-- Decoration -->
+                <!-- Dekorasi (Decoration) -->
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#36B2B2]/5 rounded-full blur-3xl"></div>
                 
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Basic Info -->
+                    <!-- Informasi Dasar (Basic Info) -->
                     <div class="space-y-6">
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kamar Ditempati</p>
@@ -92,7 +92,7 @@
                         </div>
                     </div>
 
-                    <!-- Date Info -->
+                    <!-- Informasi Tanggal (Date Info) -->
                     <div class="space-y-6">
                         <div>
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Bayar Terakhir</p>
@@ -104,7 +104,7 @@
                         </div>
                     </div>
 
-                    <!-- Countdown Info -->
+                    <!-- Informasi Hitung Mundur (Countdown Info) -->
                     @php
                         $statusColors = [
                             'active' => 'bg-[#36B2B2]/5 border-[#36B2B2]/10 text-[#36B2B2]',
@@ -147,7 +147,7 @@
                 </div>
             </div>
 
-            <!-- History Section -->
+            <!-- Bagian Riwayat (History Section) -->
             <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
                 <h4 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@
             </div>
         </div>
 
-        <!-- Buy New Plan Card -->
+        <!-- Kartu Beli Paket Baru (Buy New Plan Card) -->
         <div class="lg:col-span-1 space-y-6">
             <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden h-fit">
                 <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">

@@ -21,12 +21,12 @@ class ProcessImageOptimization implements ShouldQueue
     protected $field;
 
     /**
-     * The number of seconds the job can run before timing out.
+     * Jumlah detik pekerjaan dapat berjalan sebelum waktu habis (timeout).
      */
     public $timeout = 300; // 5 minutes
 
     /**
-     * Create a new job instance.
+     * Buat instance job baru (Create a new job instance).
      */
     public function __construct($tempPath, $directory, Model $model, $field = 'foto')
     {
@@ -37,34 +37,34 @@ class ProcessImageOptimization implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Eksekusi job (Execute the job).
      */
     public function handle(): void
     {
-        ini_set('memory_limit', '512M'); // Increase memory for large images
+        ini_set('memory_limit', '512M'); // Tingkatkan memori untuk gambar besar
         
-        // 1. Check if temp file exists
+        // 1. Periksa apakah file sementara (temp file) ada
         if (!Storage::disk('public')->exists($this->tempPath)) {
             return;
         }
 
         $fullPath = storage_path('app/public/' . $this->tempPath);
 
-        // Capture old file path before updating
+        // Ambil jalur file lama sebelum memperbarui (updating)
         $oldFile = $this->model->{$this->field};
 
-        // 2. Process and optimize
+        // 2. Proses dan optimalkan (Process and optimize)
         $newPath = ImageHelper::uploadAndOptimize($fullPath, $this->directory);
 
-        // 3. Update Model
+        // 3. Perbarui Model (Update Model)
         $this->model->update([
             $this->field => $newPath
         ]);
 
-        // 4. Delete temp file
+        // 4. Hapus file sementara (Delete temp file)
         Storage::disk('public')->delete($this->tempPath);
 
-        // 5. Delete old optimized image file
+        // 5. Hapus file gambar lama yang sudah dioptimalkan (old optimized image)
         if ($oldFile) {
             $oldPath = str_replace('storage/', '', $oldFile);
             if (Storage::disk('public')->exists($oldPath)) {

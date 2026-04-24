@@ -2,7 +2,7 @@
 
 @section('dashboard-content')
     <div x-data="aduanUser()" class="space-y-6">
-        {{-- Header --}}
+        {{-- Kepala (Header) --}}
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/50" data-aos="fade-up">
             <div class="flex items-center justify-between">
                 <div>
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        {{-- Table --}}
+        {{-- Tabel (Table) --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-aos="fade-up"
             data-aos-delay="100">
             <div class="overflow-x-auto">
@@ -98,7 +98,7 @@
                 </table>
             </div>
 
-            {{-- Pagination Controls --}}
+            {{-- Kontrol Paginasi (Pagination Controls) --}}
             <div class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
                 <div class="text-xs text-gray-500">
                     Menampilkan <span class="font-bold text-gray-900" x-text="paginatedItems.length"></span> dari <span
@@ -129,7 +129,7 @@
             </div>
         </div>
 
-        {{-- Detail Modal --}}
+        {{-- Modal Detail (Detail Modal) --}}
         <div x-show="showDetail" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div x-show="showDetail" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" @click="showDetail = false"

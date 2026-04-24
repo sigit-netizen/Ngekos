@@ -4,7 +4,7 @@
     <div
         class="relative min-h-screen bg-gradient-to-b from-slate-50/80 to-white overflow-hidden py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-inter">
 
-        <!-- Decorative Background -->
+        <!-- Latar Belakang Dekoratif (Decorative Background) -->
         <div class="absolute top-10 left-10 w-72 h-72 bg-[#36B2B2]/10 rounded-full blur-3xl -z-10 animate-float"></div>
         <div class="absolute bottom-20 right-10 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl -z-10 animate-float"
             style="animation-delay: 1.5s;"></div>
@@ -31,7 +31,7 @@
                 <form method="POST" action="{{ route('otp.send') }}">
                     @csrf
                     <div class="space-y-4" x-data="{ selectedChannel: 'whatsapp' }">
-                        <!-- WhatsApp Option -->
+                        <!-- Opsi WhatsApp (WhatsApp Option) -->
                         <label for="channel_wa"
                             class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all hover:border-[#36B2B2]/50"
                             :class="selectedChannel === 'whatsapp' ? 'border-[#36B2B2] bg-[#36B2B2]/5' : 'border-gray-100 bg-gray-50/50'">
@@ -56,7 +56,7 @@
                             </div>
                         </label>
 
-                        <!-- Email Option -->
+                        <!-- Opsi Email (Email Option) -->
                         <label for="channel_email"
                             class="relative flex items-center p-4 rounded-2xl border-2 cursor-pointer transition-all hover:border-[#36B2B2]/50"
                             :class="selectedChannel === 'email' ? 'border-[#36B2B2] bg-[#36B2B2]/5' : 'border-gray-100 bg-gray-50/50'">

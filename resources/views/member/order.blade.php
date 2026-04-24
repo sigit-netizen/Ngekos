@@ -2,6 +2,9 @@
 
 @section('dashboard-content')
     @php
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        /** @var \App\Models\Kos $kos */
         $tab = $tab ?? 'order';
         $statusFilter = $statusFilter ?? 'active';
     @endphp
@@ -14,7 +17,7 @@
                                 }"
         x-init="$watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
-        {{-- Header --}}
+        {{-- Kepala Halaman (Header) --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-10 px-1" data-aos="fade-up">
             <div class="flex-1">
                 <div
@@ -36,9 +39,9 @@
             </div>
         </div>
 
-        {{-- Stats Cards --}}
+        {{-- Kartu Statistik (Stats Cards) --}}
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-10">
-            {{-- Verifikasi (Pending Orders) --}}
+            {{-- Verifikasi (Pesanan Tertunda / Pending Orders) --}}
             <button @click="activeTab = 'order'; currentStatus = 'verif'; window.location.href = '?tab=order&status=verif'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="(currentStatus === 'verif' || currentStatus === 'pending')
@@ -70,7 +73,7 @@
                     Verifikasi</p>
             </button>
 
-            {{-- Menunggu (Verified, waiting for payment) --}}
+            {{-- Menunggu (Terverifikasi, menunggu pembayaran / Verified, waiting for payment) --}}
             <button
                 @click="activeTab = 'order'; currentStatus = 'menunggu'; window.location.href = '?tab=order&status=menunggu'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
@@ -95,7 +98,7 @@
                     Menunggu</p>
             </button>
 
-            {{-- Konfirmasi (Verified, proof uploaded) --}}
+            {{-- Konfirmasi (Terverifikasi, bukti diunggah / Verified, proof uploaded) --}}
             <button
                 @click="activeTab = 'order'; currentStatus = 'konfirmasi'; window.location.href = '?tab=order&status=konfirmasi'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
@@ -130,7 +133,7 @@
                     Konfirmasi</p>
             </button>
 
-            {{-- Verifikasi Sewa (Recurring Rent) --}}
+            {{-- Verifikasi Sewa (Sewa Berulang / Recurring Rent) --}}
             <button @click="activeTab = 'order'; currentStatus = 'sewa'; window.location.href = '?tab=order&status=sewa'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
                 :class="currentStatus === 'sewa'
@@ -161,7 +164,7 @@
                     Verif Sewa</p>
             </button>
 
-            {{-- Aktif (Penyewa Aktif) --}}
+            {{-- Aktif (Penyewa Aktif / Active Tenant) --}}
             <button
                 @click="activeTab = 'riwayat'; currentStatus = 'active'; window.location.href = '?tab=riwayat&status=active'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
@@ -187,7 +190,7 @@
                     Aktif</p>
             </button>
 
-            {{-- Ditolak --}}
+            {{-- Ditolak (Rejected) --}}
             <button
                 @click="activeTab = 'riwayat'; currentStatus = 'rejected'; window.location.href = '?tab=riwayat&status=rejected'"
                 class="relative w-full p-4 sm:p-5 rounded-3xl sm:rounded-[2.5rem] border-2 transition-all duration-500 text-left group overflow-hidden"
@@ -213,7 +216,7 @@
             </button>
         </div>
 
-        {{-- Verification Alert Card (Action Needed) --}}
+        {{-- Kartu Peringatan Verifikasi (Perlu Tindakan / Verification Alert Card - Action Needed) --}}
         @if(($orderKonfirmasiCount ?? 0) > 0 || ($pendingCount ?? 0) > 0 || ($rentKonfirmasiCount ?? 0) > 0)
             <div class="mb-10 px-1" data-aos="fade-up" data-aos-delay="50">
                 <div
@@ -265,11 +268,11 @@
             </div>
         @endif
 
-        {{-- Content Area --}}
+        {{-- Area Konten (Content Area) --}}
         <div class="bg-white rounded-[2.5rem] border-2 border-gray-50 shadow-2xl shadow-gray-200/50 overflow-hidden min-h-[600px]"
             data-aos="fade-up" data-aos-delay="100">
 
-            {{-- Tab Header --}}
+            {{-- Kepala Tab (Tab Header) --}}
             <div
                 class="px-5 sm:px-10 py-6 md:py-8 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/20">
                 <div class="flex items-center gap-3">
@@ -314,7 +317,7 @@
             </div>
 
             <div class="p-0" x-data="{ showProof: false, proofUrl: '' }">
-                {{-- Proof Modal --}}
+                {{-- Modal Bukti (Proof Modal) --}}
                 <div x-show="showProof"
                     class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm"
                     @click="showProof = false" x-cloak>
@@ -330,10 +333,10 @@
                     </div>
                 </div>
 
-                {{-- 1. Order Kamar --}}
+                {{-- 1. Pemesanan Kamar (Room Order) --}}
                 <div x-show="activeTab === 'order'">
 
-                    {{-- Desktop Table View --}}
+                    {{-- Tampilan Tabel Desktop (Desktop Table View) --}}
                     <div x-show="currentStatus === 'regis'" x-transition:enter="transition ease-out duration-300 transform"
                         x-transition:enter-start="opacity-0 translate-y-4"
                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -355,6 +358,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
                                     @foreach($pendingPenyewa as $pending)
+                                        @php /** @var \App\Models\PendingUser $pending */ @endphp
                                         <tr
                                             class="group hover:bg-amber-50/40 transition-all border-b border-gray-50 last:border-0">
                                             <td class="px-8 py-6">
@@ -369,7 +373,7 @@
                                                                 {{ $pending->name }}
                                                             </div>
                                                             <div x-data="{ 
-                                                                                                                                                                                                    expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                    expiryTime: new Date('{{ $pending->created_at?->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
                                                                                                                                                                                                     now: new Date().getTime(),
                                                                                                                                                                                                     timer: '',
                                                                                                                                                                                                     init() {
@@ -405,7 +409,7 @@
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span
-                                                    class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ optional($pending->created_at)->format('d M Y') ?? '-' }}</span>
+                                                    class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ $pending->created_at?->format('d M Y') ?? '-' }}</span>
                                             </td>
                                             <td class="px-8 py-6 text-center">
                                                 <div class="flex items-center justify-center gap-3">
@@ -435,9 +439,10 @@
                             </table>
                         </div>
 
-                        {{-- Mobile Card View --}}
+                        {{-- Tampilan Kartu Mobile (Mobile Card View) --}}
                         <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-10 mt-2">
                             @foreach($pendingPenyewa as $pending)
+                                @php /** @var \App\Models\PendingUser $pending */ @endphp
                                 <div
                                     class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm relative group overflow-hidden flex flex-col gap-4">
                                     <div class="flex items-center gap-3">
@@ -451,7 +456,7 @@
                                             </h4>
                                             <p class="text-[11px] text-gray-500 tracking-tight mt-0.5 truncate">
                                                 {{ $pending->nomor_wa }} &bull;
-                                                {{ optional($pending->created_at)->format('d/m/y') }}
+                                                {{ $pending->created_at?->format('d/m/y') }}
                                             </p>
                                         </div>
                                     </div>
@@ -472,7 +477,7 @@
                                         <div class="flex items-center justify-between mt-1 pt-2 border-t border-gray-200/50">
                                             <span class="text-[10px] font-semibold text-gray-500 uppercase">Sisa Waktu</span>
                                             <div x-data="{ 
-                                                                                                                                                        expiryTime: new Date('{{ optional($pending->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                        expiryTime: new Date('{{ $pending->created_at?->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
                                                                                                                                                         now: new Date().getTime(),
                                                                                                                                                         timer: '',
                                                                                                                                                         init() {
@@ -557,7 +562,7 @@
                                 {{ count($orderTransaksi ?? []) }} Data
                             </span>
                         </div>
-                        {{-- Desktop Table View --}}
+                        {{-- Tampilan Tabel Desktop (Desktop Table View) --}}
                         <div
                             class="hidden md:block overflow-x-auto bg-white border border-t-0 border-gray-100 rounded-b-3xl">
                             <table class="w-full text-left whitespace-nowrap">
@@ -580,20 +585,21 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
                                     @forelse($orderTransaksi ?? [] as $order)
+                                        @php /** @var \App\Models\Transaksi $order */ @endphp
                                         <tr class="group hover:bg-slate-50 transition-colors">
                                             <td class="px-8 py-6">
                                                 <div class="flex items-center gap-3">
                                                     <div
                                                         class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-sm">
-                                                        {{ substr(optional($order->user)->name ?? '?', 0, 1) }}
+                                                        {{ substr($order->user?->name ?? '?', 0, 1) }}
                                                     </div>
                                                     <div>
                                                             <div class="font-bold text-gray-900">
-                                                                {{ optional($order->user)->name ?? 'N/A' }}
+                                                                {{ $order->user?->name ?? 'N/A' }}
                                                             </div>
                                                             @if($order->status === 'pending')
                                                                 <div x-data="{ 
-                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ optional($order->created_at)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ $order->created_at?->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
                                                                                                                                                                                                                                                                     now: new Date().getTime(),
                                                                                                                                                                                                                                                                     timer: '',
                                                                                                                                                                                                                                                                     init() {
@@ -613,9 +619,9 @@
                                                                     <span x-text="timer"></span>
                                                                 </div>
                                                             @elseif($order->status === 'verified' && $order->bukti_pembayaran)
-                                                                {{-- Countdown Timer for Owner to Confirm Payment --}}
+                                                                {{-- Penghitung Mundur bagi Pemilik untuk Konfirmasi Pembayaran (Countdown Timer for Owner to Confirm Payment) --}}
                                                                 <div x-data="{ 
-                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ optional($order->tanggal_pembayaran)->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
+                                                                                                                                                                                                                                                                    expiryTime: new Date('{{ $order->tanggal_pembayaran?->addDay()?->toIso8601String() ?? now()->toIso8601String() }}').getTime(),
                                                                                                                                                                                                                                                                     now: new Date().getTime(),
                                                                                                                                                                                                                                                                     timer: '',
                                                                                                                                                                                                                                                                     init() {
@@ -643,14 +649,14 @@
                                                             @endif
                                                         </div>
                                                         <div class="text-[10px] text-gray-400 font-medium">
-                                                            {{ optional($order->user)->email ?? '' }}
+                                                            {{ $order->user?->email ?? '' }}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span
-                                                    class="font-bold text-gray-700 text-sm">{{ optional($order->kamar)->nomor_kamar ?? '-' }}</span>
+                                                    class="font-bold text-gray-700 text-sm">{{ $order->kamar?->nomor_kamar ?? '-' }}</span>
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span class="font-bold text-[#36B2B2] text-sm">Rp
@@ -685,7 +691,7 @@
                                             </td>
                                             <td class="px-8 py-6">
                                                 <span
-                                                    class="text-xs font-bold text-gray-500">{{ optional($order->created_at)->format('d M Y') ?? '-' }}</span>
+                                                    class="text-xs font-bold text-gray-500">{{ $order->created_at?->format('d M Y') ?? '-' }}</span>
                                             </td>
                                             <td class="px-8 py-6 text-center">
                                                 <div class="flex items-center justify-center gap-2">
@@ -740,7 +746,7 @@
                                                                 </div>
                                                             @endif
 
-                                                            {{-- Countdown for Pending or Verified with Proof --}}
+                                                            {{-- Penghitung Mundur untuk Status Pending atau Terverifikasi dengan Bukti (Countdown for Pending or Verified with Proof) --}}
                                                             @php
                                                                 $expiry = null;
                                                                 if($order->status === 'pending') {
@@ -951,7 +957,7 @@
                             </table>
                         </div>
 
-                        {{-- Mobile Card View --}}
+                        {{-- Tampilan Kartu Mobile (Mobile Card View) --}}
                         <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-4">
                             @forelse($orderTransaksi ?? [] as $order)
                                 <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-4">
@@ -1260,7 +1266,7 @@
                     </div>
                 </div>
 
-                {{-- 3. Riwayat (Active/Rejected) --}}
+                {{-- 3. Riwayat (Aktif/Ditolak) (History - Active/Rejected) --}}
                 <div x-show="activeTab === 'riwayat'">
                     <div class="px-8 py-5 bg-teal-50/50 border-y border-teal-100/50 flex items-center justify-between mb-0">
                         <div class="flex items-center gap-3">
@@ -1286,7 +1292,7 @@
                         </span>
                     </div>
 
-                    {{-- Desktop Table View --}}
+                    {{-- Tampilan Tabel Desktop (Desktop Table View) --}}
                     <div
                         class="hidden md:block overflow-x-auto bg-white border border-t-0 border-gray-100 rounded-b-3xl mb-8">
                         <table class="w-full text-left whitespace-nowrap">
@@ -1363,7 +1369,7 @@
                         </table>
                     </div>
 
-                    {{-- Mobile Card View --}}
+                    {{-- Tampilan Kartu Mobile (Mobile Card View) --}}
                     <div class="grid grid-cols-1 gap-4 md:hidden px-4 mb-4">
                         @forelse($riwayatPenyewa ?? [] as $penyewa)
                             <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
@@ -1427,17 +1433,17 @@
 
     </div>
 
-    {{-- Proof Modal --}}
+    {{-- Modal Bukti (Proof Modal) --}}
     <template x-teleport="body">
         <div x-show="showProof" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6 lg:p-10 overflow-hidden" x-cloak>
 
-            {{-- Backdrop --}}
+            {{-- Latar Belakang (Backdrop) --}}
             <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-md" @click="showProof = false"></div>
 
-            {{-- Modal Content --}}
+            {{-- Konten Modal (Modal Content) --}}
             <div x-show="showProof" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -1446,7 +1452,7 @@
                 x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                 class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden active:scale-[0.99] transition-transform">
 
-                {{-- Modal Header --}}
+                {{-- Kepala Modal (Modal Header) --}}
                 <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                     <div class="flex items-center gap-3">
                         <div class="w-2 h-6 bg-[#36B2B2] rounded-full"></div>
@@ -1461,7 +1467,7 @@
                     </button>
                 </div>
 
-                {{-- Modal Body --}}
+                {{-- Badan Modal (Modal Body) --}}
                 <div class="p-6 sm:p-8 bg-white max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div class="relative group rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner">
                         <img :src="proofUrl" class="w-full h-auto object-contain bg-gray-50 min-h-[200px]"
@@ -1485,7 +1491,7 @@
                     </div>
                 </div>
 
-                {{-- Modal Footer --}}
+                {{-- Kaki Modal (Modal Footer) --}}
                 <div class="p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end">
                     <button @click="showProof = false"
                         class="px-8 py-3.5 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-all shadow-xl shadow-gray-200 active:scale-95">

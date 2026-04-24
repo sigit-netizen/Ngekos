@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, HasRoles, HasPushSubscriptions;
 
     /**
-     * The attributes that are mass assignable.
+     * Atribut yang dapat diisi secara massal (mass assignable).
      *
      * @var array<int, string>
      */
@@ -40,7 +40,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atribut yang harus disembunyikan untuk serialisasi (serialization).
      *
      * @var array<int, string>
      */
@@ -50,7 +50,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Atribut yang harus di-cast ke tipe data tertentu.
      *
      * @var array<string, string>
      */
@@ -60,7 +60,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get plan name based on id_plans mapping
+     * Dapatkan nama paket berdasarkan pemetaan id_plans
      */
     public function getPlanName()
     {
@@ -102,7 +102,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a verified tenant (penyewa).
+     * Periksa apakah pengguna adalah penyewa (tenant) yang terverifikasi.
      */
     public function isPenyewa()
     {
@@ -125,8 +125,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the date when the user started renting the current room.
-     * Calculated based on the oldest 'paid' transaction for the current id_kamar.
+     * Dapatkan tanggal mulai sewa pengguna untuk kamar saat ini.
+     * Dihitung berdasarkan transaksi 'berbayar' (paid) tertua untuk id_kamar saat ini.
      */
     public function getMulaiSewaAttribute()
     {
@@ -144,14 +144,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Restore user roles based on their current plan ID.
+     * Pulihkan peran pengguna (user roles) berdasarkan ID paket mereka saat ini.
      */
     public function syncPlanRole()
     {
-        // Roles associated with plans that should be swapped
+        // Peran yang terkait dengan paket yang harus ditukar (swapped)
         $planRoles = ['pro', 'premium', 'per_kamar_premium', 'per_kamar_pro', 'nonaktif'];
 
-        // Determine target roles
+        // Tentukan peran target (target roles)
         $rolesToKeep = ['admin'];
 
         $roleMap = [
@@ -165,26 +165,26 @@ class User extends Authenticatable
             $rolesToKeep[] = $roleMap[$this->id_plans];
         }
 
-        // Remove old plan roles that are NOT in the rolesToKeep list
+        // Hapus peran paket lama yang TIDAK ada dalam daftar rolesToKeep
         foreach ($planRoles as $role) {
             if (!in_array($role, $rolesToKeep) && $this->hasRole($role)) {
                 $this->removeRole($role);
             }
         }
 
-        // Add missing target roles
+        // Tambahkan peran target yang belum ada
         foreach ($rolesToKeep as $role) {
             if (!$this->hasRole($role)) {
                 $this->assignRole($role);
             }
         }
 
-        // CRITICAL: Clear permission cache so changes reflect in sidebar immediately
+        // PENTING (CRITICAL): Bersihkan cache izin sehingga perubahan segera terlihat di sidebar
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     /**
-     * Set user status to 'aktif' in status_users table and restore roles.
+     * Setel status pengguna menjadi 'aktif' di tabel status_users dan pulihkan peran.
      */
     public function activateStatus()
     {
@@ -197,7 +197,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Set user status to 'inactive' in status_users table and assign 'nonaktif' role.
+     * Setel status pengguna menjadi 'inactive' di tabel status_users dan berikan peran 'nonaktif'.
      */
     public function deactivateStatus()
     {
@@ -210,30 +210,30 @@ class User extends Authenticatable
     }
 
     /**
-     * Evict tenant: clear room/kos association and release the room.
+     * Keluarkan penyewa (evict): hapus asosiasi kamar/kos dan lepaskan kamar tersebut.
      */
     public function evict()
     {
         \DB::beginTransaction();
         try {
-            // 1. Find ANY transactions that might be "locking" this user or rooms (pending, verified, paid)
+            // 1. Cari transaksi APAPUN yang mungkin "mengunci" pengguna atau kamar ini (status pending, verified, paid)
             $activeTransactions = \App\Models\Transaksi::where('id_user', $this->id)
                 ->whereIn('status', ['pending', 'verified', 'paid'])
                 ->get();
 
-            // 2. Release any rooms associated with these transactions
+            // 2. Lepaskan kamar mana pun yang terkait dengan transaksi ini
             foreach ($activeTransactions as $tx) {
                 if ($tx->kamar) {
                     $tx->kamar->update(['status' => 'tersedia']);
                 }
             }
 
-            // 3. Mark those transactions as 'expired'
+            // 3. Tandai transaksi tersebut sebagai 'expired' (kedaluwarsa)
             \App\Models\Transaksi::where('id_user', $this->id)
                 ->whereIn('status', ['pending', 'verified', 'paid'])
                 ->update(['status' => 'expired']);
 
-            // 4. Force release user's own room association just in case
+            // 4. Paksa pelepasan asosiasi kamar milik pengguna untuk jaga-jaga (just in case)
             $evictionData = null;
             if ($this->kamar) {
                 $evictionData = [
@@ -244,22 +244,22 @@ class User extends Authenticatable
                 $this->kamar->update(['status' => 'tersedia']);
             }
 
-            // 5. Clear user's room and kos association
+            // 5. Hapus asosiasi kamar dan kos milik pengguna
             $this->update([
                 'id_kamar' => null,
                 'id_kos' => null,
-                'status' => 'active', // Back to general active user
+                'status' => 'active', // Kembali ke pengguna aktif umum (general active user)
             ]);
 
-            // Notify Tenant
+            // Beri tahu Penyewa (Notify Tenant)
             if ($evictionData && $this->nomor_wa) {
                 $this->notify(new \App\Notifications\EvictionNotification($evictionData));
             }
 
-            // 6. Reset Roles: Remove 'users' (tenant) and assign 'user' (general)
+            // 6. Reset Peran: Hapus 'users' (penyewa) dan berikan 'user' (umum/general)
             $this->syncRoles(['user']);
 
-            // 7. Ensure permissions are synced according to Gambar 2 (User Umum)
+            // 7. Pastikan izin (permissions) disinkronkan sesuai dengan Gambar 2 (User Umum)
             $userUmumPermissions = [
                 'menu.dashboard',
                 'menu.order',
@@ -267,11 +267,11 @@ class User extends Authenticatable
                 'fitur.belum_sewa'
             ];
             
-            // Explicitly sync permissions for this specific user to match 'User Umum' state
-            // This will remove 'menu.aduan' and 'menu.jatuh_tempo' automatically
+            // Sinkronkan izin secara eksplisit untuk pengguna khusus ini agar cocok dengan status 'User Umum'. 
+            // Ini akan menghapus 'menu.aduan' dan 'menu.jatuh_tempo' secara otomatis.
             $this->syncPermissions($userUmumPermissions);
 
-            // Clear Spatie permission cache
+            // Bersihkan cache izin Spatie (Spatie permission cache)
             app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
             \DB::commit();

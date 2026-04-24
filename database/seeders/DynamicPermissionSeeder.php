@@ -13,10 +13,10 @@ class DynamicPermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cached roles and permissions
+        // Reset cache peran (roles) dan izin (permissions)
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Scan view directories (member and user factor)
+        // 1. Pindai direktori view (pembeda member dan user)
         $directories = [
             resource_path('views/member'),
             resource_path('views/user')
@@ -33,14 +33,14 @@ class DynamicPermissionSeeder extends Seeder
 
                     if (!in_array($permissionName, $permissions)) {
                         $permissions[] = $permissionName;
-                        // Generate permission if not exist
+                        // Buat izin (permission) jika belum ada
                         Permission::firstOrCreate(['name' => $permissionName]);
                     }
                 }
             }
         }
 
-        // 1.5 Add Feature Permissions
+        // 1.5 Tambahkan Izin Fitur (Feature Permissions)
         $featurePermissions = [
             'fitur.edit_profile'
         ];
@@ -53,7 +53,7 @@ class DynamicPermissionSeeder extends Seeder
         }
 
         // 2. Ambil kategori roles dari tabel `plans` (jika ada isinya, buat role darisitu)
-        // Kita juga pastikan role 'superadmin' ada mutlak
+        // Kita juga pastikan peran 'superadmin' ada secara mutlak
         $superAdminRole = Role::firstOrCreate(['name' => 'superadmin']);
         $superAdminRole->syncPermissions(Permission::all());
 
@@ -65,8 +65,8 @@ class DynamicPermissionSeeder extends Seeder
 
                 if ($roleName !== 'superadmin') {
                     $role = Role::firstOrCreate(['name' => $roleName]);
-                    // Only GIVE permissions, do not SYNC (wipe existing)
-                    // This ensures that user-defined permissions in the UI are preserved
+                    // Hanya BERIKAN (GIVE) izin, jangan SYNC (karena akan menghapus yang sudah ada)
+                    // Ini memastikan bahwa izin yang ditentukan pengguna di UI tetap terjaga
                     foreach ($permissions as $p) {
                         if (!$role->hasPermissionTo($p)) {
                             $role->givePermissionTo($p);
@@ -75,7 +75,7 @@ class DynamicPermissionSeeder extends Seeder
                 }
             }
         } else {
-            // Fallback
+            // Cadangan (Fallback)
             $memberRole = Role::firstOrCreate(['name' => 'member']);
             foreach ($permissions as $p) {
                 if (!$memberRole->hasPermissionTo($p)) {
@@ -91,7 +91,7 @@ class DynamicPermissionSeeder extends Seeder
             }
         }
 
-        // Always create 'users' and 'admin' roles (referenced by controllers)
+        // Selalu buat peran 'users' dan 'admin' (direferensikan oleh controller)
         Role::firstOrCreate(['name' => 'users']);
         Role::firstOrCreate(['name' => 'admin']);
     }

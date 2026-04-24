@@ -13,7 +13,7 @@ class PendingUserController extends Controller
     {
         $request->validate([
             'email' => 'required|email|exists:pending_users,email',
-            'bukti_pembayaran' => 'required|image|max:512000', // 500MB as requested before
+            'bukti_pembayaran' => 'required|image|max:512000', // 500MB seperti yang diminta sebelumnya
             'metode_pembayaran' => 'required|string',
         ]);
 
@@ -32,7 +32,7 @@ class PendingUserController extends Controller
                 'status' => 'konfirmasi',
             ]);
 
-            // Notify Superadmins
+            // Beri tahu Superadmin
             $superadmins = \App\Models\User::role('superadmin')->get();
             foreach ($superadmins as $admin) {
                 if ($admin->nomor_wa) {

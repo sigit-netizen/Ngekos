@@ -4,14 +4,14 @@
     <div
         class="relative min-h-screen bg-gradient-to-b from-slate-50/80 to-white overflow-hidden py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-inter">
 
-        <!-- Decorative Background Elements -->
+        <!-- Elemen Latar Belakang Dekoratif (Decorative Background Elements) -->
         <div class="absolute top-10 left-10 w-72 h-72 bg-[#36B2B2]/10 rounded-full blur-3xl -z-10 animate-float"></div>
         <div class="absolute bottom-20 right-10 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl -z-10 animate-float"
             style="animation-delay: 1.5s;"></div>
 
         <div class="w-full max-w-[480px] z-10">
 
-            <!-- Logo Section -->
+            <!-- Bagian Logo (Logo Section) -->
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
                     class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
@@ -20,7 +20,7 @@
                 <p class="mt-3 text-sm font-medium text-gray-500">Verifikasi Keamanan Perangkat</p>
             </div>
 
-            <!-- Glassmorphism Card -->
+            <!-- Kartu Glassmorphism (Glassmorphism Card) -->
             <div class="bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl shadow-gray-200/60 border border-gray-100 p-8 sm:p-10 transform transition-all duration-500 hover:shadow-[#36b2b2]/5"
                 data-aos="fade-up" data-aos-duration="1000">
 

@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Defaults
+    | Default Autentikasi (Authentication Defaults)
     |--------------------------------------------------------------------------
     |
-    | This option controls the default authentication "guard" and password
-    | reset options for your application. You may change these defaults
-    | as required, but they're a perfect start for most applications.
+    | Opsi ini mengontrol "guard" autentikasi default dan opsi reset kata sandi
+    | untuk aplikasi Anda. Anda dapat mengubah default ini sesuai kebutuhan,
+    | namun ini adalah awal yang sempurna untuk sebagian besar aplikasi.
     |
     */
 
@@ -20,18 +20,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Guards
+    | Guard Autentikasi (Authentication Guards)
     |--------------------------------------------------------------------------
     |
-    | Next, you may define every authentication guard for your application.
-    | Of course, a great default configuration has been defined for you
-    | here which uses session storage and the Eloquent user provider.
+    | Selanjutnya, Anda dapat mendefinisikan setiap guard autentikasi untuk aplikasi Anda.
+    | Tentu saja, konfigurasi default yang bagus telah ditentukan untuk Anda
+    | di sini yang menggunakan penyimpanan sesi dan penyedia pengguna Eloquent.
     |
-    | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
+    | Semua driver autentikasi memiliki penyedia pengguna. Ini menentukan bagaimana
+    | pengguna benar-benar diambil dari database Anda atau mekanisme penyimpanan
+    | lain yang digunakan oleh aplikasi ini untuk menyimpan data pengguna Anda.
     |
-    | Supported: "session"
+    | Didukung: "session"
     |
     */
 
@@ -44,18 +44,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | User Providers
+    | Penyedia Pengguna (User Providers)
     |--------------------------------------------------------------------------
     |
-    | All authentication drivers have a user provider. This defines how the
-    | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
+    | Semua driver autentikasi memiliki penyedia pengguna. Ini menentukan bagaimana
+    | pengguna benar-benar diambil dari database Anda atau mekanisme penyimpanan
+    | lain yang digunakan oleh aplikasi ini untuk menyimpan data pengguna Anda.
     |
-    | If you have multiple user tables or models you may configure multiple
-    | sources which represent each model / table. These sources may then
-    | be assigned to any extra authentication guards you have defined.
+    | Jika Anda memiliki beberapa tabel atau model pengguna, Anda dapat mengonfigurasi
+    | beberapa sumber yang mewakili setiap model / tabel. Sumber-sumber ini kemudian
+    | dapat ditetapkan ke guard autentikasi tambahan yang telah Anda tetapkan.
     |
-    | Supported: "database", "eloquent"
+    | Didukung: "database", "eloquent"
     |
     */
 
@@ -73,20 +73,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Resetting Passwords
+    | Mereset Kata Sandi (Resetting Passwords)
     |--------------------------------------------------------------------------
     |
-    | You may specify multiple password reset configurations if you have more
-    | than one user table or model in the application and you want to have
-    | separate password reset settings based on the specific user types.
+    | Anda dapat menentukan beberapa konfigurasi reset kata sandi jika Anda memiliki
+    | lebih dari satu tabel atau model pengguna dalam aplikasi dan Anda ingin memiliki
+    | pengaturan reset kata sandi yang terpisah berdasarkan tipe pengguna tertentu.
     |
-    | The expire time is the number of minutes that each reset token will be
-    | considered valid. This security feature keeps tokens short-lived so
-    | they have less time to be guessed. You may change this as needed.
+    | Waktu kedaluwarsa adalah jumlah menit setiap token reset akan dianggap valid.
+    | Fitur keamanan ini menjaga token agar berumur pendek sehingga mereka memiliki
+    | lebih sedikit waktu untuk ditebak. Anda dapat mengubah ini sesuai kebutuhan.
     |
-    | The throttle setting is the number of seconds a user must wait before
-    | generating more password reset tokens. This prevents the user from
-    | quickly generating a very large amount of password reset tokens.
+    | Pengaturan throttle adalah jumlah detik yang harus ditunggu pengguna sebelum
+    | menghasilkan lebih banyak token reset kata sandi. Ini mencegah pengguna dari
+    | menghasilkan jumlah token reset kata sandi yang sangat besar dengan cepat.
     |
     */
 
@@ -101,12 +101,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Password Confirmation Timeout
+    | Waktu Habis Konfirmasi Kata Sandi (Password Confirmation Timeout)
     |--------------------------------------------------------------------------
     |
-    | Here you may define the amount of seconds before a password confirmation
-    | times out and the user is prompted to re-enter their password via the
-    | confirmation screen. By default, the timeout lasts for three hours.
+    | Di sini Anda dapat menentukan jumlah detik sebelum konfirmasi kata sandi
+    | habis waktu dan pengguna diminta untuk memasukkan kembali kata sandi mereka melalui
+    | layar konfirmasi. Secara default, waktu habis berlangsung selama tiga jam.
     |
     */
 

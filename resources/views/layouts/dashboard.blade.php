@@ -2,7 +2,7 @@
 
 @section('content')
     <style>
-        /* Floating Animation from Welcome Page */
+        /* Animasi Mengambang dari Halaman Welcome (Floating Animation from Welcome Page) */
         @keyframes float {
 
             0%,
@@ -24,7 +24,7 @@
             animation-delay: 2s;
         }
 
-        /* Custom Scrollbar for Main Content */
+        /* Scrollbar Kustom untuk Konten Utama (Custom Scrollbar for Main Content) */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -45,12 +45,12 @@
 
     <div x-data="{ sidebarOpen: false }" class="flex h-screen bg-slate-50 font-inter overflow-hidden relative">
 
-        <!-- Background Accents -->
+        <!-- Aksen Latar Belakang (Background Accents) -->
         <div
             class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#36B2B2]/5 blur-[100px] animate-float pointer-events-none z-0">
         </div>
 
-        <!-- Mobile sidebar overlay -->
+        <!-- Overlay sidebar seluler (Mobile sidebar overlay) -->
         <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
@@ -60,13 +60,13 @@
         <!-- Sidebar -->
         @include('layouts.dashboard-sidebar')
 
-        <!-- Main ContentWrapper -->
+        <!-- Pembungkus Konten Utama (Main Content Wrapper) -->
         <div class="flex-1 flex flex-col min-w-0 z-10 overflow-hidden">
 
-            <!-- Header (Mobile Toggle & Profile) -->
+            <!-- Header (Toggle Seluler & Profil) -->
             @include('layouts.dashboard-header')
 
-            <!-- Scrollable Main Container -->
+            <!-- Wadah Utama yang Dapat Discroll (Scrollable Main Container) -->
             <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 relative z-0">
                 @if (session('success_login') || session('success') || session('error') || $errors->any())
                     <script>

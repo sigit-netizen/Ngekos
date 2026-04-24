@@ -17,7 +17,7 @@ use App\Notifications\OwnerRegistrationNotification;
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Tampilkan halaman pendaftaran.
      */
     public function create(): View
     {
@@ -25,7 +25,7 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Tangani permintaan pendaftaran yang masuk.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'id_plans' => ['required', 'integer', 'in:1,2'], // 1: Anak Kos, 2: Pemilik Kos
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email', 'unique:pending_users,email'],
             'password' => ['required', Rules\Password::defaults()],
-            // Optional fields (for later completion)
+            // Field opsional (untuk dilengkapi nanti)
             'nik' => ['nullable', 'numeric', 'unique:users,nik', 'unique:pending_users,nik'],
             'nomor_wa' => ['nullable', 'numeric', 'unique:users,nomor_wa', 'unique:pending_users,nomor_wa'],
             'tanggal_lahir' => ['nullable', 'date'],
@@ -51,7 +51,7 @@ class RegisteredUserController extends Controller
             'status' => 'pending',
         ]);
 
-        // Notify Superadmins if it's an owner registration
+        // Beri tahu Superadmin jika ini adalah pendaftaran pemilik kos (owner)
         if ($request->id_plans == 2) {
             $superadmins = User::where('id_plans', 6)->get();
             $uniqueTargets = collect();

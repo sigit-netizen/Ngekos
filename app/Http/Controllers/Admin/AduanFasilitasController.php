@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class AduanFasilitasController extends Controller
 {
     /**
-     * Display all aduans for the admin's kos.
+     * Tampilkan semua aduan untuk kos admin.
      */
     public function index(Request $request)
     {
@@ -38,7 +38,7 @@ class AduanFasilitasController extends Controller
         $belumDibaca = Aduan::where('id_kos', $kos?->id)->where('status', 'belum_dibaca')->count();
         $sudahDibaca = Aduan::where('id_kos', $kos?->id)->where('status', 'sudah_dibaca')->count();
 
-        // Specific category counts
+        // Jumlah kategori spesifik
         $countAduan = Aduan::where('id_kos', $kos?->id)->where('kategori', 'fasilitas')->count();
         $countTambah = Aduan::where('id_kos', $kos?->id)->where('kategori', 'tambah')->count();
 
@@ -56,7 +56,7 @@ class AduanFasilitasController extends Controller
     }
 
     /**
-     * Mark an aduan as read.
+     * Tandai aduan sebagai sudah dibaca.
      */
     public function markRead(Aduan $aduan)
     {
@@ -76,7 +76,7 @@ class AduanFasilitasController extends Controller
     }
 
     /**
-     * Mark an aduan as unread.
+     * Tandai aduan sebagai belum dibaca.
      */
     public function markUnread(Aduan $aduan)
     {
@@ -96,7 +96,7 @@ class AduanFasilitasController extends Controller
     }
 
     /**
-     * Delete an aduan.
+     * Hapus aduan.
      */
     public function destroy(Aduan $aduan)
     {

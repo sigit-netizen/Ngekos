@@ -9,7 +9,7 @@
 @endphp
 <div x-data="{ filter: '{{ $filter }}' }" class="pb-12 text-gray-800">
 
-    {{-- Header Content --}}
+    {{-- Konten Kepala (Header Content) --}}
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-10" data-aos="fade-up">
         <div class="max-w-2xl">
             <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#36B2B2]/10 text-[#36B2B2] rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-[#36B2B2]/20">
@@ -31,7 +31,7 @@
             </p>
         </div>
 
-        {{-- Main Stats Dashboard --}}
+        {{-- Dasbor Statistik Utama (Main Stats Dashboard) --}}
         <div class="flex items-center gap-4 bg-white p-2 rounded-[2rem] border border-gray-100 shadow-sm">
             <div class="bg-rose-50 rounded-2xl px-6 py-4 text-center min-w-[120px] border border-rose-100/50">
                 <p class="text-3xl font-black text-rose-600 leading-none mb-1">{{ $belumDibaca }}</p>
@@ -44,7 +44,7 @@
         </div>
     </div>
 
-    {{-- Summary Cards (Aduan & Ajuan) --}}
+    {{-- Kartu Ringkasan (Aduan & Ajuan) (Summary Cards) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12" data-aos="fade-up">
         <!-- Card Aduan -->
         <a href="{{ route('admin.pesan_aduan', ['kategori' => $kategori === 'fasilitas' ? 'semua' : 'fasilitas', 'filter' => $filter]) }}"
@@ -101,7 +101,7 @@
         </a>
     </div>
 
-    {{-- Filter Bar --}}
+    {{-- Bilah Filter (Filter Bar) --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8" data-aos="fade-up">
         <div class="flex bg-gray-100/80 backdrop-blur-md p-1.5 rounded-2xl w-fit border border-gray-200/50 shadow-inner">
             @foreach([
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    {{-- Aduan Cards --}}
+    {{-- Kartu Aduan (Aduan Cards) --}}
     @if($aduans->isEmpty())
         <div class="bg-white rounded-[3rem] p-24 text-center border-2 border-dashed border-gray-100 flex flex-col items-center justify-center" data-aos="fade-up">
             <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-8 shadow-inner">
@@ -144,13 +144,13 @@
                 <div class="group relative bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden" 
                     data-aos="fade-up" data-aos-delay="{{ min($index * 50, 400) }}">
                     
-                    {{-- Status Indicator Bar --}}
+                    {{-- Bilah Indikator Status (Status Indicator Bar) --}}
                     <div class="absolute inset-y-0 left-0 w-1.5 {{ $aduan->status === 'belum_dibaca' ? 'bg-rose-500' : 'bg-gray-200' }}"></div>
 
                     <div class="p-8 sm:p-10">
                         <div class="flex flex-col lg:flex-row gap-8">
                             
-                            {{-- User Info Section --}}
+                            {{-- Bagian Informasi Pengguna (User Info Section) --}}
                             <div class="flex flex-row lg:flex-col items-center lg:items-center gap-4 lg:w-32 shrink-0">
                                 <div class="relative">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner
@@ -174,7 +174,7 @@
                                             </a>
                                         @endif
 
-                                        {{-- Room --}}
+                                        {{-- Kamar (Room) --}}
                                         <div class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-500 rounded-md text-[9px] font-bold">
                                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                                             Kamar {{ $aduan->user->kamar->nomor_kamar ?? '-' }}
@@ -184,7 +184,7 @@
                                 </div>
                             </div>
 
-                            {{-- Message Content Section --}}
+                            {{-- Bagian Konten Pesan (Message Content Section) --}}
                             <div class="flex-1 min-w-0">
                                 <div class="flex flex-wrap items-center gap-3 mb-4">
                                     <h3 class="font-black text-gray-900 text-lg leading-tight">{{ $aduan->judul }}</h3>
@@ -207,7 +207,7 @@
                                     </p>
                                 </div>
 
-                                {{-- Meta Info --}}
+                                {{-- Informasi Meta (Meta Info) --}}
                                 <div class="flex items-center gap-6 mb-8 text-[11px] font-bold text-gray-400">
                                     <div class="flex items-center gap-1.5">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -221,7 +221,7 @@
                                     @endif
                                 </div>
 
-                                {{-- Footer Actions --}}
+                                {{-- Aksi Kaki (Footer Actions) --}}
                                 <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-50">
                                     <div class="flex items-center gap-3">
                                         @if($aduan->status === 'belum_dibaca')
@@ -269,13 +269,13 @@
             @endforeach
         </div>
 
-        {{-- Pagination --}}
+        {{-- Penomoran Halaman (Pagination) --}}
         <div class="mt-10 flex justify-center">
             {{ $aduans->links() }}
         </div>
     @endif
 
-    {{-- Success / Error Flash --}}
+    {{-- Pesan Kilat Sukses / Galat (Success / Error Flash) --}}
     @if(session('success'))
         <div class="fixed bottom-6 right-6 z-50 bg-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl shadow-emerald-500/30 font-black text-sm flex items-center gap-3"
             x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"

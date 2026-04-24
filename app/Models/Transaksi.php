@@ -53,8 +53,8 @@ class Transaksi extends Model
     }
 
     /**
-     * Get the failure reason description for failed/rejected transactions.
-     * Used mainly for desktop views.
+     * Dapatkan deskripsi alasan kegagalan untuk transaksi yang gagal/ditolak.
+     * Digunakan terutama untuk tampilan desktop.
      */
     public function getKeteranganGagalAttribute()
     {
@@ -71,8 +71,8 @@ class Transaksi extends Model
     }
 
     /**
-     * Get the shorter failure reason description.
-     * Used mainly for mobile card views.
+     * Dapatkan deskripsi alasan kegagalan yang lebih pendek.
+     * Digunakan terutama untuk tampilan kartu mobile.
      */
     public function getKeteranganGagalSingkatAttribute()
     {
@@ -89,11 +89,11 @@ class Transaksi extends Model
     }
 
     /**
-     * Check and evict tenants with "Dead" accounts (late > 3 days).
+     * Periksa dan keluarkan (evict) penyewa dengan akun "Mati" (terlambat > 3 hari).
      */
     public static function checkDeadAccounts($kodeKos = null)
     {
-        // Find users who are currently tenants (have id_kamar)
+        // Cari pengguna yang saat ini menjadi penyewa (memiliki id_kamar)
         $query = User::whereNotNull('id_kamar');
         
         if ($kodeKos) {
@@ -106,7 +106,7 @@ class Transaksi extends Model
         $tenants = $query->get();
 
         foreach ($tenants as $tenant) {
-            // Get latest paid rent transaction
+            // Dapatkan transaksi sewa berbayar terbaru (latest paid rent transaction)
             $lastRent = self::where('id_user', $tenant->id)
                 ->where('status', 'paid')
                 ->whereIn('tipe', [self::TYPE_BOOKING, self::TYPE_SEWA])
@@ -119,7 +119,7 @@ class Transaksi extends Model
                 
                 $daysDiff = (int) $nowWib->diffInDays($expiryWib, false);
 
-                // If late more than 2 days (Day -3 is Dead/Inactive)
+                // Jika terlambat lebih dari 2 hari (Hari ke-3 adalah Mati/Nonaktif)
                 if ($daysDiff < -2) {
                     $tenant->evict();
                 }
@@ -128,12 +128,12 @@ class Transaksi extends Model
     }
 
     /**
-     * Check and cancel expired verified transactions.
-     * Often called before listing orders to ensure up-to-date status.
+     * Periksa dan batalkan transaksi terverifikasi yang kedaluwarsa (expired).
+     * Sering dipanggil sebelum menampilkan daftar pesanan (order) untuk memastikan status terbaru.
      */
     public static function checkExpiry()
     {
-        // 1. Handle Verified orders (Waiting for Payment) - 24h limit (batas_bayar)
+        // 1. Menangani pesanan Terverifikasi (Menunggu Pembayaran) - batas 24 jam (batas_bayar)
         $expiredUnpaid = self::where('status', 'verified')
             ->whereNull('bukti_pembayaran')
             ->where('batas_bayar', '<', now())
@@ -152,12 +152,12 @@ class Transaksi extends Model
             }
         }
 
-        // 2. Handle Pending orders (Waiting for Admin Verification) - 24h limit
+        // 2. Menangani pesanan Tertunda (Menunggu Verifikasi Admin) - batas 24 jam (limit)
         self::where('status', 'pending')
             ->where('created_at', '<', now()->subDay())
             ->update(['status' => 'rejected']);
 
-        // 3. Handle Verified orders with Proof (Waiting for Admin Confirmation) - 24h limit
+        // 3. Menangani pesanan Terverifikasi dengan Bukti (Menunggu Konfirmasi Admin) - batas 24 jam (limit)
         $expiredUnconfirmed = self::where('status', 'verified')
             ->whereNotNull('bukti_pembayaran')
             ->where('updated_at', '<', now()->subDay())

@@ -18,7 +18,7 @@ class OrderMasukNotification extends Notification implements ShouldQueue
     public $orderData;
 
     /**
-     * Create a new notification instance.
+     * Buat instance notifikasi baru (Create a new notification instance).
      */
     public function __construct($orderData = null)
     {
@@ -26,7 +26,7 @@ class OrderMasukNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Dapatkan saluran pengiriman (delivery channels) notifikasi.
      *
      * @return array<int, string>
      */
@@ -44,7 +44,7 @@ class OrderMasukNotification extends Notification implements ShouldQueue
             ->action('Cek Dashboard', 'dashboard');
     }
 
-    // WebPush removed
+    // WebPush dihapus
 
     public function toFonnte($notifiable)
     {
@@ -56,7 +56,7 @@ class OrderMasukNotification extends Notification implements ShouldQueue
         
         $tag = ($tipe === 'sewa') ? 'PEMBAYARAN SEWA' : 'BOOKING BARU';
         
-        // Dynamic message based on who is being notified
+        // Pesan dinamis berdasarkan siapa yang diberi tahu (notified)
         $ownerName = $this->orderData['owner_name'] ?? 'Pihak Kos';
         
         $message = "[NGEKOS.ID - NOTIFIKASI {$tag}]\n\n" .
@@ -80,7 +80,7 @@ class OrderMasukNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the array representation of the notification.
+     * Dapatkan representasi array dari notifikasi.
      *
      * @return array<string, mixed>
      */

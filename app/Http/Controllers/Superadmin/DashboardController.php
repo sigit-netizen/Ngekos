@@ -14,24 +14,24 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $selectedYear = $request->get('year', date('Y'));
-        $selectedMonth = $request->get('month', '');   // empty = show all months
+        $selectedMonth = $request->get('month', '');   // kosong = tampilkan semua bulan
         $statusFilter = $request->get('status_member', 'all');
 
-        // ── Statistics ────────────────────────────────────────────────
+        // ── Statistik ────────────────────────────────────────────────
         $totalUsers = User::role('users')->count();
         $totalMembers = User::role('admin')->count();
 
-        // Active members = admin users who have at least one active subscription
+        // Anggota aktif = pengguna admin yang memiliki setidaknya satu langganan aktif (active subscription)
         $activeMemberIds = Langganan::where('status', 'active')->distinct()->pluck('id_user');
         $activeMembersCount = User::role('admin')->whereIn('id', $activeMemberIds)->count();
         $totalOverall = User::whereDoesntHave('roles', fn($q) => $q->where('name', 'superadmin'))->count();
 
         $now = Carbon::now();
 
-        // ── Chart Mode ────────────────────────────────────────────────
-        // month selected → daily breakdown; otherwise → monthly breakdown
+        // ── Mode Grafik (Chart Mode) ────────────────────────────────────────────────
+        // bulan dipilih → rincian harian; jika tidak → rincian bulanan (monthly breakdown)
         if ($selectedMonth) {
-            // Daily breakdown within the selected month
+            // Rincian harian dalam bulan yang dipilih
             $chartMode = 'daily';
 
             $usersGrowth = User::role('users')
@@ -60,7 +60,7 @@ class DashboardController extends Controller
                 ->get()
                 ->pluck('total', 'day');
 
-            // Build full day range for the month
+            // Bangun rentang hari lengkap untuk bulan tersebut
             $daysInMonth = Carbon::createFromDate($selectedYear, $selectedMonth, 1)->daysInMonth;
             $labels = [];
             $userGrowthData = [];
@@ -79,7 +79,7 @@ class DashboardController extends Controller
                 }
             }
         } else {
-            // Monthly breakdown across the year
+            // Rincian bulanan sepanjang tahun
             $chartMode = 'monthly';
 
             $usersGrowth = User::role('users')
@@ -108,7 +108,7 @@ class DashboardController extends Controller
                 ->get()
                 ->pluck('total', 'month');
 
-            // Build full 12-month labels
+            // Bangun label 12 bulan lengkap
             $labels = [];
             $userGrowthData = [];
             $memberGrowthData = [];

@@ -104,7 +104,7 @@
     transform: scale(1.1);
   }
 
-  /* Responsive Adjustments */
+  /* Penyesuaian Responsif (Responsive Adjustments) */
   @media (max-width: 640px) {
     .loader-container {
       width: 180px;

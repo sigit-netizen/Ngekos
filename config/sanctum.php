@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Stateful Domains
+    | Domain Stateful (Stateful Domains)
     |--------------------------------------------------------------------------
     |
-    | Requests from the following domains / hosts will receive stateful API
-    | authentication cookies. Typically, these should include your local
-    | and production domains which access your API via a frontend SPA.
+    | Permintaan dari domain / host berikut akan menerima cookie autentikasi
+    | API stateful. Biasanya, ini harus mencakup domain lokal
+    | dan produksi Anda yang mengakses API Anda melalui SPA frontend.
     |
     */
 
@@ -22,13 +22,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Sanctum Guards
+    | Guard Sanctum (Sanctum Guards)
     |--------------------------------------------------------------------------
     |
-    | This array contains the authentication guards that will be checked when
-    | Sanctum is trying to authenticate a request. If none of these guards
-    | are able to authenticate the request, Sanctum will use the bearer
-    | token that's present on an incoming request for authentication.
+    | Array ini berisi guard autentikasi yang akan diperiksa ketika
+    | Sanctum mencoba mengautentikasi permintaan. Jika tidak ada dari guard ini
+    | yang dapat mengautentikasi permintaan, Sanctum akan menggunakan bearer
+    | token yang ada pada permintaan masuk untuk autentikasi.
     |
     */
 
@@ -36,12 +36,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Expiration Minutes
+    | Menit Kedaluwarsa (Expiration Minutes)
     |--------------------------------------------------------------------------
     |
-    | This value controls the number of minutes until an issued token will be
-    | considered expired. This will override any values set in the token's
-    | "expires_at" attribute, but first-party sessions are not affected.
+    | Nilai ini mengontrol jumlah menit hingga token yang dikeluarkan akan
+    | dianggap kedaluwarsa. Ini akan menimpa nilai apa pun yang disetel dalam atribut
+    | "expires_at" token, tetapi sesi pihak pertama tidak terpengaruh.
     |
     */
 
@@ -49,12 +49,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Sanctum Middleware
+    | Middleware Sanctum (Sanctum Middleware)
     |--------------------------------------------------------------------------
     |
-    | When authenticating your first-party SPA with Sanctum you may need to
-    | customize some of the middleware Sanctum uses while processing the
-    | request. You may change the middleware listed below as required.
+    | Saat mengautentikasi SPA pihak pertama Anda dengan Sanctum, Anda mungkin perlu
+    | menyesuaikan beberapa middleware yang digunakan Sanctum saat memproses
+    | permintaan. Anda dapat mengubah middleware yang tercantum di bawah ini sesuai kebutuhan.
     |
     */
 

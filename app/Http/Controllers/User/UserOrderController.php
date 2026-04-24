@@ -12,27 +12,30 @@ use Illuminate\Http\Request;
 class UserOrderController extends Controller
 {
     /**
-     * Display user order page with search and order history.
+     * Tampilkan halaman pesanan pengguna dengan pencarian dan riwayat pesanan.
      */
     public function index(Request $request)
     {
         $user = auth()->user();
 
-        // Auto-cancel expired verified orders
+        // Batalkan otomatis pesanan terverifikasi yang telah kedaluwarsa (expired verified orders)
         Transaksi::checkExpiry();
 
-        // Get user's order history
+        // Dapatkan riwayat pesanan pengguna
         $orders = Transaksi::where('id_user', $user->id)
             ->with(['kamar.kos.user.nomorBank'])
             ->latest()
             ->paginate(10);
 
-        // Count stats
+        // Hitung statistik (Count stats)
         $pendingCount = Transaksi::where('id_user', $user->id)->where('status', 'pending')->count();
         $verifiedCount = Transaksi::where('id_user', $user->id)->where('status', 'verified')->count();
         $rejectedCount = Transaksi::where('id_user', $user->id)->where('status', 'rejected')->count();
 
         $tab = $request->input('tab', 'all');
+
+        // Ambil kode_kos dari query string jika user datang dari landing page
+        $intendedKos = $request->input('kode_kos');
 
         return view('user.order', [
             'title' => 'Order Kamar',
@@ -42,17 +45,19 @@ class UserOrderController extends Controller
             'pendingCount' => $pendingCount,
             'verifiedCount' => $verifiedCount,
             'rejectedCount' => $rejectedCount,
+            'intendedKos' => $intendedKos,
         ]);
     }
 
     /**
-     * Search kos with filters: lokasi, harga (predefined range), kategori.
+     * Cari kos dengan filter: lokasi, harga (rentang yang telah ditentukan), kategori.
      */
     public function searchKos(Request $request)
     {
-        // Filter variables
+        // Variabel filter
         $kategori = $request->kategori;
         $lokasi = $request->lokasi;
+        $kodeKos = $request->kode_kos; // Filter langsung by kode_kos
         $hargaMin = null;
         $hargaMax = null;
 
@@ -66,11 +71,16 @@ class UserOrderController extends Controller
 
         $tipeSewa = $request->tipe_sewa;
 
-        $searchPerformed = $request->filled('lokasi') || $request->filled('harga') || $request->filled('kategori') || $request->filled('kota') || $request->filled('tipe_sewa');
+        $searchPerformed = $request->filled('lokasi') || $request->filled('harga') || $request->filled('kategori') || $request->filled('kota') || $request->filled('tipe_sewa') || $request->filled('kode_kos');
 
         $query = Kos::query();
 
-        // 1. Filter by lokasi / kota
+        // 0. Filter langsung by kode_kos (dari landing page redirect)
+        if ($kodeKos) {
+            $query->where('kode_kos', $kodeKos);
+        }
+
+        // 1. Filter berdasarkan lokasi / kota
         if ($lokasi) {
             $query->where(function ($q) use ($lokasi) {
                 $q->where('alamat', 'like', '%' . $lokasi . '%')
@@ -84,21 +94,20 @@ class UserOrderController extends Controller
             $query->where('kota', $request->kota);
         }
 
-        // 2. Filter by kategori
+        // 2. Filter berdasarkan kategori
         if ($kategori) {
             $query->where('kategori', $kategori);
         }
 
-        // 3. Filter by tipe_sewa (tipe_durasi in kamar)
+        // 3. Filter berdasarkan tipe_sewa (tipe_durasi di kamar)
         if ($tipeSewa) {
             $query->whereHas('kamars', function ($q) use ($tipeSewa) {
                 $q->where('tipe_durasi', $tipeSewa);
             });
         }
 
-        // 3. Optional: Add base constraints (we no longer hide full kos, so we don't strictly use whereHas for 'tersedia' here)
-        // If price is specified, we check if the kos AT LEAST has a room matching the price. 
-        // If they just search without price, we show all matching kos.
+        // Jika harga ditentukan, periksa apakah kos SETIDAKNYA memiliki kamar yang sesuai dengan harga tersebut. 
+        // Jika mereka hanya mencari tanpa menentukan harga, tampilkan semua kos yang cocok.
         if (!is_null($hargaMin) || !is_null($hargaMax)) {
             $query->whereHas('kamars', function ($q) use ($hargaMin, $hargaMax) {
                 if (!is_null($hargaMin)) {
@@ -110,7 +119,7 @@ class UserOrderController extends Controller
             });
         }
 
-        // 4. Eager load: Only load matching available rooms
+        // 4. Memuat langsung (Eager load): Hanya muat kamar tersedia yang cocok
         $query->with([
             'kamars' => function ($q) use ($hargaMin, $hargaMax, $tipeSewa) {
                 $q->where('status', 'tersedia')
@@ -136,11 +145,11 @@ class UserOrderController extends Controller
             ->withMin('kamars as harga_termurah', 'harga')
             ->withMax('kamars as harga_termahal', 'harga');
 
-        // 5. Order by Popularity if it's the recommendation call (no filters)
+        // 5. Urutkan berdasarkan Popularitas jika ini adalah panggilan rekomendasi (tanpa filter)
         $kosList = $query->get();
 
         if (!$searchPerformed) {
-            // Count successful transactions per city
+            // Hitung transaksi sukses per kota
             $cityPopularity = \App\Models\Transaksi::join('kamar', 'transaksi.id_kamar', '=', 'kamar.id')
                 ->join('kos', 'kamar.id_kos', '=', 'kos.id')
                 ->whereIn('transaksi.status', ['verified', 'paid'])
@@ -180,8 +189,8 @@ class UserOrderController extends Controller
                 ] : null,
                 'kategori' => $kos->kategori,
                 'foto' => $kos->foto,
-                'harga_termurah' => $kos->harga_termurah, // From withMin
-                'harga_termahal' => $kos->harga_termahal, // From withMax
+                'harga_termurah' => $kos->harga_termurah, // Dari withMin
+                'harga_termahal' => $kos->harga_termahal, // Dari withMax
                 'owner' => [
                     'instagram' => $kos->user->instagram,
                     'twitter' => $kos->user->twitter,
@@ -209,7 +218,7 @@ class UserOrderController extends Controller
     }
 
     /**
-     * Store a new order (transaksi) from user.
+     * Simpan pesanan (transaksi) baru dari pengguna.
      */
     public function store(Request $request)
     {
@@ -225,7 +234,7 @@ class UserOrderController extends Controller
         $user = auth()->user();
         $isPenyewa = $user->isPenyewa();
 
-        // Check if user already has an active order for this kamar
+        // Periksa apakah pengguna sudah memiliki pesanan aktif untuk kamar ini
         $existingOrder = Transaksi::where('id_user', $user->id)
             ->where('id_kamar', $request->id_kamar)
             ->where('status', 'pending')
@@ -235,20 +244,20 @@ class UserOrderController extends Controller
             return back()->with('error', 'Anda sudah memiliki order yang menunggu verifikasi untuk kamar ini.');
         }
 
-        // Determine if this is a rent payment (sewa) or a new booking
+        // Tentukan apakah ini pembayaran sewa atau pesanan baru (booking)
         $isRentPayment = $isPenyewa && $user->id_kamar == $request->id_kamar;
         $tipe = $isRentPayment ? Transaksi::TYPE_SEWA : Transaksi::TYPE_BOOKING;
 
-        // Get kamar details
+        // Dapatkan detail kamar
         $kamar = Kamar::findOrFail($request->id_kamar);
 
-        // ENSURE fixed payment: jumlah_bayar must exactly match kamar->harga
+        // PASTIKAN pembayaran tetap: jumlah_bayar harus tepat sama dengan kamar->harga
         if ($request->jumlah_bayar != $kamar->harga) {
             return back()->with('error', 'Nominal pembayaran tidak sesuai dengan harga kamar. Silakan coba lagi.');
         }
 
         if (!$isRentPayment) {
-            // NEW: Check if the room is locked by someone else (pending, verified or paid within 24h)
+            // BARU: Periksa apakah kamar dikunci oleh orang lain (status pending, verified, atau dibayar dalam 24 jam)
             $lockedOrder = Transaksi::where('id_kamar', $request->id_kamar)
                 ->where(function ($q) {
                     $q->whereIn('status', ['pending', 'verified'])
@@ -263,18 +272,18 @@ class UserOrderController extends Controller
                 return back()->with('error', 'Maaf, kamar ini baru saja dibooking oleh orang lain. Silakan pilih kamar lain.');
             }
 
-            // Check if user is already a tenant (only for new bookings)
+            // Periksa apakah pengguna sudah menjadi penyewa (hanya untuk pesanan baru)
             if ($isPenyewa) {
                 return back()->with('error', 'Anda sudah menjadi penyewa. Tidak bisa membuat order baru.');
             }
 
-            // Check if kamar is still available (only for new bookings)
+            // Periksa apakah kamar masih tersedia (hanya untuk pesanan baru)
             if ($kamar->status !== 'tersedia') {
                 return back()->with('error', 'Maaf, kamar ini sudah tidak tersedia.');
             }
         }
 
-        // Expiry logic: "jika pyment batas waktunya 3 hari"
+        // Logika Kedaluwarsa: "jika pymen batas waktunya 3 hari"
         $batasBayar = $request->batas_bayar ? \Carbon\Carbon::parse($request->batas_bayar) : null;
         if ($request->metode_pembayaran === 'pymen') {
             $batasBayar = now()->addDays(3);
@@ -309,7 +318,7 @@ class UserOrderController extends Controller
             'jatuh_tempo' => $initialJatuhTempo,
         ]);
 
-        // Notify Kos Owner (Queued for speed)
+        // Beri tahu Pemilik Kos (Antrean/Queued untuk kecepatan)
         $owner = $kamar->kos->user;
         if ($owner && $owner->nomor_wa) {
             $owner->notify(new \App\Notifications\OrderMasukNotification([
@@ -327,7 +336,7 @@ class UserOrderController extends Controller
     }
 
     /**
-     * Cancel a pending order.
+     * Batalkan pesanan tertunda (pending order).
      */
     public function cancelOrder(Transaksi $transaksi)
     {
@@ -357,7 +366,7 @@ class UserOrderController extends Controller
             return back()->with('error', 'Silakan unggah bukti setelah pesanan disetujui.');
         }
 
-        // Enforce 24h deadline
+        // Terapkan batas waktu 24 jam
         if ($order->batas_bayar && now()->gt($order->batas_bayar)) {
             $order->update(['status' => 'failed']);
             return back()->with('error', 'Waktu maksimal unggah bukti (1x24 jam) telah habis. Pesanan otomatis gagal.');
@@ -379,7 +388,7 @@ class UserOrderController extends Controller
                 'bukti_pembayaran'
             );
 
-            // Notify Kos Owner
+            // Beri tahu Pemilik Kos (Notify Kos Owner)
             $owner = $order->kamar->kos->user;
             if ($owner && $owner->nomor_wa) {
                 $owner->notify(new \App\Notifications\BuktiPembayaranNotification([
@@ -397,7 +406,7 @@ class UserOrderController extends Controller
     }
 
     /**
-     * Toggle kos favorit for the current user.
+     * Alihkan (Toggle) kos favorit untuk pengguna saat ini.
      */
     public function toggleFavorit(Request $request, $id)
     {

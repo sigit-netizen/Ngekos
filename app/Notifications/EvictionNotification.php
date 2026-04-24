@@ -16,8 +16,8 @@ class EvictionNotification extends Notification implements ShouldQueue
     public $evictionData;
 
     /**
-     * Create a new notification instance.
-     * $evictionData should contain:
+     * Buat instance notifikasi baru.
+     * $evictionData harus berisi:
      * - kos_name
      * - nomor_kamar
      * - owner_phone

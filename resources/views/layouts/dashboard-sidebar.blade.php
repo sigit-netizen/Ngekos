@@ -7,7 +7,7 @@
             <img src="/storage/logo/logo.svg" alt="Logo" class="h-10 w-auto" />
         </a>
 
-        <!-- Mobile Close Button -->
+        <!-- Tombol Tutup Seluler (Mobile Close Button) -->
         <button @click="sidebarOpen = false" class="lg:hidden ml-auto p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
@@ -16,25 +16,31 @@
         </button>
     </div>
 
-    <!-- Navigation Links -->
+    <!-- Tautan Navigasi (Navigation Links) -->
     <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
         @php
+            /** @var \App\Models\User $user */
             $user = auth()->user();
 
-            // Get latest active subscription with plan details for accurate labeling
+            // Dapatkan langganan aktif terbaru dengan detail paket untuk pelabelan yang akurat
+            // (Get latest active subscription with plan details for accurate labeling)
+            /** @var \App\Models\Langganan|null $latestSub */
             $latestSub = \App\Models\Langganan::with('jenis_langganan')
                 ->where('id_user', $user->id)
                 ->where('status', 'active')
                 ->latest()
                 ->first();
 
-            // Set plan name primarily from active subscription, fallback to user model logic
+            // Atur nama paket terutama dari langganan aktif, cadangan (fallback) ke logika model pengguna
+            // (Set plan name primarily from active subscription, fallback to user model logic)
             $planName = $latestSub ? ($latestSub->jenis_langganan->nama ?? $user->getPlanName()) : $user->getPlanName();
 
-            // Strip "MEMBER " prefix if present for cleaner sidebar look (optional but good)
+            // Hapus awalan "MEMBER " jika ada agar tampilan sidebar lebih bersih (opsional)
+            // (Remove "MEMBER " prefix if exists for cleaner sidebar look (optional))
             $planName = str_replace('MEMBER ', '', strtoupper($planName));
 
-            // Calculate Status for Admin Sidebar Badge
+            // Hitung Status untuk Lencana (Badge) Sidebar Admin
+            // (Calculate Status for Admin Sidebar Badge)
             $sidebarStatus = 'active';
             if ($latestSub && !($user->hasRole('superadmin') || $user->id_plans == 6)) {
                 $expiryDate = $latestSub->jatuh_tempo ? \Carbon\Carbon::parse($latestSub->jatuh_tempo) : \Carbon\Carbon::parse($latestSub->tanggal_pembayaran)->addDays(30);
@@ -48,7 +54,7 @@
             }
         @endphp
 
-        <!-- Subscription Badge (Specific for Admin) -->
+        <!-- Lencana Langganan (Khusus untuk Admin) -->
         @if (($role ?? 'user') == 'admin')
             <div class="px-4 mb-6">
                 <div class="p-3 rounded-2xl border transition-all duration-300
@@ -121,25 +127,25 @@
                 Data User
             </a>
 
-            <!-- Laporan Pembayaran -->
+            <!-- Laporan Pembayaran (Payment Report) -->
             @php
                 $inactiveCount = \App\Models\Langganan::with(['user.statusUser'])->whereNotNull('tanggal_pembayaran')
                     ->get()
                     ->filter(function ($sub) {
-                        // Exclude users already officially deactivated
+                        // Kecualikan pengguna yang sudah dinonaktifkan secara resmi
                         if ($sub->user && $sub->user->statusUser && $sub->user->statusUser->status === 'inactive') {
                             return false;
                         }
-                        // Using jatuh_tempo if available, standardized to 30 days fallback
+                        // Gunakan jatuh_tempo jika tersedia, standar fallback 30 hari
                         $expiryDate = $sub->jatuh_tempo ? \Carbon\Carbon::parse($sub->jatuh_tempo) : \Carbon\Carbon::parse($sub->tanggal_pembayaran)->addDays(30);
 
-                        // WIB Reset Logic
+                        // Logika Reset WIB (WIB Reset Logic)
                         $nowWib = now('Asia/Jakarta')->startOfDay();
                         $expiryWib = $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay();
 
                         $diff = (int) $nowWib->diffInDays($expiryWib, false);
 
-                        // "Mati" is defined as package expired for more than 3 days
+                        // "Mati" didefinisikan sebagai paket kedaluwarsa lebih dari 3 hari
                         return $diff < -3;
                     })->count();
             @endphp
@@ -170,10 +176,10 @@
                 </div>
             </a>
 
-            <!-- Order -->
+            <!-- Pesanan (Order) -->
             @php
                 $pendingPackets = \App\Models\Langganan::where('status', 'pending')->count();
-                // Add PendingUser counts from staging table (only status=pending)
+                // Tambahkan hitungan PendingUser dari tabel staging (hanya status=pending)
                 $pendingRegistrations = \App\Models\PendingUser::where('status', 'pending')->count();
                 $pendingCount = $pendingPackets + $pendingRegistrations;
             @endphp
@@ -204,7 +210,7 @@
                 </div>
             </a>
 
-            <!-- Permission -->
+            <!-- Izin (Permission) -->
             <a href="{{ route('superadmin.permission') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->is('superadmin/permission*') ? 'bg-[#36B2B2]/10 text-[#36B2B2] font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-[#36B2B2] font-medium' }} transition-colors group">
                 <div
@@ -218,7 +224,7 @@
                 Permission
             </a>
 
-            <!-- Aduan Section -->
+            <!-- Bagian Aduan (Complaint Section) -->
             <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">Aduan</p>
 
             <!-- Aduan Member -->
@@ -278,7 +284,7 @@
                 </div>
             </a>
 
-        @elseif (($role ?? 'user') == 'admin' || Auth::user()->hasRole('nonaktif'))
+        @elseif (($role ?? 'user') == 'admin' || $user->hasRole('nonaktif'))
             <p class="px-4 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Admin Panel</p>
 
             <!-- Dashboard -->
@@ -330,6 +336,7 @@
             @endcan
             @can('menu.order')
                 @php
+                    /** @var \App\Models\Kos|null $adminKos */
                     $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
                     $tpOrder = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
                     $tpUser = $adminKos ? \App\Models\PendingUser::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
@@ -400,6 +407,7 @@
             <!-- Aduan -->
             @can('menu.pesan_aduan')
                 @php
+                    /** @var \App\Models\Kos|null $adminKos */
                     $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
                     $unreadAduanCount = $adminKos ? \App\Models\Aduan::where('id_kos', $adminKos->id)->where('status', 'belum_dibaca')->count() : 0;
                 @endphp
@@ -448,9 +456,10 @@
             @endcan
 
 
-            <!-- Tagihan App -->
+            <!-- Tagihan Aplikasi (App Billing) -->
             @can('menu.tagihan_sistem')
                 @php
+                    /** @var \App\Models\Langganan|null $memberSub */
                     $memberSub = \App\Models\Langganan::where('id_user', Auth::id())->latest()->first();
                     $mExpiry = $memberSub?->jatuh_tempo ? \Carbon\Carbon::parse($memberSub->jatuh_tempo) : ($memberSub?->tanggal_pembayaran ? \Carbon\Carbon::parse($memberSub->tanggal_pembayaran)->addDays(30) : null);
                     $mNow = now('Asia/Jakarta')->startOfDay();
@@ -620,7 +629,7 @@
         @endif
     </nav>
 
-    <!-- Sidebar Footer / Logout Component -->
+    <!-- Footer Sidebar / Komponen Logout (Sidebar Footer / Logout Component) -->
     <div class="p-4 border-t border-gray-100 shrink-0 bg-gray-50/50">
         <form method="POST" action="{{ route('logout') }}">
             @csrf

@@ -6,12 +6,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Database Connection Name
+    | Nama Koneksi Database Default (Default Database Connection Name)
     |--------------------------------------------------------------------------
     |
-    | Here you may specify which of the database connections below you wish
-    | to use as your default connection for all database work. Of course
-    | you may use many connections at once using the Database library.
+    | Di sini Anda dapat menentukan mana dari koneksi database di bawah ini yang ingin
+    | Anda gunakan sebagai koneksi default untuk semua pekerjaan database. Tentu saja
+    | Anda dapat menggunakan banyak koneksi sekaligus menggunakan pustaka Database.
     |
     */
 
@@ -19,17 +19,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Database Connections
+    | Koneksi Database (Database Connections)
     |--------------------------------------------------------------------------
     |
-    | Here are each of the database connections setup for your application.
-    | Of course, examples of configuring each database platform that is
-    | supported by Laravel is shown below to make development simple.
+    | Berikut adalah masing-masing konfigurasi koneksi database untuk aplikasi Anda.
+    | Tentu saja, contoh konfigurasi setiap platform database yang
+    | didukung oleh Laravel ditunjukkan di bawah ini untuk memudahkan pengembangan.
     |
     |
-    | All database work in Laravel is done through the PHP PDO facilities
-    | so make sure you have the driver for your particular database of
-    | choice installed on your machine before you begin development.
+    | Semua pekerjaan database di Laravel dilakukan melalui fasilitas PHP PDO
+    | jadi pastikan Anda memiliki driver untuk database pilihan Anda
+    | terinstal di mesin Anda sebelum Anda memulai pengembangan.
     |
     */
 
@@ -97,12 +97,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Migration Repository Table
+    | Tabel Repositori Migrasi (Migration Repository Table)
     |--------------------------------------------------------------------------
     |
-    | This table keeps track of all the migrations that have already run for
-    | your application. Using this information, we can determine which of
-    | the migrations on disk haven't actually been run in the database.
+    | Tabel ini melacak semua migrasi yang telah dijalankan untuk
+    | aplikasi Anda. Menggunakan informasi ini, kami dapat menentukan migrasi
+    | mana di disk yang sebenarnya belum dijalankan di database.
     |
     */
 
@@ -110,12 +110,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Redis Databases
+    | Database Redis (Redis Databases)
     |--------------------------------------------------------------------------
     |
-    | Redis is an open source, fast, and advanced key-value store that also
-    | provides a richer body of commands than a typical key-value system
-    | such as APC or Memcached. Laravel makes it easy to dig right in.
+    | Redis adalah penyimpanan kunci-nilai (key-value) sumber terbuka, cepat, dan canggih yang juga
+    | menyediakan kumpulan perintah yang lebih kaya daripada sistem kunci-nilai tipikal
+    | seperti APC atau Memcached. Laravel memudahkan untuk langsung menggunakannya.
     |
     */
 

@@ -16,7 +16,7 @@ class PenyewaController extends Controller
         $kos = Kos::where('id_user', $admin->id)->first();
         $status = $request->get('status', 'active');
 
-        // Trigger auto-evict here too if viewing active tenants
+        // Picu pengeluaran otomatis (auto-evict) di sini juga jika melihat penyewa aktif
         if ($kos && $status === 'active') {
             \App\Models\Transaksi::checkDeadAccounts($kos->kode_kos);
         }
@@ -57,14 +57,14 @@ class PenyewaController extends Controller
     }
 
     /**
-     * Manually evict a tenant.
+     * Keluarkan penyewa secara manual.
      */
     public function evict(User $user)
     {
         $admin = Auth::user();
         $kos = Kos::where('id_user', $admin->id)->first();
 
-        // Security check
+        // Pemeriksaan keamanan (Security check)
         if (!$kos || $user->id_kos !== $kos->id) {
             return back()->with('error', 'Akses ditolak: Penyewa tidak terdaftar di kos Anda.');
         }

@@ -5,27 +5,26 @@ require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Rute Web (Web Routes)
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| Di sini Anda dapat mendaftarkan rute web untuk aplikasi Anda. Rute-rute
+| ini dimuat oleh RouteServiceProvider dalam grup yang berisi grup
+| middleware "web". Sekarang, buat sesuatu yang luar biasa!
 |
 */
-// Landing Page
-// Landing Page
+// Halaman Utama (Landing Page)
 Route::get('/', [\App\Http\Controllers\LandingPageController::class, 'index'])->name('home');
 
-// Kos Management
+// Manajemen Kos (Kos Management)
 Route::put('/admin/kos/{kos}', [\App\Http\Controllers\KosController::class, 'update'])->middleware('auth')->name('admin.kos.update');
 Route::post('/search-kos', [\App\Http\Controllers\User\UserOrderController::class, 'searchKos'])->name('kos.search');
 
-// Profile Routes
+// Rute Profil (Profile Routes)
 Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
 Route::post('/profile/verify-password', [\App\Http\Controllers\ProfileController::class, 'verifyPassword'])->middleware('auth')->name('profile.verify-password');
 
-// Pending Verification Page
+// Halaman Verifikasi Tertunda (Pending Verification Page)
 Route::get('/pending', function () {
     if (auth()->user()->status === 'active') {
         return redirect()->route(auth()->user()->hasRole('superadmin') ? 'superadmin.dashboard' : 'admin.dashboard');
@@ -37,11 +36,11 @@ Route::post('/push-subscription', [\App\Http\Controllers\PushSubscriptionControl
     ->middleware('auth')
     ->name('push-subscription');
 
-// Protected Admin Dashboard
+// Dashboard Admin Terproteksi (Protected Admin Dashboard)
 Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(function () {
     Route::get('/admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Kamar Management
+    // Manajemen Kamar (Kamar Management)
     Route::get('/admin/kamar', [\App\Http\Controllers\Admin\KamarController::class, 'index'])->name('admin.kamar');
     Route::post('/admin/kamar', [\App\Http\Controllers\Admin\KamarController::class, 'store'])->name('admin.kamar.store');
     Route::put('/admin/kamar/{kamar}', [\App\Http\Controllers\Admin\KamarController::class, 'update'])->name('admin.kamar.update');
@@ -55,7 +54,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
         return view('member.cabang_kos', ['title' => 'Cabang Kos', 'role' => 'admin']);
     })->name('admin.cabang_kos');
 
-    // Aduan Management
+    // Manajemen Aduan (Aduan Management)
     Route::get('/admin/pesan-aduan', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'index'])->name('admin.pesan_aduan');
     Route::post('/admin/aduan/{aduan}/read', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'markRead'])->name('admin.aduan.read');
     Route::post('/admin/aduan/{aduan}/unread', [\App\Http\Controllers\Admin\AduanFasilitasController::class, 'markUnread'])->name('admin.aduan.unread');
@@ -79,14 +78,14 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     Route::post('/admin/order/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'confirmPayment'])->name('admin.order.confirm');
     Route::post('/admin/order/{id}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectOrder'])->name('admin.order.reject');
 
-    // Penyewa (PendingUser) Verification
+    // Verifikasi Penyewa (PendingUser Verification)
     Route::post('/admin/penyewa/{pendingUser}/verify', [\App\Http\Controllers\Admin\OrderController::class, 'verifyPenyewa'])->name('admin.penyewa.verify');
     Route::post('/admin/penyewa/{pendingUser}/reject', [\App\Http\Controllers\Admin\OrderController::class, 'rejectPenyewa'])->name('admin.penyewa.reject');
 
 
-    // Dynamic Route for automatically generated admin menus
+    // Rute Dinamis untuk menu admin yang dibuat secara otomatis
     Route::get('/admin/{page}', function ($page) {
-        // Prevent pages with required controller data from being served without them
+        // Cegah halaman yang memerlukan data controller agar tidak diakses tanpa data tersebut
         if (in_array($page, ['pesan_aduan'])) {
             abort(404);
         }
@@ -98,7 +97,7 @@ Route::middleware(['auth', 'role:admin|nonaktif', 'check.subscription'])->group(
     })->name('admin.dynamic');
 });
 
-// Protected User Dashboards (Anak Kos)
+// Dashboard Pengguna Terproteksi / Anak Kos (Protected User Dashboards)
 Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(function () {
     Route::get('/user', [\App\Http\Controllers\User\DashboardController::class, 'index'])->name('user.dashboard');
 
@@ -114,12 +113,12 @@ Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(func
     Route::get('/user/jatuh-tempo', [\App\Http\Controllers\User\JatuhTempoController::class, 'index'])->name('user.jatuh_tempo');
     Route::post('/user/jatuh-tempo', [\App\Http\Controllers\User\JatuhTempoController::class, 'store'])->name('user.jatuh_tempo.store');
 
-    // Fasilitas routes
+    // Rute Fasilitas (Fasilitas routes)
     Route::get('/user/fasilitas', [\App\Http\Controllers\User\FasilitasController::class, 'index'])->name('user.fasilitas');
     Route::post('/user/fasilitas/aduan', [\App\Http\Controllers\User\FasilitasController::class, 'storeAduan'])->name('user.fasilitas.aduan');
     Route::post('/user/fasilitas/tambah', [\App\Http\Controllers\User\FasilitasController::class, 'storeTambah'])->name('user.fasilitas.tambah');
 
-    // Dynamic Route for automatically generated user menus
+    // Rute Dinamis untuk menu pengguna yang dibuat secara otomatis
     Route::get('/user/{page}', function ($page) {
         if (view()->exists('user.' . $page)) {
             $title = ucwords(str_replace(['_', '-'], ' ', $page));
@@ -129,7 +128,7 @@ Route::middleware(['auth', 'role:users|user', 'check.subscription'])->group(func
     })->name('user.dynamic');
 });
 
-// Other specific dashboard roles... (assuming these exists from existing code)
+// Peran dashboard spesifik lainnya... (berdasarkan kode yang sudah ada)
 Route::middleware(['auth', 'role:member'])->group(function () {
     Route::get('/member', function () {
         return view('member.dashboard', ['role' => 'member']);
@@ -180,7 +179,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::post('/superadmin/user/{user}/deactivate', [\App\Http\Controllers\Superadmin\LaporanPembayaranController::class, 'deactivateUser'])->name('superadmin.user.deactivate');
 });
 
-// Registration Pending Status Page (Secure via Session)
+// Halaman Status Pendaftaran Tertunda (Aman melalui Sesi)
 Route::get('/registration/pending', function (\Illuminate\Http\Request $request) {
     $pendingUserId = session('pending_user_id');
     
@@ -199,20 +198,20 @@ Route::get('/registration/pending', function (\Illuminate\Http\Request $request)
         ->whereNotIn('nama_plans', ['Member', 'Superadmin'])
         ->get();
 
-    // Fetch Superadmin bank accounts for payment instructions
+    // Ambil akun bank Superadmin untuk instruksi pembayaran
     $superadminBanks = \App\Models\User::role('superadmin')
         ->with('nomorBank')
         ->get()
         ->filter(fn($u) => $u->nomorBank)
         ->map(fn($u) => $u->nomorBank);
 
-    // Calculate total payment
+    // Hitung total pembayaran
     $totalPembayaran = 0;
     if ($pendingUser->plan_type) {
         $planName = trim($pendingUser->plan_type);
         $searchKey = $planName;
         
-        // Map simple names to database names if needed
+        // Petakan nama sederhana ke nama database jika diperlukan
         if (strtolower($planName) === 'pro') $searchKey = 'MEMBER PRO';
         if (strtolower($planName) === 'premium') $searchKey = 'MEMBER PREMIUM';
 
@@ -263,7 +262,7 @@ Route::post('/registration/step-one', [\App\Http\Controllers\Auth\PendingUserDas
 Route::post('/registration/send-otp', [\App\Http\Controllers\Auth\PendingUserDashboardController::class, 'sendOtp'])->name('registration.send-otp');
 Route::post('/registration/verify-otp', [\App\Http\Controllers\Auth\PendingUserDashboardController::class, 'verifyOtp'])->name('registration.verify-otp');
 
-// Registration Rejected Status Page (Secure via Session)
+// Halaman Status Pendaftaran Ditolak (Aman melalui Sesi)
 Route::get('/registration/rejected', function (\Illuminate\Http\Request $request) {
     $pendingUserId = session('pending_user_id');
 

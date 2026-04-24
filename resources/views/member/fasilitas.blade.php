@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
-    {{-- Header --}}
+    {{-- Kepala Halaman (Header) --}}
     <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-10 shadow-sm border border-white/50 mb-8"
         data-aos="fade-up">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    {{-- Main Content --}}
+    {{-- Konten Utama (Main Content) --}}
     <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden mb-10" data-aos="fade-up">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    {{-- Modals --}}
+    {{-- Modal-Modal (Modals) --}}
     <div id="fasilitasModal"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
         <div
@@ -203,7 +203,7 @@
             methodField.innerHTML = '@method("PUT")';
             inputNama.value = item.nama_fasilitas;
 
-            // Set initial value for editing
+            // Atur nilai awal untuk pengeditan (Set initial value for editing) --}}
             inputHargaHidden.value = item.harga_tambahan;
             inputHargaDisplay.value = "Rp " + new Intl.NumberFormat('id-ID').format(item.harga_tambahan);
 

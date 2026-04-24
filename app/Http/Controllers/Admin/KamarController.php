@@ -17,7 +17,7 @@ class KamarController extends Controller
         $user = Auth::user();
         $kos = $user->kos()->first();
 
-        // Eager load fasilitas and transaksis
+        // Muat fasilitas dan transaksi secara eager (Eager load)
         $kamars = $kos ? $kos->kamars()->with(['fasilitas', 'transaksis'])->latest()->get() : collect();
 
         $activeSubscription = $user->langganans()->where('status', 'active')->latest()->first();
@@ -43,7 +43,7 @@ class KamarController extends Controller
             return back()->with('error', 'Silakan buat data kos terlebih dahulu.');
         }
 
-        // Clean price input from formatting (dots)
+        // Bersihkan input harga dari format (titik)
         if ($request->has('harga')) {
             $request->merge(['harga' => str_replace('.', '', $request->harga)]);
         }
@@ -65,14 +65,14 @@ class KamarController extends Controller
             'fasilitas.*' => 'nullable|string',
         ]);
 
-        // Temporary path for background processing
+        // Path sementara untuk pemrosesan latar belakang (background processing)
         $tempPath = null;
         $file = $request->file('foto_camera') ?? $request->file('foto_gallery') ?? $request->file('foto');
         if ($file) {
             $tempPath = $file->store('temp', 'public');
         }
 
-        // Quota check
+        // Pemeriksaan kuota
         $activeSubscription = $user->langganans()->where('status', 'active')->latest()->first();
         $isPerKamar = in_array($user->id_plans, [4, 5]);
         if ($isPerKamar && $activeSubscription) {
@@ -82,7 +82,7 @@ class KamarController extends Controller
             }
         }
 
-        // Max duration check (1 year)
+        // Pemeriksaan durasi maksimal (1 tahun)
         if ($request->tipe_durasi === 'bulan' && $request->durasi_sewa > 12) {
             return back()->with('error', 'Durasi maksimal adalah 12 bulan.');
         }
@@ -98,8 +98,8 @@ class KamarController extends Controller
             'harga' => $request->harga,
             'durasi_sewa' => $request->durasi_sewa,
             'tipe_durasi' => $request->tipe_durasi,
-            'status' => 'tersedia', // Default, auto in view
-            'foto' => $tempPath ? 'storage/' . $tempPath : null, // Show temp before optimized
+            'status' => 'tersedia', // Default, otomatis di tampilan (view)
+            'foto' => $tempPath ? 'storage/' . $tempPath : null, // Tampilkan file sementara sebelum dioptimasi
             'id_kos' => $kos->id,
         ]);
 
@@ -107,7 +107,7 @@ class KamarController extends Controller
             \App\Jobs\ProcessImageOptimization::dispatch($tempPath, 'kamar', $kamar, 'foto');
         }
 
-        // Add facilities
+        // Tambah fasilitas
         if ($request->fasilitas) {
             foreach ($request->fasilitas as $name) {
                 $name = trim($name);
@@ -125,7 +125,7 @@ class KamarController extends Controller
 
     public function update(Request $request, Kamar $kamar)
     {
-        // Clean price input
+        // Bersihkan input harga
         if ($request->has('harga')) {
             $request->merge(['harga' => str_replace('.', '', $request->harga)]);
         }
@@ -133,7 +133,7 @@ class KamarController extends Controller
         $user = Auth::user();
         $kos = $user->kos()->first();
 
-        // Security Check: Ensure kamar belongs to user's kos
+        // Pemeriksaan Keamanan: Pastikan kamar milik kos pengguna
         if (!$kos || $kamar->id_kos !== $kos->id) {
             abort(403, 'Akses ditolak.');
         }
@@ -153,7 +153,7 @@ class KamarController extends Controller
             'foto_gallery' => 'nullable|image|max:512000',
         ]);
 
-        // Max duration check (1 year)
+        // Pemeriksaan durasi maksimal (1 tahun)
         if ($request->tipe_durasi === 'bulan' && $request->durasi_sewa > 12) {
             return back()->with('error', 'Durasi maksimal adalah 12 bulan.');
         }
@@ -182,7 +182,7 @@ class KamarController extends Controller
         $user = Auth::user();
         $kos = $user->kos()->first();
 
-        // Security Check: Ensure kamar belongs to user's kos
+        // Pemeriksaan Keamanan: Pastikan kamar milik kos pengguna
         if (!$kos || $kamar->id_kos !== $kos->id) {
             abort(403, 'Akses ditolak.');
         }
@@ -192,10 +192,10 @@ class KamarController extends Controller
             'fasilitas.*' => 'nullable|string',
         ]);
 
-        // Remove old facilities
+        // Hapus fasilitas lama
         $kamar->fasilitas()->delete();
 
-        // Add new facilities
+        // Tambah fasilitas baru
         if ($request->fasilitas) {
             foreach ($request->fasilitas as $name) {
                 $name = trim($name);
@@ -216,7 +216,7 @@ class KamarController extends Controller
         $user = Auth::user();
         $kos = $user->kos()->first();
 
-        // Security Check: Ensure kamar belongs to user's kos
+        // Pemeriksaan Keamanan: Pastikan kamar milik kos pengguna
         if (!$kos || $kamar->id_kos !== $kos->id) {
             abort(403, 'Akses ditolak.');
         }

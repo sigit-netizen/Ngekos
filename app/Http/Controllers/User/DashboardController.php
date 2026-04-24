@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     /**
-     * Display the user dashboard.
+     * Tampilkan dashboard pengguna (user dashboard).
      */
     public function index(Request $request)
     {
@@ -28,7 +28,7 @@ class DashboardController extends Controller
             $data['kosData'] = $user->kosAnak;
             $data['kamarData'] = $user->kamar;
         } else {
-            // Logic for users who haven't rented yet
+            // Logika untuk pengguna yang belum menyewa (rented)
             $latestOrder = Transaksi::where('id_user', $user->id)
                 ->latest()
                 ->with(['kamar.kos'])
@@ -58,6 +58,9 @@ class DashboardController extends Controller
             $data['orderStatus'] = $orderStatus;
             $data['popularCities'] = $popularCities;
         }
+
+        // Ambil kode_kos dari query string jika user datang dari landing page
+        $data['intendedKos'] = $request->input('kode_kos');
 
         return view('user.dashboard', $data);
     }

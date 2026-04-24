@@ -16,16 +16,16 @@ class OrderManagementController extends Controller
         $activeTab = $request->get('tab', 'pending_member');
         $statusFilter = $request->get('status', 'active');
 
-        // Counts for Pending User and Pending Member from PendingUser Table
+        // Hitung Pengguna Tertunda (Pending User) dan Member Tertunda dari Tabel PendingUser
         $pendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'pending')->count();
         $pendingMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'pending')->count();
         $pendingPaymentMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'konfirmasi')->count();
 
-        // Rejected counts from PendingUser table
+        // Hitung pendaftaran yang ditolak dari tabel PendingUser
         $rejectedPendingMemberCount = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'rejected')->count();
         $rejectedPendingUserCount = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->count();
 
-        // Counts for Active/Rejected from User Table (Role-based to match list visibility)
+        // Hitung Aktif/Ditolak dari Tabel User (Berdasarkan peran untuk mencocokkan visibilitas daftar)
         $memberRoles = ['admin', 'pro', 'premium', 'per_kamar_pro', 'per_kamar_premium'];
         $userRoles = ['users'];
 
@@ -40,15 +40,15 @@ class OrderManagementController extends Controller
             'rejected' => Langganan::where('status', 'rejected')->count(),
         ];
 
-        // 1. Pending Member (From PendingUser Table)
+        // 1. Member Tertunda (Dari Tabel PendingUser)
         $pendingMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'pending')->latest()->paginate(10, ['*'], 'member_p');
 
-        // 1b. Pending Payment Member (From PendingUser Table)
+        // 1b. Member Menunggu Pembayaran (Dari Tabel PendingUser)
         $pendingPaymentMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'konfirmasi')->latest()->paginate(10, ['*'], 'member_pay');
 
-        // 2. Active/Rejected Member
+        // 2. Member Aktif/Ditolak (Active/Rejected Member)
         if ($statusFilter === 'rejected') {
-            // Show rejected registrations from pending_users
+            // Tampilkan pendaftaran yang ditolak dari pending_users
             $activeMembers = \App\Models\PendingUser::where('id_plans', '!=', 1)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'member_a');
         } else {
             $activeMembers = User::role(['admin', 'pro', 'premium', 'per_kamar_pro', 'per_kamar_premium'])
@@ -57,20 +57,20 @@ class OrderManagementController extends Controller
                 ->paginate(10, ['*'], 'member_a');
         }
 
-        // 3. Pending User (From PendingUser Table)
+        // 3. Pengguna Tertunda (Dari Tabel PendingUser)
         $pendingUsers = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'pending')->latest()->paginate(10, ['*'], 'user_p');
 
-        // 4. Active/Rejected User
+        // 4. Pengguna Aktif/Ditolak (Active/Rejected User)
         if ($statusFilter === 'rejected') {
             $activeUsers = \App\Models\PendingUser::where('id_plans', 1)->where('status', 'rejected')->latest()->paginate(10, ['*'], 'user_a');
         } else {
             $activeUsers = User::role('users')->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'user_a');
         }
 
-        // 5. Pending Paket (From STAGING table)
+        // 5. Paket Tertunda (Dari tabel STAGING/penampung)
         $pendingPackets = LanggananBaru::with(['user', 'jenis_langganan'])->where('status', 'pending')->latest()->paginate(10, ['*'], 'packet_p');
 
-        // 6. Active/Rejected Paket
+        // 6. Paket Aktif/Ditolak (Active/Rejected Paket)
         $activePackets = Langganan::with(['user', 'jenis_langganan'])->where('status', $statusFilter)->latest()->paginate(10, ['*'], 'packet_a');
 
         return view('superadmin.order', [
@@ -103,10 +103,10 @@ class OrderManagementController extends Controller
 
     public function verifyUser(\App\Models\PendingUser $pendingUser)
     {
-        // For Anak Kos (id_plans == 1), keep immediate activation
+        // Untuk Anak Kos (id_plans == 1), tetap lakukan aktivasi langsung
         if ($pendingUser->id_plans == 1) {
             return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
-                // 1. Create the official User
+                // 1. Buat Pengguna resmi (official User)
                 $user = User::create([
                     'name' => $pendingUser->name,
                     'email' => $pendingUser->email,
@@ -118,32 +118,32 @@ class OrderManagementController extends Controller
                     'status' => 'active',
                 ]);
 
-                // 2. Role & Plan Logic
+                // 2. Logika Peran & Paket (Role & Plan Logic)
                 $user->id_plans = 1;
 
-                // Assign appropriate role
+                // Berikan peran yang sesuai (appropriate role)
                 if ($pendingUser->kode_kos) {
                     $kos = \App\Models\Kos::where('kode_kos', $pendingUser->kode_kos)->first();
                     if ($kos) {
                         $user->id_kos = $kos->id;
                         $user->assignRole('users'); // Penyewa
                     } else {
-                        $user->assignRole('user'); // User Umum
+                        $user->assignRole('user'); // Pengguna Umum
                     }
                 } else {
-                    $user->assignRole('user'); // User Umum
+                    $user->assignRole('user'); // Pengguna Umum
                 }
 
                 $user->save();
 
-                // 5. Delete from staging
+                // 5. Hapus dari penampung (staging)
                 $pendingUser->delete();
 
                 return back()->with('success', 'Akun ' . $user->name . ' berhasil diverifikasi dan diaktifkan!');
             });
         }
 
-        // For Members (id_plans == 2), just verify the data
+        // Untuk Member (id_plans == 2), cukup verifikasi datanya
         $pendingUser->update(['status' => 'verified']);
         return back()->with('success', 'Data ' . $pendingUser->name . ' berhasil diverifikasi. Menunggu pembayaran dari calon member.');
     }
@@ -151,7 +151,7 @@ class OrderManagementController extends Controller
     public function confirmMemberPayment(\App\Models\PendingUser $pendingUser)
     {
         return \Illuminate\Support\Facades\DB::transaction(function () use ($pendingUser) {
-            // 1. Create the official User
+            // 1. Buat Pengguna resmi (official User)
             $user = User::create([
                 'name' => $pendingUser->name,
                 'email' => $pendingUser->email,
@@ -163,10 +163,10 @@ class OrderManagementController extends Controller
                 'status' => 'active',
             ]);
 
-            // 2. Role & Plan Logic
+            // 2. Logika Peran & Paket (Role & Plan Logic)
             $planName = trim($pendingUser->plan_type);
             
-            // Map plan names to IDs (Case-insensitive)
+            // Petakan nama paket ke ID (Tidak peka huruf besar/kecil)
             $plan = \Illuminate\Support\Facades\DB::table('plans')
                 ->whereRaw('LOWER(nama_plans) = ?', [strtolower($planName)])
                 ->first();
@@ -175,16 +175,16 @@ class OrderManagementController extends Controller
                 $user->id_plans = $plan->id;
             }
 
-            $user->activateStatus(); // Ensure status is 'aktif' and roles are mapped
+            $user->activateStatus(); // Pastikan status 'aktif' dan peran dipetakan
             $user->save();
 
-            // 3. Deactivate existing active subscriptions
+            // 3. Nonaktifkan langganan aktif yang ada
             \App\Models\Langganan::where('id_user', $user->id)
                 ->where('status', 'active')
                 ->update(['status' => 'expired']);
 
-            // 4. Create active Langganan record
-            // Match the plan name precisely with Jenis Langganan
+            // 4. Buat rekaman (record) Langganan aktif
+            // Cocokkan nama paket secara tepat dengan Jenis Langganan
             $searchKey = $planName;
             if (strtolower($planName) === 'pro') $searchKey = 'MEMBER PRO';
             if (strtolower($planName) === 'premium') $searchKey = 'MEMBER PREMIUM';
@@ -201,7 +201,7 @@ class OrderManagementController extends Controller
                     'jatuh_tempo' => now('Asia/Jakarta')->addDays(30),
                 ]);
 
-                // Notify Superadmins
+                // Beri tahu Superadmin
                 $superadmins = User::where('id_plans', 6)->get();
                 $uniqueTargets = collect();
                 foreach ($superadmins as $admin) {
@@ -219,7 +219,7 @@ class OrderManagementController extends Controller
                 }
             }
 
-            // 4. Automatically create a default Kos record
+            // 4. Buat rekaman Kos default secara otomatis
             \App\Models\Kos::create([
                 'id_user' => $user->id,
                 'nama_kos' => 'Kos Baru ' . $user->name,
@@ -254,7 +254,7 @@ class OrderManagementController extends Controller
         $staging = LanggananBaru::findOrFail($id);
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($staging) {
-            // Update or create the SINGLE record in the main Langganan table
+            // Perbarui atau buat rekaman TUNGGAL dalam tabel utama Langganan
             $subscription = Langganan::updateOrCreate(
                 ['id_user' => $staging->id_user],
                 [
@@ -268,7 +268,7 @@ class OrderManagementController extends Controller
                 ]
             );
 
-            // Notify Superadmins
+            // Beri tahu Superadmin
             $superadmins = User::where('id_plans', 6)->get();
             $uniqueTargets = collect();
             foreach ($superadmins as $admin) {
@@ -286,14 +286,14 @@ class OrderManagementController extends Controller
                 ]));
             }
 
-            // Auto-reactivate user and sync plan ID
+            // Aktifkan kembali pengguna secara otomatis dan sinkronkan ID paket
             if ($subscription->user) {
                 $subscription->user->id_plans = $subscription->id_langganan;
                 $subscription->user->save();
                 $subscription->user->activateStatus();
             }
 
-            // Delete from staging
+            // Hapus dari penampung (staging)
             $staging->delete();
 
             return back()->with('success', 'Paket member berhasil diverifikasi dan diaktifkan!');
@@ -308,7 +308,7 @@ class OrderManagementController extends Controller
             'status' => 'rejected',
         ]);
 
-        // Optionally delete it immediately or wait for manual deletion/auto-reset
+        // Opsional: hapus segera atau tunggu penghapusan manual/reset otomatis (auto-reset)
         // $staging->delete();
 
         return back()->with('success', 'Transaksi paket ditolak!');

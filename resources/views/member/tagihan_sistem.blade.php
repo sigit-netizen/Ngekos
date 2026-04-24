@@ -23,10 +23,10 @@
             <p class="text-gray-500">Lihat faktur masa aktif sewa sistem aplikasi Ngekos Anda atau beli paket baru.</p>
         </div>
 
-        {{-- Pending Payment Instructions or Waiting Verification --}}
+        {{-- Instruksi Pembayaran Tertunda atau Menunggu Verifikasi (Pending Payment Instructions or Waiting Verification) --}}
         @if($pendingSubscription?->status == 'pending')
             @if($pendingSubscription->bukti_pembayaran)
-                {{-- Waiting for Verification State --}}
+                {{-- Kondisi Menunggu Verifikasi (Waiting for Verification State) --}}
                 <div class="bg-emerald-50 rounded-[2.5rem] p-10 sm:p-16 shadow-xl shadow-emerald-900/5 mb-10 overflow-hidden relative group border-2 border-emerald-100"
                     data-aos="fade-down" x-data="{
                                                 deadline: {{ $pendingSubscription->updated_at->addDay()->timestamp * 1000 }},
@@ -47,7 +47,7 @@
                                                         String(s).padStart(2, '0');
                                                 }
                                             }" x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
-                    {{-- Decorative background elements --}}
+                    {{-- Elemen Latar Dekoratif (Decorative background elements) --}}
                     <div
                         class="absolute top-0 right-0 w-64 h-64 bg-emerald-100/50 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-emerald-200/50 transition-colors duration-700">
                     </div>
@@ -56,7 +56,7 @@
                     <div class="relative z-10 flex flex-col items-center text-center max-w-2xl mx-auto">
                         <div
                             class="w-24 h-24 bg-white rounded-[2rem] shadow-xl shadow-emerald-200/50 flex items-center justify-center mb-8 relative group-hover:scale-110 transition-transform duration-500">
-                            {{-- Pulse effect --}}
+                            {{-- Efek Denyut (Pulse effect) --}}
                             <div class="absolute inset-0 bg-emerald-400 rounded-[2rem] animate-ping opacity-20"></div>
 
                             <svg class="w-12 h-12 text-emerald-500 relative z-10" fill="none" stroke="currentColor"
@@ -107,7 +107,7 @@
                     </div>
                 </div>
             @else
-                {{-- Payment Instructions State (Original UI) --}}
+                {{-- Kondisi Instruksi Pembayaran (UI Asli) (Payment Instructions State (Original UI)) --}}
                 <div class="bg-blue-50 rounded-[2.5rem] p-8 sm:p-12 shadow-xl shadow-blue-900/5 mb-10 overflow-hidden relative group border-2 border-blue-100"
                     data-aos="fade-down">
                     <div class="relative z-10 flex flex-col lg:flex-row gap-10">
@@ -165,7 +165,7 @@
                         <div class="lg:w-96 flex-shrink-0">
                             <div
                                 class="bg-white rounded-[2.5rem] p-10 text-center shadow-xl relative overflow-hidden group/card h-full flex flex-col justify-center border-2 border-blue-100">
-                                {{-- Decorative light circle --}}
+                                {{-- Lingkaran Cahaya Dekoratif (Decorative light circle) --}}
                                 <div
                                     class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-10 -mt-10 blur-2xl opacity-50">
                                 </div>
@@ -197,7 +197,7 @@
             @endif
         @endif
 
-        {{-- Rejected Notification --}}
+        {{-- Notifikasi Ditolak (Rejected Notification) --}}
         @if($pendingSubscription?->status == 'rejected')
             <div class="bg-rose-50 border-l-4 border-rose-500 p-6 mb-10 rounded-r-[2rem] shadow-sm shadow-rose-900/5"
                 data-aos="fade-down">
@@ -219,7 +219,7 @@
             </div>
         @endif
 
-        {{-- Notification Banner --}}
+        {{-- Banner Notifikasi (Notification Banner) --}}
         @if($subscription?->status == 'active')
             @if($computedStatus == 'grace')
                 <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-r-xl shadow-sm" data-aos="fade-down">
@@ -266,10 +266,10 @@
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="100">
-            <!-- Active Package Card -->
+            <!-- Kartu Paket Aktif (Active Package Card) -->
             <div class="lg:col-span-2 space-y-6">
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
-                    <!-- Decoration -->
+                    <!-- Dekorasi (Decoration) -->
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#36B2B2]/5 rounded-full blur-3xl"></div>
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -316,7 +316,7 @@
                     @endphp
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Basic Info -->
+                        <!-- Informasi Dasar (Basic Info) -->
                         <div class="space-y-6">
                             <div>
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Jenis Paket
@@ -338,7 +338,7 @@
                             </div>
                         </div>
 
-                        <!-- Date Info -->
+                        <!-- Informasi Tanggal (Date Info) -->
                         <div class="space-y-6">
                             <div>
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tanggal
@@ -356,7 +356,7 @@
                             </div>
                         </div>
 
-                        <!-- Countdown Info -->
+                        <!-- Informasi Hitung Mundur (Countdown Info) -->
                         @php
                             $statusColors = [
                                 'active' => 'bg-[#36B2B2]/5 border-[#36B2B2]/10 text-[#36B2B2]',
@@ -397,7 +397,7 @@
                     </div>
                 </div>
 
-                <!-- History Section Expanded -->
+                <!-- Bagian Riwayat Diperluas (History Section Expanded) -->
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
                     <h4 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,7 +452,7 @@
                 </div>
             </div>
 
-            <!-- Buy New Plan Card -->
+            <!-- Kartu Beli Paket Baru (Buy New Plan Card) -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
                     <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -534,7 +534,7 @@
             </div>
         </div>
 
-        {{-- Upload Modal --}}
+        {{-- Modal Unggah (Upload Modal) --}}
         <template x-teleport="body">
             <div x-show="showUploadModal" class="fixed inset-0 z-[9999] overflow-y-auto"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -547,7 +547,7 @@
                     <div class="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]"
                         @click.stop>
 
-                        <!-- Modal Header (Fixed) -->
+                        <!-- Kepala Modal (Tetap) (Modal Header (Fixed)) -->
                         <div class="p-6 bg-gray-50 border-b border-gray-100 flex items-center justify-between shrink-0">
                             <div>
                                 <h3 class="text-xl font-black text-gray-900">Unggah Bukti Bayar</h3>
@@ -563,7 +563,7 @@
                             </button>
                         </div>
 
-                        <!-- Modal Body (Scrollable) -->
+                        <!-- Badan Modal (Dapat Digulir) (Modal Body (Scrollable)) -->
                         <div class="overflow-y-auto flex-1 custom-scrollbar">
                             <form action="{{ route('admin.subscription.upload-proof') }}" method="POST"
                                 enctype="multipart/form-data" class="p-8">

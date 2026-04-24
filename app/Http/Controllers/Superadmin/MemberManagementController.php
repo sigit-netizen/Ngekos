@@ -15,7 +15,7 @@ class MemberManagementController extends Controller
         $search = $request->get('search');
         $paket = $request->get('paket');
 
-        // Get users with 'admin' role (The Owners) and 'nonaktif' role
+        // Dapatkan pengguna dengan peran 'admin' (Pemilik/Owner) dan peran 'nonaktif' (deactivated)
         $query = User::role(['admin', 'nonaktif']);
 
         if ($search) {
@@ -69,7 +69,7 @@ class MemberManagementController extends Controller
 
         $user->assignRole('admin');
 
-        // Mapping plan role
+        // Memetakan peran paket (Mapping plan role)
         $roleMap = [
             2 => 'pro',
             3 => 'premium',
@@ -99,7 +99,7 @@ class MemberManagementController extends Controller
             $user->update(['password' => Hash::make($request->password)]);
         }
 
-        // Re-sync roles if plan changed
+        // Sinkronkan ulang peran jika paket (plan) berubah
         $user->syncRoles(['admin']);
         $roleMap = [
             2 => 'pro',
@@ -116,15 +116,15 @@ class MemberManagementController extends Controller
 
     public function toggleStatus(User $user)
     {
-        // Get current status from the statusUser relationship (default to 'aktif' if no record exists)
+        // Dapatkan status saat ini dari relasi statusUser (default ke 'aktif' jika tidak ada rekaman)
         $currentStatus = $user->statusUser ? $user->statusUser->status : 'aktif';
 
         if ($currentStatus === 'inactive') {
-            // Activate using model helper (updates DB and restores roles)
+            // Aktifkan menggunakan helper model (memperbarui DB dan memulihkan peran)
             $user->activateStatus();
             $message = "Member {$user->name} berhasil diaktifkan kembali!";
         } else {
-            // Deactivate using model helper
+            // Nonaktifkan menggunakan helper model
             $user->deactivateStatus();
             $message = "Member {$user->name} telah dinonaktifkan!";
         }

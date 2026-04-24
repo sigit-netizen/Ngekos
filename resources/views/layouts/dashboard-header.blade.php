@@ -2,7 +2,7 @@
     class="h-20 bg-white/60 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0 z-20">
 
     <div class="flex items-center gap-4">
-        <!-- Mobile Menu Button -->
+        <!-- Tombol Menu Seluler (Mobile Menu Button) -->
         <button @click="sidebarOpen = true"
             class="relative lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 focus:outline-none transition-colors border border-gray-200 bg-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,13 +12,16 @@
             @php
                 $headerNotifCount = 0;
                 if (auth()->check()) {
+                    /** @var \App\Models\User $user */
                     $user = auth()->user();
                     if ($user->hasRole('admin') || $user->hasRole('nonaktif')) {
+                        /** @var \App\Models\Kos|null $adminKos */
                         $adminKos = \App\Models\Kos::where('id_user', auth()->id())->first();
                         $tpOrder = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
                         $tpUser = $adminKos ? \App\Models\PendingUser::where('kode_kos', $adminKos->kode_kos)->where('status', 'pending')->count() : 0;
                         $tpReview = $adminKos ? \App\Models\Transaksi::where('kode_kos', $adminKos->kode_kos)->where('status', 'verified')->count() : 0;
 
+                        /** @var \App\Models\Langganan|null $memberSub */
                         $memberSub = \App\Models\Langganan::where('id_user', $user->id)->latest()->first();
                         $mExpiry = $memberSub?->jatuh_tempo ? \Carbon\Carbon::parse($memberSub->jatuh_tempo) : ($memberSub?->tanggal_pembayaran ? \Carbon\Carbon::parse($memberSub->tanggal_pembayaran)->addDays(30) : null);
                         $mNow = now('Asia/Jakarta')->startOfDay();
@@ -55,7 +58,7 @@
             @endif
         </button>
 
-        <!-- Page Title -->
+        <!-- Judul Halaman (Page Title) -->
         <div>
             <h2 class="text-xl font-bold text-gray-900 hidden sm:block">
                 {{ $title ?? 'Dashboard' }}
@@ -63,18 +66,18 @@
         </div>
     </div>
 
-    <!-- Quick Actions & Profile -->
+    <!-- Tindakan Cepat & Profil (Quick Actions & Profile) -->
     <div class="flex items-center gap-4">
 
-        <!-- Profile Dropdown -->
+        <!-- Dropdown Profil (Profile Dropdown) -->
         <div class="relative">
             <button @click="open = !open" @click.outside="open = false"
                 class="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-white bg-white/50 border border-gray-100 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#36B2B2]/30">
                 <img class="h-8 w-8 rounded-full object-cover border-2 border-white shadow-sm"
-                    src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'User') }}&background=36B2B2&color=fff"
-                    alt="{{ auth()->user()->name ?? 'User' }} Avatar">
+                    src="https://ui-avatars.com/api/?name={{ urlencode($user->name ?? 'User') }}&background=36B2B2&color=fff"
+                    alt="{{ $user->name ?? 'User' }} Avatar">
                 <span
-                    class="hidden md:block text-sm font-semibold text-gray-700">{{ auth()->user()->name ?? 'User' }}</span>
+                    class="hidden md:block text-sm font-semibold text-gray-700">{{ $user->name ?? 'User' }}</span>
                 <svg class="w-4 h-4 text-gray-400 hidden md:block" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
@@ -82,7 +85,7 @@
                 </svg>
             </button>
 
-            <!-- Dropdown Menu -->
+            <!-- Menu Dropdown (Dropdown Menu) -->
             <div x-show="open" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -92,9 +95,9 @@
                 class="absolute right-0 mt-3 w-64 rounded-2xl bg-white shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden isolate"
                 style="display: none;">
                 <div class="px-4 py-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white">
-                    <p class="text-sm font-black text-gray-900 tracking-tight">{{ auth()->user()->name ?? 'User' }}</p>
+                    <p class="text-sm font-black text-gray-900 tracking-tight">{{ $user->name ?? 'User' }}</p>
                     <p class="text-[10px] text-[#36B2B2] font-bold truncate mt-0.5 uppercase tracking-wider">
-                        {{ auth()->user()->email ?? '' }}
+                        {{ $user->email ?? '' }}
                     </p>
                 </div>
                 <div class="p-2 space-y-1">
@@ -152,7 +155,7 @@
 </header>
 
 @push('modals')
-    <!-- Global Profile Modal (Root Level) -->
+    <!-- Modal Profil Global (Tingkat Root) (Global Profile Modal Root Level) -->
     <div x-cloak x-data="{ 
                                                         verifyPassword: '', 
                                                         isVerifying: false, 
@@ -196,12 +199,12 @@
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0" class="fixed inset-0 overflow-y-auto">
 
-        <!-- Backdrop -->
+        <!-- Latar Belakang (Backdrop) -->
         <div class="fixed inset-0 bg-gray-900/80 backdrop-blur-md"
             style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh;"
             @click="$store.profile.close()"></div>
 
-        <!-- Password Verification Content -->
+        <!-- Konten Verifikasi Kata Sandi (Password Verification Content) -->
         <div x-show="mode === 'verify'" class="relative min-h-screen flex items-center justify-center p-4">
             <div x-show="mode === 'verify'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -254,7 +257,7 @@
             </div>
         </div>
 
-        <!-- Profile Modal Content -->
+        <!-- Konten Modal Profil (Profile Modal Content) -->
         <div x-show="mode === 'profile'" class="relative min-h-screen flex items-center justify-center p-4">
             <div x-show="mode === 'profile'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
@@ -277,11 +280,11 @@
                     </button>
                 </div>
 
-                <!-- Form -->
+                <!-- Formulir (Form) -->
                 <form action="{{ route('profile.update') }}" method="POST" class="p-8">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                        <!-- Name -->
+                        <!-- Nama (Name) -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +293,7 @@
                                 </svg>
                                 Nama Lengkap
                             </label>
-                            <input type="text" name="name" value="{{ auth()->user()->name }}" required
+                            <input type="text" name="name" value="{{ $user->name }}" required
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot">
                         </div>
@@ -304,7 +307,7 @@
                                 </svg>
                                 Alamat Email
                             </label>
-                            <input type="email" name="email" value="{{ auth()->user()->email }}" required
+                            <input type="email" name="email" value="{{ $user->email }}" required
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot">
                         </div>
@@ -318,13 +321,13 @@
                                 </svg>
                                 Nomor Induk Kependudukan (NIK)
                             </label>
-                            <input type="text" name="nik" value="{{ auth()->user()->nik }}" @cannot('fitur.edit_profile')
+                            <input type="text" name="nik" value="{{ $user->nik }}" @cannot('fitur.edit_profile')
                                 readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="16 digit NIK">
                         </div>
 
-                        <!-- WA -->
+                        <!-- WA (WhatsApp) -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,13 +336,13 @@
                                 </svg>
                                 WhatsApp (Aktif)
                             </label>
-                            <input type="text" name="nomor_wa" value="{{ auth()->user()->nomor_wa }}"
+                            <input type="text" name="nomor_wa" value="{{ $user->nomor_wa }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="0812xxxx">
                         </div>
 
-                        <!-- Address -->
+                        <!-- Alamat (Address) -->
                         <div class="md:col-span-2 space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,9 +355,9 @@
                             </label>
                             <textarea name="alamat" rows="2" @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm resize-none @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
-                                placeholder="Masukan alamat lengkap Anda...">{{ auth()->user()->alamat }}</textarea>
+                                placeholder="Masukan alamat lengkap Anda...">{{ $user->alamat }}</textarea>
                         </div>
-                        <!-- Social Media Divider -->
+                        <!-- Pembatas Media Sosial (Social Media Divider) -->
                         <div class="md:col-span-2 flex items-center gap-4 mt-6 sm:mt-8 mb-2">
                             <div class="h-px flex-1 bg-gray-100"></div>
                             <span
@@ -372,7 +375,7 @@
                                 </svg>
                                 Instagram
                             </label>
-                            <input type="text" name="instagram" value="{{ auth()->user()->instagram }}"
+                            <input type="text" name="instagram" value="{{ $user->instagram }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-pink-400 focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm"
                                 placeholder="@username">
@@ -387,7 +390,7 @@
                                 </svg>
                                 Twitter (X)
                             </label>
-                            <input type="text" name="twitter" value="{{ auth()->user()->twitter }}"
+                            <input type="text" name="twitter" value="{{ $user->twitter }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-blue-400 focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm"
                                 placeholder="@username">
@@ -402,7 +405,7 @@
                                 </svg>
                                 YouTube
                             </label>
-                            <input type="text" name="youtube" value="{{ auth()->user()->youtube }}"
+                            <input type="text" name="youtube" value="{{ $user->youtube }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-red-500 focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm"
                                 placeholder="URL Channel">
@@ -417,12 +420,12 @@
                                 </svg>
                                 TikTok
                             </label>
-                            <input type="text" name="tiktok" value="{{ auth()->user()->tiktok }}"
+                            <input type="text" name="tiktok" value="{{ $user->tiktok }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-gray-900 focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm"
                                 placeholder="@username">
                         </div>
-                        <!-- Bank Info Divider -->
+                        <!-- Pembatas Info Bank (Bank Info Divider) -->
                         <div class="md:col-span-2 flex items-center gap-4 mt-8 mb-2">
                             <div class="h-px flex-1 bg-gray-100"></div>
                             <span
@@ -432,7 +435,7 @@
                             <br>
                         </div>
 
-                        <!-- Bank 1: Name and Number -->
+                        <!-- Bank 1: Nama dan Nomor (Bank 1: Name and Number) -->
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -441,7 +444,7 @@
                                 </svg>
                                 Nama Bank 1
                             </label>
-                            <input type="text" name="nama_bank" value="{{ auth()->user()->nomorBank->nama_bank ?? '' }}"
+                            <input type="text" name="nama_bank" value="{{ $user->nomorBank->nama_bank ?? '' }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Misal: BCA, Mandiri, BRI">
@@ -456,13 +459,13 @@
                                 Nomor Rekening 1
                             </label>
                             <input type="text" name="nomor_rekening"
-                                value="{{ auth()->user()->nomorBank->nomor_rekening ?? '' }}" @cannot('fitur.edit_profile')
+                                value="{{ $user->nomorBank->nomor_rekening ?? '' }}" @cannot('fitur.edit_profile')
                                 readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Masukan nomor rekening">
                         </div>
 
-                        <!-- Bank 1: Owner Name -->
+                        <!-- Bank 1: Nama Pemilik (Bank 1: Owner Name) -->
                         <div class="md:col-span-2 space-y-1.5">
                             <label class="text-xs font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -470,7 +473,7 @@
                                 </svg>
                                 Nama Pemilik Rekening 1
                             </label>
-                            <input type="text" name="nama_pemilik" value="{{ auth()->user()->nomorBank->nama_pemilik ?? '' }}"
+                            <input type="text" name="nama_pemilik" value="{{ $user->nomorBank->nama_pemilik ?? '' }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Nama sesuai buku tabungan">
@@ -478,7 +481,7 @@
 
                         <div class="md:col-span-2 h-px bg-gray-100 my-2"></div>
 
-                        <!-- Bank 2: Name and Number -->
+                        <!-- Bank 2: Nama dan Nomor (Bank 2: Name and Number) -->
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -487,7 +490,7 @@
                                 </svg>
                                 Nama Bank 2
                             </label>
-                            <input type="text" name="nama_bank_2" value="{{ auth()->user()->nomorBank->nama_bank_2 ?? '' }}"
+                            <input type="text" name="nama_bank_2" value="{{ $user->nomorBank->nama_bank_2 ?? '' }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Misal: DANA, OVO, GOPAY">
@@ -502,13 +505,13 @@
                                 Nomor Rekening 2
                             </label>
                             <input type="text" name="nomor_rekening_2"
-                                value="{{ auth()->user()->nomorBank->nomor_rekening_2 ?? '' }}" @cannot('fitur.edit_profile')
+                                value="{{ $user->nomorBank->nomor_rekening_2 ?? '' }}" @cannot('fitur.edit_profile')
                                 readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Masukan nomor rekening/HP">
                         </div>
 
-                        <!-- Bank 2: Owner Name -->
+                        <!-- Bank 2: Nama Pemilik (Bank 2: Owner Name) -->
                         <div class="md:col-span-2 space-y-1.5">
                             <label class="text-xs font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -516,13 +519,13 @@
                                 </svg>
                                 Nama Pemilik Rekening 2
                             </label>
-                            <input type="text" name="nama_pemilik_2" value="{{ auth()->user()->nomorBank->nama_pemilik_2 ?? '' }}"
+                            <input type="text" name="nama_pemilik_2" value="{{ $user->nomorBank->nama_pemilik_2 ?? '' }}"
                                 @cannot('fitur.edit_profile') readonly @endcannot
                                 class="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-gray-200 focus:border-[#36B2B2] focus:outline-none transition-all text-sm font-medium text-gray-800 shadow-sm @cannot('fitur.edit_profile') opacity-75 cursor-not-allowed @endcannot"
                                 placeholder="Nama pemilik akun">
                         </div>
 
-                        <!-- Security Divider -->
+                        <!-- Pembatas Keamanan (Security Divider) -->
                         <div class="md:col-span-2 flex items-center gap-4 mt-8 mb-2">
                             <div class="h-px flex-1 bg-gray-100"></div>
                             <span
@@ -531,7 +534,7 @@
                             <div class="h-px flex-1 bg-gray-100"></div>
                             <br>
                         </div>
-                        <!-- Password -->
+                        <!-- Kata Sandi (Password) -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -545,7 +548,7 @@
                                 placeholder="{{ auth()->user()->can('fitur.edit_profile') ? '••••••••' : 'Tidak diizinkan' }}">
                         </div>
 
-                        <!-- Confirm Password -->
+                        <!-- Konfirmasi Kata Sandi (Confirm Password) -->
                         <div class="space-y-1.5">
                             <label class="text-sm font-bold text-gray-700 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

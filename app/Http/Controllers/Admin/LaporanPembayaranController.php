@@ -37,7 +37,7 @@ class LaporanPembayaranController extends Controller
         $search = $request->get('search');
         $durationTypeFilter = $request->get('duration_type');
 
-        // Fetch Users who have at least one paid transaction for this kos
+        // Ambil pengguna yang memiliki setidaknya satu transaksi berbayar untuk kos ini
         $query = \App\Models\User::where('id_kos', $kos->id)
             ->where('status', 'active')
             ->whereNotNull('id_kamar')
@@ -55,15 +55,15 @@ class LaporanPembayaranController extends Controller
         }
 
         $allTenants = $query->get()->map(function ($user) use ($yearFilter, $monthFilter, $kos) {
-            // Get the GLOBAL latest paid transaction for this user in this kos
-            // If they have ANY successful transaction, they are a "Real Tenant"
+            // Dapatkan transaksi berbayar terbaru secara GLOBAL untuk pengguna ini di kos ini
+            // Jika mereka memiliki transaksi yang berhasil (ANY successful transaction), mereka adalah "Penyewa Asli"
             $latestTrx = Transaksi::where('id_user', $user->id)
                 ->where('kode_kos', $kos->kode_kos)
                 ->where('status', 'paid')
                 ->orderBy('tanggal_pembayaran', 'desc')
                 ->first();
 
-            // Logic to calculate expiry based on duration in the transaction
+            // Logika untuk menghitung masa kedaluwarsa (expiry) berdasarkan durasi dalam transaksi
             $paymentDate = $latestTrx ? Carbon::parse($latestTrx->tanggal_pembayaran) : null;
             $expiryDate = null;
 
@@ -78,7 +78,7 @@ class LaporanPembayaranController extends Controller
                         $expiryDate = $paymentDate->copy()->addDays($duration);
                     } elseif ($type === 'minggu') {
                         $expiryDate = $paymentDate->copy()->addWeeks($duration);
-                    } else { // Default to 'bulan' or any other unrecognized type
+                    } else { // Default ke 'bulan' atau jenis durasi lain yang tidak dikenali
                         $expiryDate = $paymentDate->copy()->addDays($duration * 30);
                     }
                 }
@@ -93,7 +93,7 @@ class LaporanPembayaranController extends Controller
             $user->expiry_date = $expiryDate;
             $user->days_remaining = $diffDays;
 
-            // Determine status
+            // Tentukan status
             if ($diffDays >= 0) {
                 $user->computed_status = 'active';
             } elseif ($diffDays >= -3) {
@@ -107,7 +107,7 @@ class LaporanPembayaranController extends Controller
             return $user;
         });
 
-        // We show all active tenants found in the step above
+        // Kami menampilkan semua penyewa aktif yang ditemukan pada langkah di atas
 
         $metrics = [
             'total_penyewa' => $allTenants->count(),
@@ -131,7 +131,7 @@ class LaporanPembayaranController extends Controller
             });
         }
 
-        // Manual Pagination
+        // Penomoran Halaman Manual (Manual Pagination)
         $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
         $perPage = 10;
         $items = $allTenants->forPage($currentPage, $perPage)->values();

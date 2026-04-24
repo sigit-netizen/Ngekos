@@ -38,7 +38,7 @@ class RentDueReminderNotification extends Notification implements ShouldQueue
             ->action('Bayar Sekarang', 'dashboard');
     }
 
-    // WebPush removed
+    // WebPush dihapus
 
     public function toFonnte($notifiable)
     {

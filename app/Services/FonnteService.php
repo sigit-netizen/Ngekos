@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 class FonnteService
 {
     protected $token;
@@ -42,7 +44,7 @@ class FonnteService
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 3,
+            CURLOPT_TIMEOUT => 15,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
@@ -57,12 +59,26 @@ class FonnteService
         curl_close($curl);
 
         if ($error) {
+            Log::error('FonnteService cURL Error: ' . $error, ['target' => $target]);
             return [
                 'success' => false,
                 'message' => 'cURL Error: ' . $error
             ];
         }
 
-        return json_decode($response, true);
+        $decoded = json_decode($response, true);
+
+        // Log respons dari Fonnte untuk debugging
+        if (!$decoded || (isset($decoded['status']) && $decoded['status'] == false)) {
+            Log::warning('FonnteService gagal kirim pesan', [
+                'target' => $target,
+                'response_raw' => $response,
+                'decoded' => $decoded
+            ]);
+        } else {
+            Log::info('FonnteService berhasil kirim pesan ke: ' . $target);
+        }
+
+        return $decoded;
     }
 }

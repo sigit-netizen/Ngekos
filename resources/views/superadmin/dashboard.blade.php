@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
-    <!-- Header Section -->
+    <!-- Bagian Kepala (Header Section) -->
     <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-sm border border-white/50 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6"
         data-aos="fade-up" data-aos-duration="800">
         <div>
@@ -9,7 +9,7 @@
             <p class="text-gray-500 text-sm">Monitor pertumbuhan pengguna dan performa member secara real-time.</p>
         </div>
 
-        <!-- Filters -->
+        <!-- Filter (Filters) -->
         <form action="{{ route('superadmin.dashboard') }}" method="GET"
             class="flex justify-start sm:justify-end flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <div class="relative flex-1 sm:flex-none" x-data="{ open: false }">
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            {{-- Month Filter --}}
+            {{-- Filter Bulan (Month Filter) --}}
             <div class="relative flex-1 sm:flex-none">
                 <select name="month" onchange="this.form.submit()"
                     class="w-full sm:w-auto appearance-none bg-gray-50 border-none rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-gray-700 pr-10 focus:ring-2 focus:ring-[#36B2B2]/20 cursor-pointer">
@@ -58,7 +58,7 @@
         </form>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Grid Statistik (Stats Grid) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Pengguna -->
         <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group"
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
+    <!-- Bagian Grafik (Charts Section) -->
     <div class="grid grid-cols-1 gap-8 mb-8">
         <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm" data-aos="fade-up" data-aos-delay="500">
             <div class="flex items-center justify-between mb-8">
@@ -174,7 +174,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const ctx = document.getElementById('growthChart').getContext('2d');
 
-                // Create Gradients
+                // Buat Gradien (Create Gradients)
                 const userGradient = ctx.createLinearGradient(0, 0, 0, 400);
                 userGradient.addColorStop(0, 'rgba(54, 178, 178, 0.2)');
                 userGradient.addColorStop(1, 'rgba(54, 178, 178, 0)');

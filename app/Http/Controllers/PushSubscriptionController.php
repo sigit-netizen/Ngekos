@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 class PushSubscriptionController extends Controller
 {
     /**
-     * Store the PushSubscription details from the frontend.
+     * Simpan rincian PushSubscription dari frontend.
      */
     public function store(Request $request)
     {

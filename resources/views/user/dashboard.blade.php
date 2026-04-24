@@ -37,11 +37,11 @@
     @if($isPenyewa)
         @can('fitur.sudah_sewa')
             {{-- ============================================ --}}
-            {{-- DASHBOARD PENYEWA (Verified Tenant) --}}
+            {{-- DASHBOARD PENYEWA (Penyewa Terverifikasi) --}}
             {{-- ============================================ --}}
 
 
-            <!-- Welcome Banner Penyewa -->
+            <!-- Spanduk Selamat Datang Penyewa (Welcome Banner Penyewa) -->
             <div class="bg-gradient-to-br from-[#36B2B2]/10 to-emerald-50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-sm border border-[#36B2B2]/20 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6"
                 data-aos="fade-up" data-aos-duration="800">
                 <div>
@@ -66,10 +66,10 @@
                 </div>
             </div>
 
-            <!-- Info Cards -->
+            <!-- Kartu Informasi (Info Cards) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10" data-aos="fade-up" data-aos-delay="100"
                 data-aos-duration="800">
-                <!-- Kos Info -->
+                <!-- Informasi Kos (Kos Info) -->
                 <div
                     class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm hover:shadow-md border border-gray-100/50 transition-all duration-300 hover:-translate-y-1 group">
                     <div class="flex items-center justify-between mb-4">
@@ -88,7 +88,7 @@
                     <p class="text-sm font-medium text-gray-500 mt-1">{{ $kosData->alamat ?? 'N/A' }}</p>
                 </div>
 
-                <!-- Kamar Info -->
+                <!-- Informasi Kamar (Room Info) -->
                 <div
                     class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm hover:shadow-md border border-gray-100/50 transition-all duration-300 hover:-translate-y-1 group">
                     <div class="flex items-center justify-between mb-4">
@@ -105,7 +105,7 @@
                     <p class="text-sm font-medium text-gray-500 mt-1">Nomor Kamar Anda</p>
                 </div>
 
-                <!-- Harga -->
+                <!-- Harga (Price) -->
                 <div
                     class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm hover:shadow-md border border-gray-100/50 transition-all duration-300 hover:-translate-y-1 group sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center justify-between mb-4">
@@ -123,7 +123,7 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Aksi Cepat (Quick Actions) -->
             <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/50 mb-8" data-aos="fade-up"
                 data-aos-delay="200">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">Aksi Cepat</h2>
@@ -179,10 +179,10 @@
     @else
         @can('fitur.belum_sewa')
             {{-- ============================================ --}}
-            {{-- DASHBOARD USER BIASA (Not Yet Tenant) --}}
+            {{-- DASHBOARD PENGGUNA BIASA (Belum Menyewa) --}}
             {{-- ============================================ --}}
 
-            <!-- Welcome Banner -->
+            <!-- Spanduk Selamat Datang (Welcome Banner) -->
             <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 shadow-sm border border-white/50 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6"
                 data-aos="fade-up" data-aos-duration="800">
                 <div>
@@ -200,10 +200,10 @@
                 </div>
             </div>
 
-            <!-- Order Status Card -->
+            <!-- Kartu Status Pesanan (Order Status Card) -->
 
             @if($orderStatus === 'verified')
-                {{-- Terverifikasi: auto-reload will show penyewa dashboard --}}
+                {{-- Terverifikasi: muat ulang otomatis akan menampilkan dashboard penyewa (auto-reload will show tenant dashboard) --}}
                 <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-50 rounded-2xl p-6 shadow-sm border border-emerald-200/50 mb-8"
                     data-aos="fade-up" data-aos-delay="100">
                     <div class="flex items-center gap-4">
@@ -230,7 +230,7 @@
                     </div>
                 </div>
             @elseif($orderStatus === 'pending')
-                {{-- Pending: menunggu verifikasi admin --}}
+                {{-- Tertunda: menunggu verifikasi admin (Pending: waiting for admin verification) --}}
                 <div class="bg-gradient-to-br from-amber-500/10 to-amber-50 rounded-2xl p-6 shadow-sm border border-amber-200/50 mb-8"
                     data-aos="fade-up" data-aos-delay="100">
                     <div class="flex items-start gap-4">
@@ -266,7 +266,7 @@
                     </div>
                 </div>
             @else
-                {{-- Belum Order --}}
+                {{-- Belum Pesan (Not Yet Ordered) --}}
                 <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-100/50 mb-8" data-aos="fade-up"
                     data-aos-delay="100">
                     <div class="flex items-center gap-4">
@@ -288,7 +288,7 @@
                 </div>
             @endif
 
-            <!-- Search Kos Section with Filters -->
+            <!-- Bagian Cari Kos dengan Filter (Search Kos Section with Filters) -->
             <div class="mb-10" x-data="kosSearch()" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
 
                 <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-gray-100/50">
@@ -300,7 +300,7 @@
                         Cari Kos
                     </h2>
 
-                    <!-- Filter Row -->
+                    <!-- Baris Filter (Filter Row) -->
                     <div class="flex flex-col sm:flex-row gap-3 mb-4">
                         <!-- Lokasi -->
                         <div class="flex-1">
@@ -345,7 +345,7 @@
                             </select>
                         </div>
                     </div>
-                    <!-- City Chips -->
+                    <!-- Chip Kota (City Chips) -->
                     <div class="flex flex-wrap gap-2 mb-5">
                         <p class="w-full text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Kota Populer
                         </p>
@@ -357,7 +357,7 @@
                         </template>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- Tombol Aksi (Action Buttons) -->
                     <div class="flex gap-3">
                         <button @click="search()" :disabled="loading"
                             class="flex-1 sm:flex-none px-6 py-3 bg-[#36B2B2] text-white font-bold text-sm rounded-xl hover:bg-[#2b8f8f] transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#36B2B2]/30">
@@ -377,14 +377,14 @@
                         </button>
                     </div>
 
-                    <!-- Error Message -->
+                    <!-- Pesan Kesalahan (Error Message) -->
                     <template x-if="error">
                         <div class="mt-4 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium"
                             x-text="error"></div>
                     </template>
                 </div>
 
-                <!-- Recommendations Section (Shown before search) -->
+                <!-- Bagian Rekomendasi (Ditampilkan sebelum pencarian) (Recommendations Section) -->
                 <div x-show="!searchPerformed && kosList.length > 0" class="mt-8" data-aos="fade-up">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
@@ -397,10 +397,10 @@
 
                     <div class="flex overflow-x-auto gap-5 pb-8 snap-x hide-scrollbar" style="scrollbar-width: none;">
                         <template x-for="(kos, index) in kosList.slice(0, 4)" :key="'rec-'+kos.id">
-                            <!-- Small Recommendation Card -->
+                            <!-- Kartu Rekomendasi Kecil (Small Recommendation Card) -->
                             <div
                                 class="w-[280px] shrink-0 snap-center bg-white rounded-[2rem] p-4 border border-gray-100 hover:border-[#36B2B2]/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group/rec">
-                                <!-- Image Header -->
+                                <!-- Header Gambar (Image Header) -->
                                 <div class="relative h-40 rounded-2xl overflow-hidden mb-4 shadow-inner bg-gray-50">
                                     <div class="absolute top-3 left-3 z-10">
                                         <span
@@ -419,7 +419,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Info Box -->
+                                <!-- Kotak Informasi (Info Box) -->
                                 <div class="px-1">
                                     <h3 class="font-black text-gray-900 text-base leading-tight mb-1 truncate"
                                         x-text="kos.nama_kos"></h3>
@@ -459,22 +459,22 @@
                     </div>
                 </div>
 
-                <!-- Search Results -->
+                <!-- Hasil Pencarian (Search Results) -->
                 <div id="search-results">
                     <template x-if="searchPerformed && kosList.length > 0">
                         <div class="mt-6 space-y-4">
-                            <!-- Result Count -->
+                            <!-- Jumlah Hasil (Result Count) -->
                             <div class="flex items-center justify-between px-1">
                                 <p class="text-sm font-bold text-gray-500">
                                     Ditemukan <span class="text-[#36B2B2]" x-text="kosList.length"></span> kos
                                 </p>
                             </div>
 
-                            <!-- Kos Cards -->
+                            <!-- Kartu Kos (Kos Cards) -->
                             <template x-for="kos in kosList" :key="kos.id">
                                 <div
                                     class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300">
-                                    <!-- Kos Header -->
+                                    <!-- Header Kos (Kos Header) -->
                                     <div class="p-5 bg-gradient-to-r from-[#36B2B2]/5 to-emerald-50/50 border-b border-gray-100">
                                         <div class="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
                                             <div class="flex items-center gap-4">
@@ -505,7 +505,7 @@
                                                     </div>
 
                                                     <div class="space-y-2">
-                                                        <!-- City -->
+                                                        <!-- Kota (City) -->
                                                         <div class="flex items-center gap-2 text-gray-600">
                                                             <svg class="w-4 h-4 text-[#36B2B2] shrink-0" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -518,7 +518,7 @@
                                                                 x-text="'Kota ' + (kos.kota || '')"></span>
                                                         </div>
 
-                                                        <!-- Address -->
+                                                        <!-- Alamat (Address) -->
                                                         <div class="flex items-start gap-2 text-gray-500">
                                                             <svg class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -533,7 +533,7 @@
                                                                 x-text="kos.alamat || 'Alamat tidak tersedia'"></span>
                                                         </div>
 
-                                                        <!-- Price Range -->
+                                                        <!-- Rentang Harga (Price Range) -->
                                                         <template
                                                             x-if="kos.harga_termurah !== undefined && kos.harga_termurah !== null">
                                                             <div class="flex items-center gap-2">
@@ -558,7 +558,7 @@
                                                             </div>
                                                         </template>
 
-                                                        <!-- Social Media -->
+                                                        <!-- Media Sosial (Social Media) -->
                                                         <template
                                                             x-if="kos.owner && (kos.owner.instagram || kos.owner.twitter || kos.owner.youtube || kos.owner.tiktok)">
                                                             <div class="flex flex-wrap items-center gap-2 pt-2">
@@ -633,7 +633,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Kamar List (Expandable) -->
+                                    <!-- Daftar Kamar (Dapat Diperluas) (Kamar List Expandable) -->
                                     <div x-show="kos._expanded" x-transition class="p-5">
                                         <h4
                                             class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -664,11 +664,11 @@
                                             @mouseup="isDown = false; $refs.slider.classList.remove('cursor-grabbing')"
                                             @mousemove="if(!isDown) return; $event.preventDefault(); const x = $event.pageX - $refs.slider.offsetLeft; const walk = (x - startX) * 2; $refs.slider.scrollLeft = scrollLeft - walk;">
                                             <template x-for="kamar in kos.kamars" :key="kamar.id">
-                                                <!-- Room Card -->
+                                                <!-- Kartu Kamar (Room Card) -->
                                                 <div x-data="{ showDetail: false }"
                                                     class="w-[85vw] sm:w-[320px] shrink-0 snap-center bg-gray-50/50 rounded-2xl p-4 border border-gray-100 hover:border-[#36B2B2]/30 hover:bg-white transition-all duration-300 group/room cursor-pointer">
                                                     <div class="flex flex-col gap-4">
-                                                        <!-- Room Image -->
+                                                        <!-- Gambar Kamar (Room Image) -->
                                                         <div
                                                             class="w-full h-32 rounded-xl overflow-hidden bg-white border border-gray-100 shrink-0 relative group-hover/room:shadow-md transition-all">
                                                             <template x-if="kamar.foto">
@@ -711,7 +711,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Detail Fasilitas Toggle -->
+                                                            <!-- Toggle Detail Fasilitas (Detail Fasilitas Toggle) -->
                                                             <template x-if="kamar.fasilitas && kamar.fasilitas.length > 0">
                                                                 <div class="mb-4">
                                                                     <button @click="showDetail = !showDetail" type="button"
@@ -764,7 +764,7 @@
                         </div>
                     </template>
 
-                    <!-- Order Confirmation Modal -->
+                    <!-- Modal Konfirmasi Pesanan (Order Confirmation Modal) -->
                     <div x-show="showOrderModal"
                         x-effect="showOrderModal ? document.documentElement.classList.add('no-scroll') : document.documentElement.classList.remove('no-scroll')"
                         class="fixed inset-0 z-[9999] flex items-center justify-center p-8 sm:p-12 bg-black/70 backdrop-blur-sm"
@@ -772,10 +772,10 @@
                         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
                         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
 
-                        <!-- Modal Backdrop (Click to close) -->
+                        <!-- Backdrop Modal (Klik untuk menutup) (Modal Backdrop) -->
                         <div class="absolute inset-0" @click="showOrderModal = false"></div>
 
-                        <!-- Modal Content -->
+                        <!-- Konten Modal (Modal Content) -->
                         <template x-if="selectedKamar">
                             <div class="bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl relative z-10 flex flex-col overflow-hidden"
                                 style="max-height: calc(100dvh - 80px);"
@@ -786,7 +786,7 @@
                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                                 x-transition:leave-end="opacity-0 translate-y-8 scale-95" @click.stop>
 
-                                <!-- Header (Fixed) -->
+                                <!-- Header (Tetap) (Fixed Header) -->
                                 <div
                                     class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 shrink-0">
                                     <div>
@@ -813,9 +813,9 @@
                                     <input type="hidden" name="metode_pembayaran" :value="paymentMethod">
                                     <input type="hidden" name="batas_bayar" :value="paymentDeadline">
 
-                                    <!-- Body (Scrollable Area) -->
+                                    <!-- Isi (Area yang Dapat Digulirkan) (Body Scrollable Area) -->
                                     <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 overscroll-contain">
-                                        <!-- Room Info -->
+                                        <!-- Info Kamar (Room Info) -->
                                         <div
                                             class="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
                                             <div
@@ -846,7 +846,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Total Payment Amount (Fixed) -->
+                                        <!-- Total Jumlah Pembayaran (Tetap) (Total Payment Amount Fixed) -->
                                         <div class="mb-6 p-5 bg-[#36B2B2]/5 rounded-[2rem] border-2 border-[#36B2B2]/20 shadow-sm relative overflow-hidden group">
                                             <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                                                 <svg class="w-16 h-16 text-[#36B2B2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -872,7 +872,7 @@
                                         </div>
 
 
-                                        <!-- Payment Method Selection -->
+                                        <!-- Pemilihan Metode Pembayaran (Payment Method Selection) -->
                                         <div class="mb-5">
                                             <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
                                                 Metode Pembayaran <span class="text-rose-500">*</span>
@@ -893,7 +893,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Owner Bank Account (Conditional for Py-Men) -->
+                                        <!-- Rekening Bank Pemilik (Kondisional untuk Py-Men) (Owner Bank Account) -->
                                         <div x-show="paymentMethod === 'pymen'" x-transition:enter="transition ease-out duration-300"
                                             x-transition:enter-start="opacity-0 -translate-y-2"
                                             x-transition:enter-end="opacity-100 translate-y-0"
@@ -978,7 +978,7 @@
                                                 </div>
                                             </template>
 
-                                            <!-- Fallback if no account info -->
+                                            <!-- Fallback jika tidak ada info rekening (Fallback if no account info) -->
                                             <template x-if="!selectedKos.nomor_bank || (!selectedKos.nomor_bank.nomor_rekening && !selectedKos.nomor_bank.nomor_rekening_2)">
                                                 <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-center">
                                                     <p class="text-[10px] font-black uppercase tracking-widest text-amber-600 mb-1">Perhatian</p>
@@ -989,7 +989,7 @@
                                             <p class="text-[9px] font-medium text-gray-500 text-center">Batas waktu pembayaran otomatis 3 hari untuk metode Py-Men.</p>
                                         </div>
 
-                                        <!-- Payment Deadline (Conditional for Manual) -->
+                                        <!-- Batas Waktu Pembayaran (Kondisional untuk Manual) (Payment Deadline) -->
                                         <div class="mb-5" x-show="paymentMethod === 'manual'"
                                             x-transition:enter="transition ease-out duration-300"
                                             x-transition:enter-start="opacity-0 -translate-y-2"
@@ -1011,7 +1011,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Additional Notes -->
+                                        <!-- Catatan Tambahan (Additional Notes) -->
                                         <div>
                                             <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
                                                 Pesan / Catatan Tambahan (Opsional)
@@ -1065,7 +1065,33 @@
                                             if (urlParams.get('filter') === 'favorit') {
                                                 this.filters.is_favorit_only = true;
                                             }
-                                            this.search();
+
+                                            // Auto-search kos pilihan dari landing page (setelah login)
+                                            // Gunakan kode_kos dari URL atau dari server-side variable
+                                            const intendedKos = urlParams.get('kode_kos') || '{{ $intendedKos ?? '' }}';
+                                            if (intendedKos) {
+                                                // Simpan kode_kos tetapi JANGAN isi filters.lokasi
+                                                // karena search menggunakan kode_kos sebagai parameter terpisah
+                                                this._intendedKosCode = intendedKos;
+                                            }
+
+                                            this.search().then(() => {
+                                                // Jika ada kode_kos, expand kos yang sesuai dan scroll ke sana
+                                                if (this._intendedKosCode) {
+                                                    this.$nextTick(() => {
+                                                        const targetKos = this.kosList.find(k =>
+                                                            String(k.kode_kos) === String(this._intendedKosCode)
+                                                        );
+                                                        if (targetKos) {
+                                                            targetKos._expanded = true;
+                                                            setTimeout(() => {
+                                                                const el = document.getElementById('search-results');
+                                                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                            }, 400);
+                                                        }
+                                                    });
+                                                }
+                                            });
                                         },
                                         resetFilters() {
                                             this.filters = {
@@ -1091,7 +1117,10 @@
                                             if (this.filters.kategori) payload.kategori = this.filters.kategori;
                                             if (this.filters.tipe_sewa) payload.tipe_sewa = this.filters.tipe_sewa;
 
-                                            // Add explicit kota filter if it matches one of the popular cities
+                                            // Kirim kode_kos langsung ke payload agar API filter by kode unik
+                                            if (this._intendedKosCode) payload.kode_kos = this._intendedKosCode;
+
+                                            // Tambahkan filter kota eksplisit jika sesuai dengan salah satu kota populer (Add explicit kota filter if it matches one of the popular cities)
                                             const popularCities = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Malang', 'Semarang'];
                                             if (popularCities.includes(this.filters.lokasi)) {
                                                 payload.kota = this.filters.lokasi;
@@ -1109,9 +1138,9 @@
                                                 });
                                                 const data = await res.json();
 
-                                                // Update searchPerformed state correctly
+                                                // Perbarui status searchPerformed dengan benar (Update searchPerformed state correctly)
                                                 const loc = this.filters.lokasi ? this.filters.lokasi.trim() : '';
-                                                const hasFilters = loc || this.filters.harga || this.filters.kategori || this.filters.is_favorit_only;
+                                                const hasFilters = loc || this.filters.harga || this.filters.kategori || this.filters.is_favorit_only || this._intendedKosCode;
                                                 this.searchPerformed = !!hasFilters;
 
                                                 if (data.success) {
@@ -1121,7 +1150,7 @@
                                                         is_favorit: kos.favorited_by && kos.favorited_by.length > 0
                                                     }));
 
-                                                    // Local filter for favorites if selected
+                                                    // Filter lokal untuk favorit jika dipilih (Local filter for favorites if selected)
                                                     if (this.filters.is_favorit_only) {
                                                         this.kosList = this.kosList.filter(k => k.is_favorit);
                                                         if (this.kosList.length === 0) {
@@ -1162,6 +1191,6 @@
         @endcan
     @endif
 
-            <!-- Spacer for bottom -->
+            <!-- Penyangga untuk bagian bawah (Spacer for bottom) -->
             <div class="h-10"></div>
 @endsection

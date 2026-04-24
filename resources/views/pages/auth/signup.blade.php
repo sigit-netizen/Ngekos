@@ -2,26 +2,26 @@
 
 @section('content')
     <style>
-        /* Hilangkan spinner Chrome, Edge, Safari */
+        /* Hilangkan spinner untuk Chrome, Edge, dan Safari (Disable numerical spinner) */
         #nomor_wa::-webkit-inner-spin-button,
         #nomor_wa::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        /* Hilangkan spinner Firefox */
+        /* Hilangkan spinner untuk Firefox */
         #nomor_wa {
             -moz-appearance: textfield;
         }
 
-        /* Hilangkan spinner Chrome, Edge, Safari */
+        /* Hilangkan spinner untuk Chrome, Edge, dan Safari */
         #nik::-webkit-inner-spin-button,
         #nik::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        /* Hilangkan spinner Firefox */
+        /* Hilangkan spinner untuk Firefox */
         #nik {
             -moz-appearance: textfield;
         }
@@ -29,14 +29,14 @@
     <div
         class="relative min-h-screen bg-gradient-to-b from-slate-50/80 to-white overflow-hidden py-10 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-inter">
 
-        <!-- Decorative Background Elements -->
+        <!-- Elemen Latar Belakang Dekoratif (Decorative Background Elements) -->
         <div class="absolute top-10 left-10 w-72 h-72 bg-[#36B2B2]/10 rounded-full blur-3xl -z-10 animate-float"></div>
         <div class="absolute bottom-20 right-10 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl -z-10 animate-float"
             style="animation-delay: 1.5s;"></div>
 
         <div class="w-full max-w-[540px] z-10">
 
-            <!-- Logo Section -->
+            <!-- Bagian Logo (Logo Section) -->
             <div class="text-center mb-8" data-aos="fade-down" data-aos-duration="800">
                 <a href="/"
                     class="inline-flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
@@ -45,7 +45,7 @@
                 <p class="mt-3 text-sm font-medium text-gray-500">Mulai temukan kos impianmu sekarang</p>
             </div>
 
-            <!-- Glassmorphism Card -->
+            <!-- Kartu Glassmorphism (Glassmorphism Card) -->
             <div class="bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl shadow-gray-200/60 border border-gray-100 p-8 sm:p-10 transform transition-all duration-500 hover:shadow-[#36b2b2]/5"
                 data-aos="fade-up" data-aos-duration="1000">
 
@@ -59,7 +59,7 @@
                     @csrf
                     <div class="space-y-5" x-data="{ selectedRole: '{{ old('id_plans', '1') }}' }">
 
-                        <!-- Nama Lengkap -->
+                        <!-- Nama Lengkap (Full Name) -->
                         <div class="group">
                             <label class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Nama Lengkap<span class="text-red-500 ml-1">*</span>
@@ -72,7 +72,7 @@
                             @enderror
                         </div>
 
-                        <!-- Role Selection (Radio Buttons) -->
+                        <!-- Pemilihan Peran (Role Selection) -->
                         <div class="group">
                             <label class="mb-3 block text-sm font-semibold text-gray-700">
                                 Mendaftar Sebagai<span class="text-red-500 ml-1">*</span>
@@ -131,7 +131,7 @@
                             @enderror
                         </div>
 
-                        <!-- Password -->
+                        <!-- Kata Sandi (Password) -->
                         <div class="group">
                             <label class="mb-2 block text-sm font-semibold text-gray-700 transition-colors group-focus-within:text-[#36B2B2]">
                                 Password<span class="text-red-500 ml-1">*</span>
@@ -156,7 +156,7 @@
                             @enderror
                         </div>
 
-                        <!-- Checkbox -->
+                        <!-- Kotak Centang (Checkbox) -->
                         <div x-data="{ checkboxToggle: false }" class="pt-1">
                             <label for="checkboxLabelOne" class="flex cursor-pointer items-start text-sm font-normal text-gray-600 select-none group">
                                 <div class="relative mt-0.5">
@@ -179,7 +179,7 @@
                             </label>
                         </div>
 
-                        <!-- Submit Button -->
+                        <!-- Tombol Submit (Submit Button) -->
                         <div class="pt-2">
                             <button
                                 class="w-full relative flex items-center justify-center rounded-xl bg-gradient-to-r from-[#36B2B2] to-[#2b8f8f] px-4 py-4 text-sm font-bold text-white shadow-lg shadow-[#36b2b2]/30 hover:shadow-[#36b2b2]/50 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
@@ -189,7 +189,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </span>
-                                <!-- Hover flare effect -->
+                                <!-- Efek kilauan saat hover (Hover flare effect) -->
                                 <div class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1s_forwards] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                             </button>
                         </div>
@@ -207,7 +207,7 @@
 
             </div>
 
-            <!-- Back formatting like welcome section -->
+            <!-- Format kembali seperti bagian welcome (Back formatting like welcome section) -->
             <div class="mt-8 text-center">
                 <a href="/"
                     class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white/50 hover:bg-white border border-gray-200 rounded-full text-xs font-semibold text-gray-600 hover:text-[#36B2B2] transition shadow-sm backdrop-blur-sm group">
@@ -224,7 +224,7 @@
     </div>
 
     <style>
-        /* Floating Animation */
+        /* Animasi Mengambang (Floating Animation) */
         @keyframes float {
 
             0%,
@@ -241,7 +241,7 @@
             animation: float 4s ease-in-out infinite;
         }
 
-        /* Shimmer Button Effect */
+        /* Efek Kilau Tombol (Shimmer Button Effect) */
         @keyframes shimmer {
             100% {
                 transform: translateX(100%);

@@ -5,9 +5,9 @@
     $currentYear = date('Y');
 @endphp
   <div class="relative flex flex-col items-center justify-center min-h-screen p-6 overflow-hidden z-1">
-      {{-- common grid shape --}}
+      {{-- bentuk kisi umum (common grid shape) --}}
       <x-common.common-grid-shape />
-      <!-- Centered Content -->
+      <!-- Konten Terpusat (Centered Content) -->
       <div class="mx-auto w-full max-w-[242px] text-center sm:max-w-[472px]">
           <h1 class="mb-8 font-bold text-gray-800 text-title-md dark:text-white/90 xl:text-title-2xl">
               ERROR

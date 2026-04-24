@@ -15,7 +15,7 @@ class FonnteController extends Controller
     }
 
     /**
-     * Send a test message.
+     * Kirim pesan percobaan.
      */
     public function sendTest(Request $request)
     {
@@ -33,7 +33,7 @@ class FonnteController extends Controller
     }
 
     /**
-     * Example method for sending OTP (can be called from other controllers)
+     * Metode contoh untuk mengirim OTP (dapat dipanggil dari controller lain)
      */
     public function sendOtp($target, $otp)
     {
@@ -43,7 +43,7 @@ class FonnteController extends Controller
     }
 
     /**
-     * Example method for sending deadline reminder
+     * Metode contoh untuk mengirim pengingat batas waktu (tenggat)
      */
     public function sendDeadlineReminder($target, $name, $kosName, $dueDate)
     {

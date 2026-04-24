@@ -35,7 +35,7 @@ class OwnerRegistrationNotification extends Notification implements ShouldQueue
             ->action('Cek Verifikasi', 'dashboard');
     }
 
-    // WebPush removed
+    // WebPush dihapus
 
     public function toFonnte($notifiable)
     {

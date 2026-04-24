@@ -38,13 +38,13 @@
                                     alert(data.message);
                                 }
 
-                                // Reset and close
+                                // Reset dan tutup (Reset and close)
                                 form.reset();
                                 if (type === 'aduan') this.showAduanModal = false;
                                 if (type === 'tambah') this.showTambahModal = false;
 
-                                // Reload page after a short delay to show the new history item
-                                // Alternatively, we could prepend the item to the table via JS for true SPA feel
+                                // Muat ulang halaman setelah jeda singkat untuk menampilkan item riwayat baru (Reload page after a short delay)
+                                // Atau, kita bisa menambahkan item ke tabel melalui JS untuk pengalaman SPA yang sebenarnya (Alternatively, prepend via JS)
                                 setTimeout(() => window.location.reload(), 1500);
                             } else {
                                 throw new Error(data.message || 'Terjadi kesalahan');
@@ -64,7 +64,7 @@
                     $watch('showTambahModal', v => v ? document.body.classList.add('overflow-hidden') : document.body.classList.remove('overflow-hidden'));
                 ">
 
-        {{-- Flash Messages --}}
+        {{-- Pesan Flash (Flash Messages) --}}
         @if(session('success'))
             <div class="mb-6 bg-emerald-50 border border-emerald-100 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3 font-bold text-sm"
                 x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show=false, 4000)"
@@ -86,7 +86,7 @@
             </div>
         @endif
 
-        {{-- Header Summary Card --}}
+        {{-- Kartu Ringkasan Header (Header Summary Card) --}}
         <div class="bg-gradient-to-br from-[#36B2B2] to-[#2D8E8E] rounded-[2.5rem] p-8 sm:p-12 shadow-2xl shadow-[#36B2B2]/20 mb-10 overflow-hidden relative group"
             data-aos="fade-up">
             <div
@@ -120,9 +120,9 @@
             </div>
         </div>
 
-        {{-- Action Cards --}}
+        {{-- Kartu Aksi (Action Cards) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {{-- Aduan Fasilitas --}}
+            {{-- Aduan Fasilitas (Facility Complaint) --}}
             <div class="group relative bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
                 data-aos="fade-right">
                 <div
@@ -155,7 +155,7 @@
                 </div>
             </div>
 
-            {{-- Tambah Fasilitas --}}
+            {{-- Tambah Fasilitas (Add Facility) --}}
             <div class="group relative bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
                 data-aos="fade-left">
                 <div
@@ -189,7 +189,7 @@
             </div>
         </div>
 
-        {{-- History Section --}}
+        {{-- Bagian Riwayat (History Section) --}}
         <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl overflow-hidden mb-10" data-aos="fade-up">
             <div class="px-8 py-8 border-b border-gray-50 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
@@ -278,7 +278,7 @@
             </div>
         </div>
 
-        {{-- Info Banner --}}
+        {{-- Banner Informasi (Info Banner) --}}
         <div class="bg-[#36B2B2]/5 rounded-[2rem] p-6 border border-[#36B2B2]/10 flex items-center gap-4"
             data-aos="fade-up">
             <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#36B2B2] shadow-sm shrink-0">
@@ -291,7 +291,7 @@
                 dalam 2x24 jam kerja oleh pengelola kos.</p>
         </div>
 
-        {{-- ===== ADUAN MODAL ===== --}}
+        {{-- ===== MODAL ADUAN (ADUAN MODAL) ===== --}}
         <template x-teleport="body">
             <div x-show="showAduanModal" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -375,7 +375,7 @@
             </div>
         </template>
 
-        {{-- ===== TAMBAH FASILITAS MODAL ===== --}}
+        {{-- ===== MODAL TAMBAH FASILITAS (TAMBAH FASILITAS MODAL) ===== --}}
         <template x-teleport="body">
             <div x-show="showTambahModal" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"

@@ -3,22 +3,22 @@
 @section('dashboard-content')
     <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-white/50 mb-8" data-aos="fade-up">
         <div class="flex flex-col gap-4">
-            {{-- Title --}}
+            {{-- Judul (Title) --}}
             <div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">Data Member 🏢</h1>
                 <p class="text-gray-500 text-sm">Kelola dan pantau seluruh pemilik kos yang terdaftar di platform.</p>
             </div>
 
-            {{-- Search & Filter Bar --}}
+            {{-- Bilah Cari & Filter (Search & Filter Bar) --}}
             <form action="{{ route('superadmin.data_member') }}" method="GET">
                 <div class="flex flex-wrap items-center gap-3">
 
-                    {{-- Search Input --}}
+                    {{-- Input Pencarian (Search Input) --}}
                     <input type="text" name="search" value="{{ $search ?? '' }}"
                         placeholder="Cari nama, email, NIK, WA, atau Nama Kos..."
                         style="padding: 10px 16px; font-size:14px; border: 2px solid #e5e7eb; border-radius: 12px; outline:none; background:#fff; color:#1f2937; min-width:240px; flex:1; max-width:320px;">
 
-                    {{-- Paket Dropdown --}}
+                    {{-- Dropdown Paket (Paket Dropdown) --}}
                     <select name="paket"
                         style="padding: 10px 14px; font-size:14px; border: 2px solid #e5e7eb; border-radius: 12px; background:#fff; color:#374151; cursor:pointer; min-width:160px;">
                         <option value="">Semua Paket</option>
@@ -28,13 +28,13 @@
                         <option value="5" {{ ($paket ?? '') == '5' ? 'selected' : '' }}>PRO PER KAMAR</option>
                     </select>
 
-                    {{-- Cari Button --}}
+                    {{-- Tombol Cari (Cari Button) --}}
                     <button type="submit"
                         style="padding: 10px 24px; background-color: #36B2B2; color: white; font-size:14px; font-weight:700; border-radius:12px; cursor:pointer; border:none; white-space:nowrap; letter-spacing:0.5px;">
                         🔍 Cari
                     </button>
 
-                    {{-- Reset Button (only when filters active) --}}
+                    {{-- Tombol Reset (hanya saat filter aktif) (Reset Button (only when filters active)) --}}
                     @if($search || $paket)
                         <a href="{{ route('superadmin.data_member') }}"
                             style="padding: 10px 18px; background-color: #f1f5f9; color: #64748b; font-size:14px; font-weight:700; border-radius:12px; text-decoration:none; border: 2px solid #e2e8f0; white-space:nowrap;">
@@ -43,7 +43,7 @@
                     @endif
                 </div>
 
-                {{-- Active filter badges --}}
+                {{-- Badge Filter Aktif (Active filter badges) --}}
                 @if($search || $paket)
                     <div class="flex flex-wrap gap-2 mt-3">
                         @if($search)
@@ -128,7 +128,7 @@
                                         </svg>
                                     </button>
 
-                                    {{-- Toggle Status Button --}}
+                                    {{-- Tombol Alih Status (Toggle Status Button) --}}
                                     <form action="{{ route('superadmin.data_member.toggle', $member->id) }}" method="POST">
                                         @csrf
                                         <button type="button"
@@ -181,7 +181,7 @@
         <div
             style="background:#fff; border-radius:24px; width:100%; max-width:560px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); margin:auto;">
 
-            {{-- Modal Header --}}
+            {{-- Kepala Modal (Modal Header) --}}
             <div
                 style="padding:24px 28px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
                 <div>
@@ -196,12 +196,12 @@
                 </button>
             </div>
 
-            {{-- Modal Body --}}
+            {{-- Badan Modal (Modal Body) --}}
             <form id="editForm" method="POST" style="padding:24px 28px;">
                 @csrf
                 @method('PUT')
 
-                {{-- Row 1: Nama --}}
+                {{-- Baris 1: Nama (Row 1: Nama) --}}
                 <div style="margin-bottom:16px;">
                     <label
                         style="display:block; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">Nama
@@ -211,7 +211,7 @@
                         onfocus="this.style.borderColor='#36B2B2'" onblur="this.style.borderColor='#e2e8f0'">
                 </div>
 
-                {{-- Row 2: Email + Password --}}
+                {{-- Baris 2: Email + Kata Sandi (Row 2: Email + Password) --}}
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
                     <div>
                         <label
@@ -230,7 +230,7 @@
                     </div>
                 </div>
 
-                {{-- Row 3: NIK + WA --}}
+                {{-- Baris 3: NIK + WA (Row 3: NIK + WA) --}}
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
                     <div>
                         <label
@@ -249,7 +249,7 @@
                     </div>
                 </div>
 
-                {{-- Row 4: Paket --}}
+                {{-- Baris 4: Paket (Row 4: Paket) --}}
                 <div style="margin-bottom:24px;">
                     <label
                         style="display:block; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">Pilih
@@ -263,7 +263,7 @@
                     </select>
                 </div>
 
-                {{-- Submit --}}
+                {{-- Kirim (Submit) --}}
                 <button type="submit"
                     style="width:100%; padding:13px; background-color:#36B2B2; color:white; font-size:15px; font-weight:800; border-radius:14px; border:none; cursor:pointer; letter-spacing:0.5px; transition:opacity 0.2s;"
                     onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
@@ -297,7 +297,7 @@
             document.getElementById('editMemberModal').style.display = 'flex';
         }
 
-        // Close on backdrop click
+        // Tutup saat klik latar belakang (Close on backdrop click)
         document.getElementById('editMemberModal').addEventListener('click', function (e) {
             if (e.target === this) closeEditModal();
         });

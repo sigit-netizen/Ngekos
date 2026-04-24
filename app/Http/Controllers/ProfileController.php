@@ -10,7 +10,7 @@ use App\Models\User;
 class ProfileController extends Controller
 {
     /**
-     * Update the user's profile information.
+     * Perbarui informasi profil pengguna.
      */
     public function update(Request $request)
     {
@@ -49,7 +49,7 @@ class ProfileController extends Controller
         $user->youtube = $request->youtube;
         $user->tiktok = $request->tiktok;
 
-        // Update/create bank account info
+        // Perbarui/buat informasi akun bank
         $user->nomorBank()->updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -71,7 +71,7 @@ class ProfileController extends Controller
         return back()->with('success', 'Profil Anda berhasil diperbarui!');
     }
     /**
-     * Verify the user's password before opening the profile modal.
+     * Verifikasi kata sandi pengguna sebelum membuka modal profil.
      */
     public function verifyPassword(Request $request)
     {

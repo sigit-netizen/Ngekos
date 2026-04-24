@@ -70,7 +70,7 @@ class PermissionManagementController extends Controller
                 ->get();
         }
 
-        // Force 'nonaktif' to be the first column for visibility, then other plans
+        // Paksa 'nonaktif' menjadi kolom pertama untuk visibilitas, lalu paket lainnya
         $roles = $rolesQuery->orderByRaw("CASE WHEN name = 'nonaktif' THEN 0 ELSE 1 END")
             ->orderBy('id', 'asc')
             ->get();
@@ -90,7 +90,7 @@ class PermissionManagementController extends Controller
         $activeFilter = $request->input('active_filter', 'admin');
 
         DB::transaction(function () use ($request, $activeFilter) {
-            // Filter roles the same way the index method does to prevent wiping permissions of roles in other tabs
+            // Filter peran dengan cara yang sama seperti metode index untuk mencegah penghapusan izin peran di tab lain
             $rolesQuery = Role::where('name', '!=', 'superadmin')->where('name', '!=', 'admin');
 
             if ($activeFilter === 'user') {
@@ -102,7 +102,7 @@ class PermissionManagementController extends Controller
             $roles = $rolesQuery->get();
 
             foreach ($roles as $role) {
-                // Only sync if the role was actually editable in this request
+                // Hanya sinkronkan jika peran tersebut memang dapat diedit dalam permintaan ini
                 $permissions = $request->role_permissions[$role->id] ?? [];
                 $role->syncPermissions($permissions);
             }

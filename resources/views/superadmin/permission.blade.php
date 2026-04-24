@@ -17,7 +17,7 @@
         </div>
         <h3 class="text-lg font-bold text-gray-900 mb-6">Manajemen Akses Menu (Subscription)</h3>
 
-        <!-- Form Tambah Permission Baru -->
+        <!-- Form Tambah Akses Baru (Form Tambah Permission Baru) -->
         <div class="mb-8 p-5 bg-gray-50 border border-gray-100 rounded-xl">
             <h4 class="text-sm font-semibold text-gray-700 mb-3">Tambah Akses Menu dan Buat File Halaman Baru</h4>
             <form action="{{ route('superadmin.permission.store') }}" method="POST" class="flex flex-col sm:flex-row gap-3">
@@ -49,7 +49,7 @@
             </form>
         </div>
 
-        <!-- Header Filter (Tabs 2 Kategori Utama) -->
+        <!-- Kepala Filter (Tab 2 Kategori Utama) (Header Filter (Tabs 2 Kategori Utama)) -->
         <div class="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4 border-b border-gray-100 pb-4">
             <h4 class="text-md font-bold text-gray-800">Daftar Matriks Akses</h4>
 
@@ -72,7 +72,7 @@
             @csrf
             @method('PUT')
 
-            <!-- Hidden input untuk mengembalikan user ke tab yang sama setelah update sukses -->
+            <!-- Input tersembunyi untuk mengembalikan pengguna ke tab yang sama setelah pembaruan berhasil (Hidden input to return user to the same tab after successful update) -->
             <input type="hidden" name="active_filter" value="{{ $viewGroup }}">
 
             <div class="overflow-x-auto text-left shadow-sm rounded-xl border border-gray-100">
@@ -124,7 +124,7 @@
                 </table>
             </div>
 
-            <!-- Header Filter (Tabs 2 Kategori Utama) tapi untuk Fitur -->
+            <!-- Kepala Filter (Tab 2 Kategori Utama) untuk Fitur (Header Filter (Tabs 2 Kategori Utama) for Features) -->
             <div class="mt-8 mb-6 border-b border-gray-100 pb-4 flex items-center gap-3">
                 <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50">
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +188,7 @@
             </div>
         </form>
 
-        <!-- Hidden Delete Forms for Permissions -->
+        <!-- Form Penghapusan Tersembunyi untuk Akses (Hidden Delete Forms for Permissions) -->
         @foreach($permissions as $permission)
             <form id="delete-form-{{ $permission->id }}" action="{{ route('superadmin.permission.destroy', $permission->id) }}"
                 method="POST" class="hidden">

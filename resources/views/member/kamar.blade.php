@@ -37,7 +37,7 @@
                                                                                                                                                         if (isEnabled) {
                                                                                                                                                             document.body.style.overflow = 'hidden';
                                                                                                                                                         } else {
-                                                                                                                                                            // Only restore if all modals are closed
+                                                                                                                                                            // Hanya kembalikan jika semua modal sudah tertutup (Only restore if all modals are closed)
                                                                                                                                                             if (!this.showAddModal && !this.showEditModal && !this.showFasilitasModal) {
                                                                                                                                                                 document.body.style.overflow = '';
                                                                                                                                                             }
@@ -116,7 +116,7 @@
         x-init="$watch('search', () => currentPage = 1); $watch('filterStatus', () => currentPage = 1);"
         class="pb-12 text-gray-800">
 
-        <!-- Header Section -->
+        <!-- Bagian Header (Header Section) -->
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 md:mb-10" data-aos="fade-up">
             <div class="flex-1">
                 <div
@@ -160,7 +160,7 @@
         </div>
 
 
-        <!-- List Content -->
+        <!-- Konten Daftar (List Content) -->
         @if($kamars->isEmpty())
             <div class="bg-white rounded-[3rem] p-20 text-center border-2 border-dashed border-gray-100" data-aos="fade-up">
                 <div
@@ -181,7 +181,7 @@
                 </button>
             </div>
         @else
-            <!-- Filters & Stats -->
+            <!-- Filter & Statistik (Filters & Stats) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8" data-aos="fade-up">
                 <div class="sm:col-span-2 flex flex-col sm:flex-row gap-4">
                     <div class="relative flex-1">
@@ -238,9 +238,9 @@
                 </div>
             </div>
 
-            <!-- List Container -->
+            <!-- Wadah Daftar (List Container) -->
             <div class="space-y-6" data-aos="fade-up">
-                <!-- Desktop Table View -->
+                <!-- Tampilan Tabel Desktop (Desktop Table View) -->
                 <div class="hidden md:block bg-white border-2 border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -362,7 +362,7 @@
                     </div>
                 </div>
 
-                <!-- Mobile Card View -->
+                <!-- Tampilan Kartu Mobile (Mobile Card View) -->
                 <div class="grid grid-cols-1 gap-4 md:hidden">
                     <template x-for="(kamar, index) in pagedKamars" :key="kamar.id">
                         <div
@@ -456,7 +456,7 @@
                     </template>
                 </div>
 
-                <!-- PAGINATION CONTROLS -->
+                <!-- KONTROL PAGINASI (PAGINATION CONTROLS) -->
                 <div
                     class="px-6 md:px-8 py-6 bg-white border-2 border-gray-100 md:border-t rounded-[2rem] md:rounded-none md:rounded-b-[2.5rem] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm shadow-gray-100/50">
                     <p class="text-[10px] md:text-xs font-bold text-gray-400 tracking-tight uppercase order-2 sm:order-1">
@@ -492,7 +492,7 @@
             </div>
         @endif
 
-        <!-- MODAL: Tambah Kamar -->
+        <!-- MODAL: Tambah Kamar (Add Room) -->
         <div x-show="showAddModal"
             class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md overflow-hidden"
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -676,7 +676,7 @@
             </form>
         </div>
 
-        <!-- MODAL: Edit Kamar -->
+        <!-- MODAL: Ubah Kamar (Edit Room) -->
         <div x-show="showEditModal"
             class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md overflow-hidden"
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -809,7 +809,7 @@
 
                 </div>
 
-                <!-- Footer Buttons (Fixed) -->
+                <!-- Tombol Bawah (Footer Buttons) -->
                 <div
                     class="px-5 py-4 border-t border-gray-50 flex gap-3 shrink-0 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
                     <button type="button" @click="showEditModal = false"
@@ -821,7 +821,7 @@
             </form>
         </div>
 
-        <!-- MODAL: Quick Edit Fasilitas -->
+        <!-- MODAL: Ubah Cepat Fasilitas (Quick Edit Fasilitas) -->
         <div x-show="showFasilitasModal"
             class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md overflow-hidden"
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -834,7 +834,7 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Header (Fixed) -->
+                <!-- Kepala Modal (Header) -->
                 <div class="px-5 pt-4 pb-2 shrink-0 border-b border-gray-50/50">
                     <div class="flex items-center justify-between">
                         <div>
@@ -852,7 +852,7 @@
                     </div>
                 </div>
 
-                <!-- Form Scrollable Area -->
+                <!-- Area Formulir (Form Scrollable Area) -->
                 <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-5">
                     <div>
                         <div class="flex items-center justify-between mb-3 ml-1">
@@ -885,7 +885,7 @@
                     </div>
                 </div>
 
-                <!-- Footer Buttons (Fixed) -->
+                <!-- Tombol Bawah (Footer Buttons) -->
                 <div
                     class="px-5 py-4 border-t border-gray-50 flex gap-3 shrink-0 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
                     <button type="button" @click="showFasilitasModal = false"

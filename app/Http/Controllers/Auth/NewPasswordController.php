@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 class NewPasswordController extends Controller
 {
     /**
-     * Handle an incoming new password request.
+     * Tangani permintaan kata sandi (password) baru yang masuk.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -27,9 +27,9 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
+        // Di sini kami akan mencoba mereset kata sandi pengguna. Jika berhasil, kami
+        // akan memperbarui kata sandi pada model pengguna asli dan menyimpannya ke
+        // database. Jika tidak, kami akan menguraikan error dan mengembalikan respons.
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {

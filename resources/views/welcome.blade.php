@@ -28,12 +28,12 @@
             color: #1a202c;
         }
 
-        /* Smooth scroll behavior */
+        /* Perilaku gulir halus (Smooth scroll behavior) */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Custom animations for continuous floating elements (Not scroll dependent) */
+        /* Animasi kustom untuk elemen mengapung terus menerus (Tidak bergantung pada gulir) (Custom animations for continuous floating elements (Not scroll dependent)) */
         @keyframes float {
 
             0%,
@@ -66,18 +66,18 @@
             animation: pulse-glow 2s ease-in-out infinite;
         }
 
-        /* Hide scrollbar untuk Chrome/Safari/Opera */
+        /* Sembunyikan scrollbar untuk Chrome/Safari/Opera (Hide scrollbar for Chrome/Safari/Opera) */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
 
-        /* Hide scrollbar untuk IE/Edge/Firefox */
+        /* Sembunyikan scrollbar untuk IE/Edge/Firefox (Hide scrollbar for IE/Edge/Firefox) */
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
 
-        /* Animations */
+        /* Animasi (Animations) */
         @keyframes float {
 
             0%,

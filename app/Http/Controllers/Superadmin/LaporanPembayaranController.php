@@ -17,8 +17,8 @@ class LaporanPembayaranController extends Controller
         $statusFilter = $request->get('status');
         $search = $request->get('search');
 
-        // Fetch query with filters
-        // Only show the LATEST active subscription per user to avoid stacking
+        // Ambil kueri (query) dengan filter
+        // Hanya tampilkan langganan aktif TERBARU per pengguna untuk menghindari penumpukan (stacking)
         $latestActiveIds = Langganan::selectRaw('MAX(id)')
             ->where('status', 'active')
             ->groupBy('id_user');
@@ -44,31 +44,31 @@ class LaporanPembayaranController extends Controller
 
         $subscriptions = $query->orderBy('tanggal_pembayaran', 'desc')->get()
             ->map(function ($sub) {
-                // Eager loading should have fetched user.statusUser
+                // Eager loading seharusnya sudah mengambil user.statusUser
                 $userOfficialStatus = $sub->user->statusUser ? $sub->user->statusUser->status : 'aktif';
 
-                // Use the persistent jatuh_tempo column or fallback if NULL (for old data)
+                // Gunakan kolom jatuh_tempo yang persisten atau cadangan (fallback) jika NULL (untuk data lama)
                 $expiryDate = $sub->jatuh_tempo ? Carbon::parse($sub->jatuh_tempo) : Carbon::parse($sub->tanggal_pembayaran)->addDays(28);
 
-                // WIB Reset: Use Asia/Jakarta and compare pure dates (startOfDay)
+                // Reset WIB: Gunakan Asia/Jakarta dan bandingkan tanggal murni (startOfDay)
                 $nowWib = now('Asia/Jakarta')->startOfDay();
                 $expiryWib = $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay();
 
-                // Get raw difference in days
+                // Dapatkan selisih hari mentah (raw difference in days)
                 $diffDays = (int) $nowWib->diffInDays($expiryWib, false);
 
                 $sub->expiry_date = $expiryDate;
                 $sub->days_remaining = $diffDays;
 
-                // Determine precise status
+                // Tentukan status yang tepat (Determine precise status)
                 if ($diffDays >= 0) {
                     $sub->computed_status = 'active';
                 } elseif ($diffDays >= -3) {
                     $sub->computed_status = 'grace';
                     $sub->grace_days_remaining = 3 - abs($diffDays) + 1;
                 } else {
-                    // It's technically expired (Mati)
-                    // If the account is already officially deactivated, it should no longer show in the "Mati" list
+                    // Secara teknis sudah kedaluwarsa (Mati)
+                    // Jika akun sudah dinonaktifkan secara resmi, akun tersebut tidak boleh lagi muncul di daftar "Mati"
                     if ($userOfficialStatus === 'inactive') {
                         $sub->computed_status = 'deactivated';
                     } else {
@@ -80,27 +80,27 @@ class LaporanPembayaranController extends Controller
                 return $sub;
             });
 
-        // Metrics (Before status filtering for global accuracy)
+        // Metrik (Sebelum pemfilteran status untuk akurasi global)
         $totalMember = \App\Models\User::role(['admin', 'nonaktif'])->count();
         $totalActive = $subscriptions->where('computed_status', 'active')->count();
         $totalGrace = $subscriptions->where('computed_status', 'grace')->count();
         $totalInactive = $subscriptions->where('computed_status', 'inactive')->count();
         $totalDeactivated = $subscriptions->where('computed_status', 'deactivated')->count();
 
-        // Apply status filtering on collection if selected for the table view
+        // Terapkan pemfilteran status pada koleksi jika dipilih untuk tampilan tabel (table view)
         if ($statusFilter) {
             $subscriptions = $subscriptions->where('computed_status', $statusFilter);
         }
 
-        // Calculate filtered metrics BEFORE pagination
+        // Hitung metrik yang difilter SEBELUM penomoran halaman (pagination)
         $totalOrderCount = $subscriptions->count();
         $totalOmzetAmount = $subscriptions->sum(fn($s) => $s->jenis_langganan->harga);
 
-        // Manual Pagination for the collection
+        // Penomoran Halaman Manual untuk koleksi (Manual Pagination)
         $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
         $perPage = 10;
 
-        // Auto-redirect if page is out of bounds (optional but helpful)
+        // Redirect otomatis jika halaman di luar batas (opsional tapi membantu)
         $maxPage = max(1, ceil($totalOrderCount / $perPage));
         if ($currentPage > $maxPage) {
             return redirect()->route('superadmin.laporan_pembayaran', array_merge($request->except('page'), ['page' => 1]));

@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
 class DeviceOtpController extends Controller
 {
     /**
-     * Show the OTP channel selection view.
+     * Tampilkan halaman pemilihan saluran (channel) OTP.
      */
     public function showSelectChannel()
     {
@@ -31,7 +32,7 @@ class DeviceOtpController extends Controller
     }
 
     /**
-     * Generate and send OTP via selected channel.
+     * Hasilkan dan kirim OTP melalui saluran yang dipilih.
      */
     public function sendOtp(Request $request)
     {
@@ -47,25 +48,33 @@ class DeviceOtpController extends Controller
         if (!$user)
             return redirect()->route('login');
 
-        // Generate 6-digit OTP
+        // Hasilkan OTP 6 digit
         $otp = random_int(100000, 999999);
         $user->update([
             'otp' => $otp,
-            'otp_expires_at' => now()->addMinutes(1) // 1 minute expiry as requested
+            'otp_expires_at' => now()->addMinutes(1) // Kedaluwarsa 1 menit seperti yang diminta
         ]);
 
-        // Save channel to session for display
+        // Simpan saluran ke sesi untuk ditampilkan
         session(['otp_channel' => $request->channel]);
 
-        // Send OTP
+        // Kirim OTP
+        if ($request->channel === 'whatsapp' && !$user->nomor_wa) {
+            Log::warning('OTP WhatsApp: nomor_wa kosong untuk user ID: ' . $user->id);
+            return back()->with('error', 'Nomor WhatsApp Anda belum diisi di profil. Silakan pilih metode Email atau hubungi admin.');
+        }
+
         if ($request->channel === 'whatsapp' && $user->nomor_wa) {
             $fonnteService = app(\App\Services\FonnteService::class);
             $message = "Kode OTP Anda adalah: *{$otp}*\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.";
+            Log::info('OTP: Mencoba kirim WhatsApp ke nomor: ' . $user->nomor_wa . ' untuk user ID: ' . $user->id);
             $response = $fonnteService->sendMessage($user->nomor_wa, $message);
             
             if (!$response || (isset($response['status']) && $response['status'] == false)) {
+                Log::error('OTP WhatsApp gagal terkirim', ['user_id' => $user->id, 'nomor_wa' => $user->nomor_wa, 'response' => $response]);
                 return back()->with('error', 'Gagal mengirim OTP ke WhatsApp. ' . ($response['message'] ?? 'Silakan coba lagi.'));
             }
+            Log::info('OTP WhatsApp berhasil dikirim ke user ID: ' . $user->id);
         } elseif ($request->channel === 'email') {
             try {
                 \Illuminate\Support\Facades\Mail::raw("Kode OTP Anda adalah: {$otp}\n\nBerlaku selama 1 menit. Mohon tidak memberikan kode ini kepada siapapun.", function ($message) use ($user) {
@@ -82,7 +91,7 @@ class DeviceOtpController extends Controller
     }
 
     /**
-     * Show the OTP verification view.
+     * Tampilkan halaman verifikasi OTP.
      */
     public function show()
     {
@@ -94,7 +103,7 @@ class DeviceOtpController extends Controller
     }
 
     /**
-     * Handle the OTP submission.
+     * Tangani pengiriman OTP.
      */
     public function verify(Request $request)
     {
@@ -111,7 +120,7 @@ class DeviceOtpController extends Controller
         if (!$user)
             return redirect()->route('login');
 
-        // Check if expired
+        // Periksa apakah sudah kedaluwarsa
         if (now()->gt($user->otp_expires_at)) {
             return back()->with('error', 'Kode OTP sudah kadaluarsa. Silakan minta kode baru.');
         }
@@ -123,9 +132,9 @@ class DeviceOtpController extends Controller
             return back()->with('error', "Terlalu banyak percobaan salah. Verifikasi ditangguhkan selama 24 jam. Silakan coba lagi dalam $hours jam.");
         }
 
-        // Check if correct (Relaxed comparison to avoid string/int type mismatch)
+        // Periksa apakah benar (Perbandingan longgar untuk menghindari ketidakcocokan tipe string/int)
         if ($user->otp != $otpInput) {
-            RateLimiter::hit($throttleKey, 86400); // Lock for 24 hours after 3 hits
+            RateLimiter::hit($throttleKey, 86400); // Kunci selama 24 jam setelah 3 kali percobaan salah
             
             $remaining = RateLimiter::remaining($throttleKey, 3);
             $message = 'Kode OTP salah.';
@@ -137,7 +146,7 @@ class DeviceOtpController extends Controller
             return back()->with('error', $message);
         }
 
-        // OTP is correct! Clear it and sessions
+        // OTP benar! Bersihkan kode OTP dan sesi verifikasi
         RateLimiter::clear($throttleKey);
         $user->update(['otp' => null, 'otp_expires_at' => null]);
 
@@ -147,7 +156,7 @@ class DeviceOtpController extends Controller
         $request->session()->regenerate();
         session()->forget(['pending_otp_user_id', 'otp_channel']);
 
-        // Redirect logic
+        // Logika pengalihan (Redirect)
         if ($user->hasRole('superadmin')) {
             $route = 'superadmin.dashboard';
         } elseif ($user->hasRole('admin') || $user->hasRole('nonaktif')) {
@@ -164,7 +173,7 @@ class DeviceOtpController extends Controller
     }
 
     /**
-     * Resend OTP.
+     * Kirim ulang OTP.
      */
     public function resend()
     {

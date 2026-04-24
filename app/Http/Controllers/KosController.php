@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 class KosController extends Controller
 {
     /**
-     * Update the specified kos in storage.
+     * Perbarui kos tertentu di penyimpanan.
      */
     public function update(Request $request, Kos $kos)
     {
-        // Security Check: Ensure owner only updates their own kos
+        // Pemeriksaan Keamanan: Pastikan pemilik hanya dapat memperbarui kos miliknya sendiri
         if ($kos->id_user !== auth()->id()) {
             abort(403, 'Akses ditolak: Anda tidak memiliki akses ke properti ini.');
         }
@@ -27,10 +27,10 @@ class KosController extends Controller
             $updateData['nama_kos'] = $request->nama_kos;
 
             if ($request->hasFile('foto')) {
-                // Save original to temp
+                // Simpan file asli ke folder sementara (temp)
                 $tempPath = $request->file('foto')->store('temp', 'public');
 
-                // Dispatch background optimization
+                // Kirim tugas optimasi gambar ke latar belakang (background optimization)
                 \App\Jobs\ProcessImageOptimization::dispatch(
                     $tempPath,
                     'kos',
@@ -53,7 +53,7 @@ class KosController extends Controller
             $updateData['kode_kos'] = $request->kode_kos;
             $updateData['is_kode_kos_edited'] = true;
         } else {
-            // Default behavior if editField is missing (full update fallback)
+            // Perilaku standar jika editField tidak ada (pencadangan pembaruan penuh)
             $rules = [
                 'nama_kos' => 'required|string|max:255',
                 'alamat' => 'nullable|string|unique:kos,alamat,' . $kos->id,
@@ -71,7 +71,7 @@ class KosController extends Controller
 
         $kos->update($updateData);
 
-        // Batch price update is separate logic
+        // Pembaruan harga masal (batch price update) adalah logika terpisah
         if ($request->filled('harga_batch')) {
             $kos->kamars()->update(['harga' => $request->harga_batch]);
         }

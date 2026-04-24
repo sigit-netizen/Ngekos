@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Mailer
+    | Mailer Default (Default Mailer)
     |--------------------------------------------------------------------------
     |
-    | This option controls the default mailer that is used to send any email
-    | messages sent by your application. Alternative mailers may be setup
-    | and used as needed; however, this mailer will be used by default.
+    | Opsi ini mengontrol mailer default yang digunakan untuk mengirim pesan
+    | email apa pun yang dikirim oleh aplikasi Anda. Mailer alternatif dapat disiapkan
+    | dan digunakan sesuai kebutuhan; namun, mailer ini akan digunakan secara default.
     |
     */
 
@@ -17,18 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Mailer Configurations
+    | Konfigurasi Mailer (Mailer Configurations)
     |--------------------------------------------------------------------------
     |
-    | Here you may configure all of the mailers used by your application plus
-    | their respective settings. Several examples have been configured for
-    | you and you are free to add your own as your application requires.
+    | Di sini Anda dapat mengonfigurasi semua mailer yang digunakan oleh aplikasi Anda plus
+    | pengaturan masing-masing. Beberapa contoh telah dikonfigurasi untuk
+    | Anda dan Anda bebas menambahkan milik Anda sendiri sesuai kebutuhan aplikasi Anda.
     |
-    | Laravel supports a variety of mail "transport" drivers to be used while
-    | sending an e-mail. You will specify which one you are using for your
-    | mailers below. You are free to add additional mailers as required.
+    | Laravel mendukung berbagai driver "transport" email untuk digunakan saat
+    | mengirim email. Anda akan menentukan mana yang Anda gunakan untuk
+    | mailer Anda di bawah ini. Anda bebas menambahkan mailer tambahan jika diperlukan.
     |
-    | Supported: "smtp", "sendmail", "mailgun", "ses",
+    | Didukung: "smtp", "sendmail", "mailgun", "ses",
     |            "postmark", "log", "array", "failover"
     |
     */
@@ -88,12 +88,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Global "From" Address
+    | Alamat "From" Global (Global "From" Address)
     |--------------------------------------------------------------------------
     |
-    | You may wish for all e-mails sent by your application to be sent from
-    | the same address. Here, you may specify a name and address that is
-    | used globally for all e-mails that are sent by your application.
+    | Anda mungkin ingin semua email yang dikirim oleh aplikasi Anda dikirim dari
+    | alamat yang sama. Di sini, Anda dapat menentukan nama dan alamat yang
+    | digunakan secara global untuk semua email yang dikirim oleh aplikasi Anda.
     |
     */
 
@@ -104,12 +104,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Markdown Mail Settings
+    | Pengaturan Email Markdown (Markdown Mail Settings)
     |--------------------------------------------------------------------------
     |
-    | If you are using Markdown based email rendering, you may configure your
-    | theme and component paths here, allowing you to customize the design
-    | of the emails. Or, you may simply stick with the Laravel defaults!
+    | Jika Anda menggunakan perenderan email berbasis Markdown, Anda dapat mengonfigurasi
+    | tema dan jalur komponen di sini, memungkinkan Anda untuk menyesuaikan desain
+    | email. Atau, Anda bisa menggunakan default Laravel saja!
     |
     */
 

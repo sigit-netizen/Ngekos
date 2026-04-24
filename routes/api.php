@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| Rute API (API Routes)
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
+| Di sini Anda dapat mendaftarkan rute API untuk aplikasi Anda. Rute-rute
+| ini dimuat oleh RouteServiceProvider dalam grup yang ditugaskan ke grup
+| middleware "api". Selamat membangun API Anda!
 |
 */
 

@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Artisan;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Isi database aplikasi (Seed the application's database).
      */
     public function run(): void
     {
-        // Clear ALL caches to prevent Spatie permission stale table reference after migrate:fresh
+        // Bersihkan SEMUA cache untuk mencegah referensi tabel izin Spatie yang usang setelah migrate:fresh
         Artisan::call('cache:clear');
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 

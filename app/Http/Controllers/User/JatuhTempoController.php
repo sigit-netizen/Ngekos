@@ -12,27 +12,27 @@ use Carbon\Carbon;
 class JatuhTempoController extends Controller
 {
     /**
-     * Display the jatuh tempo page with premium UI and grace period logic.
+     * Tampilkan halaman jatuh tempo dengan UI premium dan logika masa tenggang (grace period).
      */
     public function index()
     {
         $user = Auth::user();
 
-        // 1. Fetch latest active/paid rental transaction
+        // 1. Ambil transaksi sewa aktif/berbayar (paid rent/booking) terbaru
         $lastPaidRent = Transaksi::where('id_user', $user->id)
             ->where('status', 'paid')
             ->whereIn('tipe', [Transaksi::TYPE_BOOKING, Transaksi::TYPE_SEWA])
             ->latest()
             ->first();
 
-        // 2. Calculate Expiry Date
+        // 2. Hitung Tanggal Kedaluwarsa (Expiry Date)
         $expiryDate = null;
         if ($lastPaidRent) {
-            // Prioritize the persistent column for manual testing/overrides
+            // Prioritaskan kolom yang persisten untuk pengujian manual/pengambilalihan (overrides)
             if ($lastPaidRent->jatuh_tempo) {
                 $expiryDate = Carbon::parse($lastPaidRent->jatuh_tempo);
             } else {
-                // Fallback to dynamic calculation
+                // Cadangan (fallback) ke perhitungan dinamis
                 $paymentDate = Carbon::parse($lastPaidRent->tanggal_pembayaran);
                 $duration = $lastPaidRent->durasi_sewa ?? 1;
                 $type = $lastPaidRent->tipe_durasi ?? 'bulan';
@@ -42,13 +42,13 @@ class JatuhTempoController extends Controller
                 } elseif ($type === 'minggu') {
                     $expiryDate = $paymentDate->copy()->addWeeks($duration);
                 } else {
-                    // Fixed 30 days as requested
+                    // Tetapkan 30 hari sesuai permintaan (Fixed 30 days)
                     $expiryDate = $paymentDate->copy()->addDays($duration * 30);
                 }
             }
         }
 
-        // 3. Status Calculation (Synchronized with System Subscription logic)
+        // 3. Perhitungan Status (Sinkron dengan logika Langganan Sistem)
         $nowWib = now('Asia/Jakarta')->startOfDay();
         $expiryWib = $expiryDate ? $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay() : null;
 
@@ -58,28 +58,28 @@ class JatuhTempoController extends Controller
         $graceDaysRemaining = 0;
         $matiDaysCount = 0;
 
-        // If user is a tenant but hasn't paid or has no rent history, we might want to handle it
+        // Jika pengguna adalah penyewa tetapi belum membayar atau tidak memiliki riwayat sewa, kita mungkin perlu menanganinya
         if ($expiryWib) {
             if ($daysRemaining > 0) {
                 // Still active
                 $computedStatus = 'active';
             } elseif ($daysRemaining >= -2) {
-                // Grace period: Day 0 (due date), Day -1, Day -2 -> Total 3 days
+                // Masa tenggang (Grace period): Hari 0 (jatuh tempo), Hari -1, Hari -2 -> Total 3 hari
                 $computedStatus = 'grace';
                 // 0 -> 3 days remaining, -1 -> 2 days, -2 -> 1 day
                 $graceDaysRemaining = $daysRemaining + 3;
             } else {
-                // Account becomes inactive starting from Day -3
+                // Akun menjadi nonaktif mulai dari Hari -3
                 $computedStatus = 'inactive';
                 // -3 -> 1 day dead, -4 -> 2 days dead, etc.
                 $matiDaysCount = abs($daysRemaining) - 2;
             }
         } else {
-            // No payment history found
+            // Tidak ada riwayat pembayaran yang ditemukan
             $computedStatus = 'none';
         }
 
-        // 4. Fetch purchase history (all paid rent/booking transactions)
+        // 4. Ambil riwayat pembelian (semua transaksi sewa/pesan berbayar)
         $history = Transaksi::where('id_user', $user->id)
             ->whereNotNull('tanggal_pembayaran')
             ->whereIn('tipe', [Transaksi::TYPE_BOOKING, Transaksi::TYPE_SEWA])
@@ -101,7 +101,7 @@ class JatuhTempoController extends Controller
     }
 
     /**
-     * Store a new rent payment order from user.
+     * Simpan pesanan pembayaran sewa baru dari pengguna (user).
      */
     public function store(Request $request)
     {
@@ -116,12 +116,12 @@ class JatuhTempoController extends Controller
 
         $user = Auth::user();
 
-        // Security check: must be a tenant of this kamar
+        // Pemeriksaan keamanan: harus merupakan penyewa dari kamar ini
         if ($user->id_kamar != $request->id_kamar) {
             return back()->with('error', 'Akses ditolak: Kamar tidak sesuai dengan data sewa Anda.');
         }
 
-        // Check if user already has an active order for this kamar
+        // Periksa apakah pengguna sudah memiliki pesanan aktif untuk kamar ini
         $existingOrder = Transaksi::where('id_user', $user->id)
             ->where('id_kamar', $request->id_kamar)
             ->where('status', 'pending')
@@ -133,7 +133,7 @@ class JatuhTempoController extends Controller
 
         $kamar = Kamar::findOrFail($request->id_kamar);
 
-        // Expiry logic
+        // Logika Kedaluwarsa (Expiry logic)
         $batasBayar = $request->batas_bayar ? Carbon::parse($request->batas_bayar) : null;
         if ($request->metode_pembayaran === 'pymen') {
             $batasBayar = now()->addDays(3);
@@ -142,7 +142,7 @@ class JatuhTempoController extends Controller
         $duration = $kamar->durasi_sewa ?? 1;
         $type = $kamar->tipe_durasi ?? 'bulan';
 
-        // Calculate next jatuh tempo based on current one if exists, else from now
+        // Hitung jatuh tempo berikutnya berdasarkan yang saat ini jika ada, jika tidak dari sekarang (now)
         $lastPaidRent = Transaksi::where('id_user', $user->id)
             ->where('status', 'paid')
             ->whereIn('tipe', [Transaksi::TYPE_BOOKING, Transaksi::TYPE_SEWA])
@@ -163,7 +163,7 @@ class JatuhTempoController extends Controller
         Transaksi::create([
             'jumlah_bayar' => $request->jumlah_bayar,
             'tanggal_pembayaran' => $request->metode_pembayaran === 'manual' ? $request->batas_bayar : null,
-            'status' => 'verified', // Rent payments bypass initial pending verification
+            'status' => 'verified', // Pembayaran sewa melewati verifikasi tertunda awal (initial pending verification)
             'tipe' => Transaksi::TYPE_SEWA,
             'durasi_sewa' => $duration,
             'tipe_durasi' => $type,

@@ -8,14 +8,14 @@ use App\Models\JenisLangganan;
 class LandingPageController extends Controller
 {
     /**
-     * Display the landing page with pricing plans.
+     * Tampilkan halaman arahan (landing page) dengan paket harga.
      */
     public function index()
     {
-        // Fetch all plans from database
+        // Ambil semua paket dari database
         $plans = JenisLangganan::all();
 
-        // Specific plan mapping for easy access in Blade
+        // Pemetaan paket khusus agar mudah diakses di Blade
         $pricing = [
             'premium' => $plans->where('nama', 'MEMBER PREMIUM')->first(),
             'pro' => $plans->where('nama', 'MEMBER PRO')->first(),
@@ -24,7 +24,7 @@ class LandingPageController extends Controller
             'biasa' => $plans->where('nama', 'MEMBER BIASA')->first(),
         ];
 
-        // Static testimonials data
+        // Data testimoni statis
         $testimonials = [
             ['name' => 'Bu Sari', 'role' => '3 Kos di Jakarta', 'text' => 'Dulu stress ngecek pembayaran manual. Sekarang tinggal buka HP, langsung tau siapa yang udah bayar. Hemat waktu banget!', 'avatar' => '1'],
             ['name' => 'Pak Budi', 'role' => '5 Kos di Bandung', 'text' => 'Awalnya ragu. Tapi begitu coba, ternyata gampang banget. Anak kos juga seneng karena bisa bayar online.', 'avatar' => '2'],
@@ -34,7 +34,7 @@ class LandingPageController extends Controller
             ['name' => 'Mas Andi', 'role' => '50+ Kamar di Malang', 'text' => 'Harga terjangkau, fitur lengkap. Dulu pakai aplikasi lain kena charge per kamar, bisa jutaan sebulan.', 'avatar' => '6']
         ];
 
-        // Fetch real kos for recommendations
+        // Ambil data kos asli untuk rekomendasi
         $highlightKos = \App\Models\Kos::with(['kamars'])
             ->has('kamars')
             ->latest()

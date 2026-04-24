@@ -14,32 +14,32 @@ use App\Notifications\AduanFasilitasNotification;
 class FasilitasController extends Controller
 {
     /**
-     * Display the user's current facilities and history of requests.
+     * Tampilkan fasilitas pengguna saat ini dan riwayat permintaan.
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Use direct relationships from User model as they are more reliable for confirmed tenants
+        // Gunakan relasi langsung dari model User karena lebih andal untuk penyewa terkonfirmasi (confirmed tenants)
         $kamar = $user->kamar;
         $kosId = $user->id_kos;
 
-        // Get currently owned facilities names (case-insensitive for comparison)
+        // Dapatkan nama-nama fasilitas yang dimiliki saat ini (tidak peka huruf besar/kecil untuk perbandingan)
         $ownedFacilitiesNames = $kamar ? $kamar->fasilitas->pluck('nama_fasilitas')->map(fn($n) => strtolower(trim($n))) : collect();
 
-        // available addons for this kos
+        // tambahan (addons) yang tersedia untuk kos ini
         $availableAddons = FasilitasKos::where('id_kos', $kosId)
             ->get()
             ->filter(function ($addon) use ($ownedFacilitiesNames) {
-                // Only show addons that the user DOES NOT already have
+                // Hanya tampilkan tambahan yang BELUM dimiliki oleh pengguna (DO NOT already have)
                 return !$ownedFacilitiesNames->contains(strtolower(trim($addon->nama_fasilitas)));
             })
             ->values();
 
-        // current facilities (for aduan select)
+        // fasilitas saat ini (untuk pilihan aduan)
         $facilities = $kamar ? $kamar->fasilitas : collect();
 
-        // history of aduan & tambah
+        // riwayat aduan & tambah (history)
         $aduans = Aduan::where('id_user', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -55,7 +55,7 @@ class FasilitasController extends Controller
     }
 
     /**
-     * Store a facility complaint submitted by the user.
+     * Simpan pengaduan fasilitas (facility complaint) yang diajukan oleh pengguna.
      */
     public function storeAduan(Request $request)
     {
@@ -87,7 +87,7 @@ class FasilitasController extends Controller
                 'status' => 'belum_dibaca',
             ]);
 
-            // Notify Kos Owner
+            // Beri tahu Pemilik Kos (Notify Kos Owner)
             $kos = $aduan->kos;
             if ($kos && $kos->user) {
                 $target = $kos->user;
@@ -124,7 +124,7 @@ class FasilitasController extends Controller
     }
 
     /**
-     * Store a tambah fasilitas request submitted by the user.
+     * Simpan permintaan tambah fasilitas yang diajukan oleh pengguna.
      */
     public function storeTambah(Request $request)
     {
@@ -156,7 +156,7 @@ class FasilitasController extends Controller
                 'status' => 'belum_dibaca',
             ]);
 
-            // Notify Kos Owner (Queued for speed)
+            // Beri tahu Pemilik Kos (Antrean/Queued untuk kecepatan)
             $kos = $aduan->kos;
             if ($kos && $kos->user) {
                 $target = $kos->user;

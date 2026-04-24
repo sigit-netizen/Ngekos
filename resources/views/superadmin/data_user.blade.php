@@ -138,13 +138,13 @@
         </div>
 
 
-        <!-- Modal Edit User -->
+        <!-- Modal Edit User (Modal Edit User) -->
         <div id="editUserModal"
             style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:50; align-items:center; justify-content:center; padding:16px;">
             <div
                 style="background:#fff; border-radius:24px; width:100%; max-width:520px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); margin:auto;">
 
-                {{-- Modal Header --}}
+                {{-- Kepala Modal (Modal Header) --}}
                 <div
                     style="padding:24px 28px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
                     <div>
@@ -160,12 +160,12 @@
                     </button>
                 </div>
 
-                {{-- Modal Body --}}
+                {{-- Badan Modal (Modal Body) --}}
                 <form id="editForm" method="POST" style="padding:24px 28px;">
                     @csrf
                     @method('PUT')
 
-                    {{-- Row 1: Nama --}}
+                    {{-- Baris 1: Nama (Row 1: Nama) --}}
                     <div style="margin-bottom:16px;">
                         <label
                             style="display:block; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">Nama
@@ -175,7 +175,7 @@
                             onfocus="this.style.borderColor='#36B2B2'" onblur="this.style.borderColor='#e2e8f0'">
                     </div>
 
-                    {{-- Row 2: Email + Password --}}
+                    {{-- Baris 2: Email + Kata Sandi (Row 2: Email + Password) --}}
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
                         <div>
                             <label
@@ -194,7 +194,7 @@
                         </div>
                     </div>
 
-                    {{-- Row 3: NIK + WA --}}
+                    {{-- Baris 3: NIK + WA (Row 3: NIK + WA) --}}
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
                         <div>
                             <label
@@ -213,7 +213,7 @@
                         </div>
                     </div>
 
-                    {{-- Submit --}}
+                    {{-- Kirim (Submit) --}}
                     <button type="submit"
                         style="width:100%; padding:13px; background-color:#36B2B2; color:white; font-size:15px; font-weight:800; border-radius:14px; border:none; cursor:pointer; letter-spacing:0.5px;"
                         onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
@@ -237,7 +237,7 @@
                 document.getElementById('editUserModal').style.display = 'flex';
             }
 
-            // Close on backdrop click
+            // Tutup saat klik latar belakang (Close on backdrop click)
             document.getElementById('editUserModal').addEventListener('click', function (e) {
                 if (e.target === this) closeEditUserModal();
             });

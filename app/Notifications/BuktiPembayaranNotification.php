@@ -16,11 +16,11 @@ class BuktiPembayaranNotification extends Notification implements ShouldQueue
     public $paymentData;
 
     /**
-     * Create a new notification instance.
-     * $paymentData should contain:
+     * Buat instance notifikasi baru.
+     * $paymentData harus berisi:
      * - type: 'tenant_order', 'owner_reg', 'owner_sub'
-     * - name: sender name
-     * - target_name: receiver name (optional)
+     * - name: nama pengirim (sender name)
+     * - target_name: nama penerima (optional)
      * - kos_name: (optional)
      * - amount: (optional)
      * - plan_name: (optional)

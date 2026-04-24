@@ -35,7 +35,7 @@ class OwnerPaymentNotification extends Notification implements ShouldQueue
             ->action('Konfirmasi Pembayaran', 'dashboard');
     }
 
-    // WebPush removed
+    // WebPush dihapus
 
     public function toFonnte($notifiable)
     {

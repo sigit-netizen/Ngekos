@@ -15,12 +15,12 @@ class UserManagementController extends Controller
         $search = $request->get('search');
         $type = $request->get('type', 'all');
 
-        // Exclude admin and superadmin roles
+        // Kecualikan peran admin dan superadmin
         $query = User::whereDoesntHave('roles', function ($q) {
             $q->whereIn('name', ['admin', 'superadmin']);
         });
 
-        // Filter by type
+        // Filter berdasarkan tipe
         if ($type === 'penyewa') {
             $query->whereNotNull('id_kos')->whereNotNull('id_kamar');
         } elseif ($type === 'user') {
@@ -65,9 +65,9 @@ class UserManagementController extends Controller
             'password' => Hash::make($request->password),
             'nik' => $request->nik,
             'nomor_wa' => $request->nomor_wa,
-            'id_plans' => 1, // Default for Anak Kos
-            'tanggal_lahir' => now(), // Default placeholder
-            'alamat' => '-', // Default placeholder
+            'id_plans' => 1, // Default untuk Anak Kos
+            'tanggal_lahir' => now(), // Placeholder default
+            'alamat' => '-', // Placeholder default
         ]);
 
         $user->assignRole('users');

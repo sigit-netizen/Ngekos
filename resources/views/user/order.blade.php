@@ -18,7 +18,7 @@
         x-init="$watch('showUploadModal', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open')); 
                                                                                 $watch('showProof', val => val ? document.body.classList.add('modal-open') : document.body.classList.remove('modal-open'))">
 
-        {{-- Header Summary Card --}}
+        {{-- Kartu Ringkasan Header (Header Summary Card) --}}
         <div class="bg-gradient-to-br from-[#36B2B2] to-[#2D8E8E] rounded-[2.5rem] p-8 sm:p-12 shadow-2xl shadow-[#36B2B2]/20 mb-10 overflow-hidden relative group"
             data-aos="fade-up">
             <div
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        {{-- Order Cards List --}}
+        {{-- Daftar Kartu Pesanan (Order Cards List) --}}
         <div class="space-y-6">
             @forelse($orders ?? [] as $index => $order)
                 @php
@@ -94,7 +94,7 @@
                 <div class="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 {{ $order->status === 'paid' ? 'border-emerald-200' : 'border-gray-50' }} shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative group"
                     data-aos="fade-up" data-aos-delay="{{ ($index % 5) * 100 }}">
 
-                    {{-- Status Ribbon --}}
+                    {{-- Pita Status (Status Ribbon) --}}
                     <div
                         class="absolute top-0 right-0 px-6 py-2.5 {{ $sc['bg'] }} {{ $sc['text'] }} rounded-bl-3xl font-black text-[10px] uppercase tracking-widest z-10 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@
                         </svg>
                         {{ $sc['label'] }}
 
-                        {{-- Countdown Timer --}}
+                        {{-- Penghitung Mundur (Countdown Timer) --}}
                         @php
                             $expiryTime = null;
                             if ($order->status === 'pending' && $order->created_at) {
@@ -110,7 +110,7 @@
                             } elseif ($order->status === 'verified' && !$order->bukti_pembayaran) {
                                 $expiryTime = $order->batas_bayar;
                             } elseif ($order->status === 'verified' && $order->bukti_pembayaran) {
-                                // Once proof is uploaded, we give Admin 24h to verify (using updated_at as proxy for upload time)
+                                // Setelah bukti diunggah, kita berikan Admin 24 jam untuk verifikasi (updated_at sebagai proxy waktu unggah)
                                 $expiryTime = $order->updated_at->addDay();
                             }
                         @endphp
@@ -140,7 +140,7 @@
                     </div>
 
                     <div class="flex flex-col lg:flex-row gap-8 relative z-0 mt-6">
-                        {{-- Main Info --}}
+                        {{-- Informasi Utama (Main Info) --}}
                         <div class="flex-1">
                             <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
                                 <div>
@@ -149,7 +149,7 @@
                                         {{ $order->kamar->kos->nama_kos ?? 'N/A' }}
                                     </h3>
 
-                                    {{-- Cool Message based on status --}}
+                                    {{-- Pesan Keren berdasarkan status (Cool Message based on status) --}}
                                     <p class="text-sm font-bold text-gray-400 italic mb-4">"{{ $sc['message'] }}"</p>
 
                                     <div class="flex flex-wrap items-center gap-3 mt-2">
@@ -176,7 +176,7 @@
                                                 {{ number_format($order->jumlah_bayar, 0, ',', '.') }}</span>
                                         </div>
 
-                                        {{-- Payment Method --}}
+                                        {{-- Metode Pembayaran (Payment Method) --}}
                                         <div
                                             class="flex items-center gap-1.5 px-3 py-1.5 {{ $order->metode_pembayaran === 'manual' ? 'bg-amber-50 border-amber-100' : 'bg-blue-50 border-blue-100' }} rounded-xl border">
                                             <span
@@ -233,7 +233,7 @@
                                 </div>
                             </div>
 
-                            {{-- Progress Stepper --}}
+                            {{-- Stepper Progres (Progress Stepper) --}}
                             <div class="grid grid-cols-4 gap-3 py-6 relative">
                                 @php
                                     $steps = [
@@ -256,7 +256,7 @@
                                 @endforeach
                             </div>
 
-                            {{-- Actions Footer --}}
+                            {{-- Footer Aksi (Actions Footer) --}}
                             <div class="flex flex-wrap items-center gap-4 pt-6 border-t border-gray-50 mt-2 relative z-50">
                                 @if($order->status === 'pending')
                                     <button type="button"
@@ -337,7 +337,7 @@
                             </div>
                         </div>
 
-                        {{-- Side Icon Dekorasi --}}
+                        {{-- Dekorasi Ikon Samping (Side Icon Decoration) --}}
                         <div
                             class="hidden lg:flex items-center justify-center w-48 bg-gray-50/50 rounded-3xl group-hover:bg-[#36B2B2]/5 transition-all duration-500 border border-transparent group-hover:border-[#36B2B2]/10">
                             <div class="relative">
@@ -379,7 +379,7 @@
             @endforelse
         </div>
 
-        {{-- Proof Modal --}}
+        {{-- Modal Bukti (Proof Modal) --}}
         <template x-teleport="body">
             <div x-show="showProof"
                 class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm"
@@ -397,10 +397,10 @@
             </div>
         </template>
 
-        {{-- Pagination --}}
+        {{-- Paginasi (Pagination) --}}
         <!-- removed closing div to wrap the modals -->
 
-        {{-- Upload Modal --}}
+        {{-- Modal Unggah (Upload Modal) --}}
         <template x-teleport="body">
             <div x-show="showUploadModal" class="fixed inset-0 z-[9999] overflow-y-auto"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -439,7 +439,7 @@
                                             x-text="new Intl.NumberFormat('id-ID').format(selectedOrderAmount)"></span>
                                     </div>
                                 
-                                {{-- Bank Account Info --}}
+                                {{-- Informasi Rekening Bank (Bank Account Info) --}}
                                 <div x-show="bank1.norek || bank2.norek" class="mb-8 space-y-4">
                                     <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Transfer Ke Rekening Pemilik</h4>
                                     
@@ -488,7 +488,7 @@
                                     </label>
 
                                     <div class="grid grid-cols-2 gap-4">
-                                        <!-- Camera Button -->
+                                        <!-- Tombol Kamera (Camera Button) -->
                                         <button type="button" onclick="document.getElementById('cameraInput').click()"
                                             class="flex flex-col items-center justify-center p-6 rounded-3xl bg-emerald-50 border-2 border-emerald-100 hover:border-emerald-500 hover:bg-emerald-100 transition-all group">
                                             <div
@@ -505,7 +505,7 @@
                                                 class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Kamera</span>
                                         </button>
 
-                                        <!-- Gallery Button -->
+                                        <!-- Tombol Galeri (Gallery Button) -->
                                         <button type="button" onclick="document.getElementById('galleryInput').click()"
                                             class="flex flex-col items-center justify-center p-6 rounded-3xl bg-blue-50 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-100 transition-all group">
                                             <div
@@ -521,7 +521,7 @@
                                         </button>
                                     </div>
 
-                                    <!-- Hidden Inputs -->
+                                    <!-- Input Tersembunyi (Hidden Inputs) -->
                                     <input type="file" id="cameraInput" name="bukti_pembayaran_camera" accept="image/*"
                                         capture="environment" class="hidden"
                                         @change="const file = $event.target.files[0]; if(file) { previewUrl = URL.createObjectURL(file); document.getElementById('galleryInput').value = ''; }">

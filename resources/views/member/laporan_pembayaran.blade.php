@@ -9,10 +9,10 @@
             </div>
         </div>
 
-        <!-- Horizontal Compact Filters -->
+        <!-- Filter Ringkas (Horizontal Compact Filters) -->
         <form action="{{ route('admin.laporan_pembayaran') }}" method="GET"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end bg-gray-50/80 p-5 rounded-2xl border border-gray-100/50 shadow-inner">
-            <!-- Search Penyewa -->
+            <!-- Cari Penyewa (Search Penyewa) -->
             <div class="md:col-span-6 lg:col-span-3">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Nama Penyewa</label>
                 <div class="relative group">
@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <!-- Duration Type Filter -->
+            <!-- Filter Tipe Durasi (Duration Type Filter) -->
             <div class="md:col-span-6 lg:col-span-2">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Bulan / Hari</label>
                 <select name="duration_type"
@@ -39,7 +39,7 @@
                 </select>
             </div>
 
-            <!-- Year Filter -->
+            <!-- Filter Tahun (Year Filter) -->
             <div class="md:col-span-4 lg:col-span-2">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
                 <select name="year"
@@ -50,7 +50,7 @@
                 </select>
             </div>
 
-            <!-- Month Filter -->
+            <!-- Filter Bulan (Month Filter) -->
             <div class="md:col-span-4 lg:col-span-2">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
                 <select name="month"
@@ -64,7 +64,7 @@
                 </select>
             </div>
 
-            <!-- Status Filter -->
+            <!-- Filter Status (Status Filter) -->
             <div class="md:col-span-4 lg:col-span-3">
                 <label class="block text-[10px] font-extrabold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
                 <select name="status"
@@ -76,7 +76,7 @@
                 </select>
             </div>
 
-            <!-- Actions -->
+            <!-- Aksi (Actions) -->
             <div class="sm:col-span-2 lg:col-span-12 xl:col-span-2 xl:flex-none flex gap-2">
                 <button type="submit"
                     class="flex-[2] xl:w-28 h-11 bg-[#36B2B2] text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2b8f8f] hover:shadow-lg hover:shadow-[#36B2B2]/20 transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -93,9 +93,9 @@
         </form>
     </div>
 
-    <!-- Standardized Stats Widgets -->
+    <!-- Widget Statistik Standar (Standardized Stats Widgets) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8" data-aos="fade-up" data-aos-delay="50">
-        <!-- Total Penyewa -->
+        <!-- Total Penyewa (Total Tenants) -->
         <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-gray-100 transition-colors">
@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        <!-- Penyewa Aktif -->
+        <!-- Penyewa Aktif (Active Tenants) -->
         <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-[#36B2B2]">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#36B2B2]/10 flex items-center justify-center text-[#36B2B2] group-hover:bg-[#36B2B2]/20 transition-colors">
@@ -131,7 +131,7 @@
             </div>
         </div>
 
-        <!-- Masa Tenggang -->
+        <!-- Masa Tenggang (Grace Period) -->
         <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-100 transition-colors">
@@ -149,7 +149,7 @@
             </div>
         </div>
 
-        <!-- Sewa Habis -->
+        <!-- Sewa Habis (Expired Lease) -->
         <div class="group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-red-500">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors">
@@ -167,7 +167,7 @@
             </div>
         </div>
 
-        <!-- Total Omzet -->
+        <!-- Total Omzet (Total Revenue) -->
         <div class="sm:col-span-2 lg:col-span-1 xl:col-span-1 group bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-emerald-500">
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-100 transition-colors">
@@ -183,7 +183,7 @@
         </div>
     </div>
 
-    <!-- Status Quick-Filters -->
+    <!-- Filter Cepat Status (Status Quick-Filters) -->
     <div class="flex flex-wrap items-center gap-2 mb-4" data-aos="fade-up" data-aos-delay="75">
         <a href="{{ route('admin.laporan_pembayaran', array_merge(request()->except('page'), ['status' => ''])) }}"
             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ !$selectedStatus ? 'bg-gray-900 text-white shadow-lg shadow-gray-200' : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50' }}">

@@ -13,28 +13,33 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Menampilkan halaman login.
      */
     public function create(): View
     {
+        // Simpan kode_kos ke session jika user datang dari landing page
+        if (request()->has('kode_kos')) {
+            session(['intended_kos' => request('kode_kos')]);
+        }
+
         return view('pages.auth.signin', ['title' => 'Masuk']);
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Menangani permintaan autentikasi yang masuk.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // 1. Try normal authentication first
+        // 1. Coba autentikasi normal terlebih dahulu
         $user = \App\Models\User::where('email', $request->email)->first();
 
         if ($user) {
             $request->authenticate();
-            // ... normal flow continues below ...
+            // ...logika login normal...
         } else {
             $pendingUser = \App\Models\PendingUser::where('email', $request->email)->first();
             if ($pendingUser && \Illuminate\Support\Facades\Hash::check($request->password, $pendingUser->password)) {
-                // Securely store pending user info in session
+                // Simpan informasi user pending dengan aman di session
                 session(['pending_user_id' => $pendingUser->id]);
 
                 if (in_array($pendingUser->status, ['pending', 'verified', 'konfirmasi'])) {
@@ -45,27 +50,27 @@ class AuthenticatedSessionController extends Controller
                     return redirect()->route('registration.rejected');
                 }
             } else {
-                // If it was a pending session but user is now in 'users' table or deleted
+                // Jika ini adalah sesi pending tetapi pengguna sekarang ada di tabel 'users' atau dihapus
                 $officialUser = \App\Models\User::where('email', $request->email)->first();
                 if ($officialUser && \Illuminate\Support\Facades\Hash::check($request->password, $officialUser->password)) {
                     session()->forget('pending_user_id');
                 }
             }
 
-            // 3. Fallback to normal authenticate() which will handle rate limiting and throw error
+            // 3. Kembali ke authenticate() normal yang akan menangani rate limiting dan menampilkan error
             $request->authenticate();
         }
 
         $user = Auth::user();
 
-        // Check if there are active sessions on OTHER devices
+        // Periksa apakah ada sesi aktif di perangkat LAIN
         $hasOtherSession = \Illuminate\Support\Facades\DB::table('sessions')
             ->where('user_id', $user->id)
             ->where('id', '!=', session()->getId())
             ->exists();
 
         if ($hasOtherSession) {
-            // Temporarily log them out and save ID to session for the OTP Selection page
+            // Keluarkan mereka sementara dan simpan ID ke sesi untuk halaman Pemilihan OTP
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -75,6 +80,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('otp.select');
         }
 
+        // Ambil kode_kos sebelum session diregenerasi agar tidak hilang
+        $intendedKos = session()->pull('intended_kos');
+
         $request->session()->regenerate();
 
         if ($user->hasRole('superadmin')) {
@@ -82,6 +90,11 @@ class AuthenticatedSessionController extends Controller
         } elseif ($user->hasRole('admin') || $user->hasRole('nonaktif')) {
             $route = 'admin.dashboard';
         } elseif ($user->hasRole(['users', 'user'])) {
+            // Cek apakah ada kos yang dipilih sebelum login
+            if ($intendedKos) {
+                return redirect()->route('user.dashboard', ['kode_kos' => $intendedKos])
+                    ->with('success_login', 'Berhasil Login! Menampilkan kos pilihanmu.');
+            }
             $route = 'user.dashboard';
         } elseif ($user->hasRole('member')) {
             $route = 'member.dashboard';
@@ -93,7 +106,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Destroy an authenticated session.
+     * Hancurkan sesi yang terautentikasi.
      */
     public function destroy(Request $request): \Illuminate\Http\RedirectResponse
     {

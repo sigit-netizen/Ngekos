@@ -18,27 +18,27 @@ class SubscriptionManagementController extends Controller
     {
         $user = Auth::user();
 
-        // Fetch Superadmin bank accounts for payment instructions
+        // Ambil akun bank Superadmin untuk instruksi pembayaran
         $superadminBanks = \App\Models\User::role('superadmin')
             ->with('nomorBank')
             ->get()
             ->filter(fn($u) => $u->nomorBank)
             ->map(fn($u) => $u->nomorBank);
 
-        // 1. Fetch user's current valid subscription (for display cards)
+        // 1. Ambil langganan pengguna yang valid saat ini (untuk tampilan kartu)
         $subscription = Langganan::with('jenis_langganan')
             ->where('id_user', $user->id)
             ->whereNotNull('tanggal_pembayaran')
             ->latest()
             ->first();
 
-        // 2. Fetch pending order from the NEW staging table
+        // 2. Ambil pesanan tertunda dari tabel penampung (staging) BARU
         $pendingSubscription = LanggananBaru::with('jenis_langganan')
             ->where('id_user', $user->id)
             ->where('status', 'pending')
             ->first();
 
-        // --- AUTO RESET LOGIC (For Staging Table) ---
+        // --- LOGIKA RESET OTOMATIS (Untuk Tabel Staging) ---
         if ($pendingSubscription) {
             $isExpired = $pendingSubscription->updated_at->addDay()->isPast();
             if ($isExpired && !$pendingSubscription->bukti_pembayaran) {
@@ -47,27 +47,27 @@ class SubscriptionManagementController extends Controller
             }
         }
 
-        // 2. Fetch all available plans for purchasing/upgrading
+        // 2. Ambil semua paket yang tersedia untuk pembelian/peningkatan (upgrade)
         $availablePlans = JenisLangganan::all();
 
-        // 3. Fetch purchase history (all except maybe the very latest active one, or just all)
+        // 3. Ambil riwayat pembelian (history)
         $history = Langganan::with('jenis_langganan')
             ->where('id_user', $user->id)
             ->whereNotNull('tanggal_pembayaran')
             ->orderBy('tanggal_pembayaran', 'desc')
             ->paginate(10);
 
-        // 4. Calculate metrics (securely in controller)
-        // Primary truth is jatuh_tempo, fallback to specialized 30-day calculation if missing
+        // 4. Hitung metrik (secara aman di controller)
+        // Kebenaran utama adalah jatuh_tempo, cadangan (fallback) ke perhitungan khusus 30 hari jika tidak ada
         $expiryDate = $subscription?->jatuh_tempo ? \Carbon\Carbon::parse($subscription->jatuh_tempo) : ($subscription?->tanggal_pembayaran ? \Carbon\Carbon::parse($subscription->tanggal_pembayaran)->addDays(30) : null);
 
-        // Use Asia/Jakarta for comparison
+        // Gunakan Asia/Jakarta untuk perbandingan
         $nowWib = now('Asia/Jakarta')->startOfDay();
         $expiryWib = $expiryDate ? $expiryDate->copy()->timezone('Asia/Jakarta')->startOfDay() : null;
 
         $daysRemaining = $expiryWib ? (int) $nowWib->diffInDays($expiryWib, false) : 0;
 
-        // Categorize status for UI colors (Synchronized with Superadmin logic)
+        // Kategorikan status untuk warna UI (Sinkron dengan logika Superadmin)
         $computedStatus = 'active';
         $graceDaysRemaining = 0;
         $matiDaysCount = 0;
@@ -84,7 +84,7 @@ class SubscriptionManagementController extends Controller
         $kos = $user->kos()->first();
         $currentRoomsCount = $kos ? $kos->kamars()->count() : 0;
 
-        // If it's the admin/member routes, we use the specific billing view
+        // Jika ini adalah rute admin/member, kami menggunakan tampilan tagihan khusus
         if (request()->is('admin/tagihan-sistem')) {
             return view('member.tagihan_sistem', [
                 'title' => 'Tagihan Sistem',
@@ -119,7 +119,7 @@ class SubscriptionManagementController extends Controller
     }
 
     /**
-     * Upgrade or change subscription plan.
+     * Tingkatkan atau ubah paket langganan.
      */
     public function update(Request $request)
     {
@@ -130,7 +130,7 @@ class SubscriptionManagementController extends Controller
 
         $user = Auth::user();
 
-        // Prevent new purchase ONLY if proof is already uploaded and not yet expired
+        // Cegah pembelian baru HANYA jika bukti sudah diunggah dan belum kedaluwarsa
         $existingPending = LanggananBaru::where('id_user', $user->id)
             ->where('status', 'pending')
             ->first();
@@ -139,7 +139,7 @@ class SubscriptionManagementController extends Controller
             return back()->with('error', 'Pesanan Anda sedang diverifikasi oleh Admin. Tunggu verifikasi selesai atau tunggu 24 jam hingga sistem reset otomatis.');
         }
 
-        // Room count validation for "per kamar" plans
+        // Validasi jumlah kamar untuk paket "per kamar"
         if (in_array($request->id_langganan, [4, 5])) {
             $kos = $user->kos()->first();
             $currentRoomsCount = $kos ? $kos->kamars()->count() : 0;
@@ -150,7 +150,7 @@ class SubscriptionManagementController extends Controller
             }
         }
 
-        // Use updateOrCreate on the STAGING table
+        // Gunakan updateOrCreate pada tabel STAGING (LanggananBaru)
         LanggananBaru::updateOrCreate(
             ['id_user' => $user->id],
             [
@@ -167,12 +167,12 @@ class SubscriptionManagementController extends Controller
 
 
     /**
-     * Upload payment proof for a pending subscription.
+     * Unggah bukti pembayaran untuk langganan yang tertunda.
      */
     public function uploadProof(Request $request)
     {
         $request->validate([
-            'bukti_pembayaran' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:512000'], // 500MB as requested before
+            'bukti_pembayaran' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:512000'], // 500MB seperti yang diminta sebelumnya
             'metode_pembayaran' => ['required', 'string'],
         ]);
 
@@ -186,7 +186,7 @@ class SubscriptionManagementController extends Controller
         }
 
         if ($request->hasFile('bukti_pembayaran')) {
-            // Delete old proof if exists
+            // Hapus bukti lama jika ada
             if ($subscription->bukti_pembayaran) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($subscription->bukti_pembayaran);
             }
@@ -199,7 +199,7 @@ class SubscriptionManagementController extends Controller
                 'metode_pembayaran' => $request->metode_pembayaran,
             ]);
 
-            // Notify Superadmins
+            // Beri tahu Superadmin
             $superadmins = \App\Models\User::role('superadmin')->get();
             foreach ($superadmins as $admin) {
                 if ($admin->nomor_wa) {

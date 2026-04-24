@@ -17,8 +17,8 @@ class OrderVerifiedNotification extends Notification implements ShouldQueue
     public $orderData;
 
     /**
-     * Create a new notification instance.
-     * $orderData should contain: 'status', 'nama_kos', 'nomor_kamar', 'kategori' (booking/sewa/registrasi/payment)
+     * Buat instance notifikasi baru (Create a new notification instance).
+     * $orderData harus berisi: 'status', 'nama_kos', 'nomor_kamar', 'kategori' (booking/sewa/registrasi/payment)
      */
     public function __construct($orderData)
     {
@@ -26,7 +26,7 @@ class OrderVerifiedNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Dapatkan saluran pengiriman (delivery channels) notifikasi.
      *
      * @return array<int, string>
      */
@@ -58,7 +58,7 @@ class OrderVerifiedNotification extends Notification implements ShouldQueue
         $message = "[NGEKOS.ID - STATUS ORDER]\n\n";
 
         if ($status === 'verified') {
-            // Admin accepted the order, waiting for payment or next step
+            // Admin menerima pesanan, menunggu pembayaran atau langkah selanjutnya
             $message .= "Halo {$nama}, Order Anda telah DITERIMA!\n" .
                        "---------------------------\n" .
                        "Kos: {$kos}\n" .
@@ -66,7 +66,7 @@ class OrderVerifiedNotification extends Notification implements ShouldQueue
                        "---------------------------\n" .
                        "Segera lakukan pembayaran dan unggah bukti pembayaran di aplikasi agar pesanan Anda diproses sepenuhnya.";
         } elseif ($status === 'paid') {
-            // Payment confirmed
+            // Pembayaran dikonfirmasi (Payment confirmed)
             $message .= "Halo {$nama}, Pembayaran Anda telah DIKONFIRMASI!\n" .
                        "---------------------------\n" .
                        "Kos: {$kos}\n" .
@@ -94,7 +94,7 @@ class OrderVerifiedNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the array representation of the notification.
+     * Dapatkan representasi array dari notifikasi.
      *
      * @return array<string, mixed>
      */

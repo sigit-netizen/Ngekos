@@ -9,10 +9,10 @@
             </div>
         </div>
 
-        <!-- Horizontal Compact Filters -->
+        <!-- Filter Kompak Horizontal (Horizontal Compact Filters) -->
         <form action="{{ route('superadmin.laporan_pembayaran') }}" method="GET"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-            <!-- Search Member -->
+            <!-- Cari Member (Search Member) -->
             <div class="lg:col-span-3">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Nama
                     Member</label>
@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <!-- Plan Filter -->
+            <!-- Filter Paket (Plan Filter) -->
             <div class="lg:col-span-3">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Paket</label>
                 <select name="plan"
@@ -41,7 +41,7 @@
                 </select>
             </div>
 
-            <!-- Year Filter -->
+            <!-- Filter Tahun (Year Filter) -->
             <div class="lg:col-span-2">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Tahun</label>
                 <select name="year"
@@ -52,7 +52,7 @@
                 </select>
             </div>
 
-            <!-- Month Filter -->
+            <!-- Filter Bulan (Month Filter) -->
             <div class="lg:col-span-2">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Bulan</label>
                 <select name="month"
@@ -66,7 +66,7 @@
                 </select>
             </div>
 
-            <!-- Status Filter -->
+            <!-- Filter Status (Status Filter) -->
             <div class="lg:col-span-2">
                 <label
                     class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Status</label>
@@ -79,7 +79,7 @@
                 </select>
             </div>
 
-            <!-- Actions -->
+            <!-- Aksi (Actions) ---- > --}}
             <div class="lg:col-span-12 xl:col-span-2 flex gap-2">
                 <button type="submit"
                     class="flex-1 h-10 bg-[#36B2B2] text-white rounded-xl text-xs font-bold hover:bg-[#2b8f8f] transition-all shadow-sm active:scale-95">
@@ -93,7 +93,7 @@
         </form>
     </div>
 
-    <!-- Standardized Stats Widgets -->
+    <!-- Widget Statistik Standar (Standardized Stats Widgets) -->
     <div class="flex flex-row flex-nowrap gap-4 mb-8" data-aos="fade-up" data-aos-delay="50">
         <!-- Total Member -->
         <div
@@ -246,7 +246,7 @@
         </div>
     </div>
 
-    <!-- Status Quick-Filters -->
+    <!-- Filter Cepat Status (Status Quick-Filters) -->
     <div class="flex flex-wrap items-center gap-2 mb-4" data-aos="fade-up" data-aos-delay="75">
         <a href="{{ route('superadmin.laporan_pembayaran', array_merge(request()->except('page'), ['status' => ''])) }}"
             class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all {{ !$selectedStatus ? 'bg-gray-900 text-white shadow-lg shadow-gray-200' : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50' }}">

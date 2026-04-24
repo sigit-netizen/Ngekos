@@ -16,27 +16,27 @@ class OrderController extends Controller
     {
         $user = auth()->user();
 
-        // Auto-cancel expired verified orders
+        // Batalkan otomatis pesanan terverifikasi yang kedaluwarsa
         Transaksi::checkExpiry();
 
-        // Auto-evict dead accounts for this kos
+        // Keluarkan otomatis akun nonaktif untuk kos ini
         $kos = Kos::where('id_user', $user->id)->first();
         if ($kos) {
             Transaksi::checkDeadAccounts($kos->kode_kos);
         }
 
-        // Auto-cancel expired registration requests
+        // Batalkan otomatis permintaan pendaftaran yang kedaluwarsa
         \App\Models\PendingUser::checkExpiry();
 
         $tab = $request->get('tab', 'order');
         $statusFilter = $request->get('status');
 
-        // Set sensible defaults for statusFilter based on tab if not provided
+        // Setel default yang masuk akal untuk statusFilter berdasarkan tab jika tidak disediakan
         if (!$statusFilter) {
             $statusFilter = ($tab === 'order') ? 'verif' : (($tab === 'riwayat') ? 'active' : 'pending');
         }
 
-        // Get the member's kos
+        // Dapatkan data kos milik member
         $kos = Kos::where('id_user', $user->id)->first();
 
         if (!$kos) {
@@ -55,54 +55,54 @@ class OrderController extends Controller
             ]);
         }
 
-        // Count pending penyewa from pending_users table who registered with this kos's kode_kos
+        // Hitung penyewa tertunda dari tabel pending_users yang mendaftar dengan kode_kos kos ini
         $pendingCount = \App\Models\PendingUser::where('kode_kos', $kos->kode_kos)
             ->where('status', 'pending')
             ->count();
 
-        // Count active penyewa (users linked to this kos)
+        // Hitung penyewa aktif (pengguna yang terhubung ke kos ini)
         $activeCount = User::where('id_kos', $kos->id)->where('status', 'active')->count();
 
-        // Count rejected from pending_users with this kode_kos
+        // Hitung pendaftaran yang ditolak dari pending_users dengan kode_kos ini
         $rejectedCount = \App\Models\PendingUser::where('kode_kos', $kos->kode_kos)
             ->where('status', 'rejected')
             ->count();
 
-        // Count pending order transaksi (Verifikasi)
+        // Hitung transaksi pesanan tertunda (Verifikasi)
         $orderPendingCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'pending')
             ->count();
 
-        // Count for 'Menunggu' (Diterima tapi belum upload bukti)
+        // Hitung untuk 'Menunggu' (Diterima tapi belum unggah bukti)
         $orderMenungguCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'verified')
             ->where('tipe', Transaksi::TYPE_BOOKING)
             ->whereNull('bukti_pembayaran')
             ->count();
 
-        // Count for 'Konfirmasi' (Sudah upload bukti tapi belum dikonfirmasi admin) - New Booking
+        // Hitung untuk 'Konfirmasi' (Sudah unggah bukti tapi belum dikonfirmasi admin) - Pemesanan Baru (New Booking)
         $orderKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->where('status', 'verified')
             ->where('tipe', Transaksi::TYPE_BOOKING)
             ->whereNotNull('bukti_pembayaran')
             ->count();
 
-        // Count for 'Verifikasi Sewa' (Sudah upload bukti tapi belum dikonfirmasi admin) - Recurring Rent
+        // Hitung untuk 'Verifikasi Sewa' (Sudah unggah bukti tapi belum dikonfirmasi admin) - Sewa Berulang (Recurring Rent)
         $rentKonfirmasiCount = Transaksi::where('kode_kos', $kos->kode_kos)
             ->whereIn('status', ['pending', 'verified'])
             ->where('tipe', Transaksi::TYPE_SEWA)
             ->count();
 
-        // Total verified count (Diterima)
+        // Total jumlah terverifikasi (Diterima)
         $orderVerifiedCount = $orderMenungguCount + $orderKonfirmasiCount;
 
-        // Pending penyewa from pending_users
+        // Penyewa tertunda dari pending_users
         $pendingPenyewa = \App\Models\PendingUser::where('kode_kos', $kos->kode_kos)
             ->where('status', 'pending')
             ->latest()
             ->paginate(10, ['*'], 'pending_page');
 
-        // Riwayat: active users linked to kos OR rejected pending_users
+        // Riwayat: pengguna aktif yang terhubung ke kos ATAU pendaftaran tertunda yang ditolak (rejected pending_users)
         if ($statusFilter === 'rejected') {
             $riwayatPenyewa = \App\Models\PendingUser::where('kode_kos', $kos->kode_kos)
                 ->where('status', 'rejected')
@@ -115,7 +115,7 @@ class OrderController extends Controller
                 ->paginate(10, ['*'], 'riwayat_page');
         }
 
-        // Order Transaksi (pending orders from users)
+        // Transaksi Pesanan (pesanan tertunda dari pengguna)
         $orderTransaksi = Transaksi::where('kode_kos', $kos->kode_kos)
             ->with(['user', 'kamar'])
             ->when($tab === 'order', function ($q) use ($statusFilter) {
@@ -163,8 +163,8 @@ class OrderController extends Controller
     }
 
     /**
-     * Verify an order: Set status to verified and start 24h timer.
-     * Also marks kamar as 'terisi' to hold reservation.
+     * Verifikasi pesanan: Setel status ke terverifikasi (verified) dan mulai penghitung waktu 24 jam.
+     * Juga tandai kamar sebagai 'terisi' untuk menahan reservasi.
      */
     public function verifyOrder($id)
     {
@@ -177,12 +177,12 @@ class OrderController extends Controller
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
-        // Ensure this order belongs to admin's kos
+        // Pastikan pesanan ini milik kos admin
         if (!$kos || $transaksi->kode_kos != $kos->kode_kos) {
             return back()->with('error', 'Order tidak valid.');
         }
 
-        // Check if kamar still available
+        // Periksa apakah kamar masih tersedia
         $kamar = Kamar::find($transaksi->id_kamar);
         if (!$kamar || $kamar->status !== 'tersedia') {
             return back()->with('error', 'Kamar sudah tidak tersedia.');
@@ -190,8 +190,8 @@ class OrderController extends Controller
 
         \DB::beginTransaction();
         try {
-            // Update transaksi status to verified (accepted by admin)
-            // For manual payment, use user's planned date. For others, use 1 day.
+            // Perbarui status transaksi menjadi terverifikasi (diterima oleh admin)
+            // Untuk pembayaran manual, gunakan tanggal yang direncanakan pengguna. Untuk lainnya, gunakan 1 hari h+1.
             $batasBayar = ($transaksi->metode_pembayaran === 'manual' && $transaksi->tanggal_pembayaran)
                 ? $transaksi->tanggal_pembayaran
                 : now()->addDay();
@@ -201,10 +201,10 @@ class OrderController extends Controller
                 'batas_bayar' => $batasBayar,
             ]);
 
-            // HOLD THE ROOM
+            // TAHAN KAMAR (HOLD THE ROOM)
             $kamar->update(['status' => 'terisi']);
 
-            // Notify Tenant (Queued for speed)
+            // Beri tahu Penyewa (Antrean/Queued untuk kecepatan)
             $orderUser = User::find($transaksi->id_user);
             if ($orderUser) {
                 $orderUser->notify(new OrderVerifiedNotification([
@@ -224,7 +224,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Confirm payment and activate user.
+     * Konfirmasi pembayaran dan aktifkan pengguna.
      */
     public function confirmPayment($id)
     {
@@ -245,7 +245,7 @@ class OrderController extends Controller
             return back()->with('error', 'Bukti pembayaran belum diunggah.');
         }
 
-        // Check if expired
+        // Periksa apakah sudah kedaluwarsa
         if ($transaksi->batas_bayar && now()->gt($transaksi->batas_bayar)) {
             $transaksi->update(['status' => 'failed']);
             return back()->with('error', 'Batas waktu pembayaran telah habis. Pesanan otomatis gagal.');
@@ -281,7 +281,7 @@ class OrderController extends Controller
                 'jatuh_tempo' => $jatuhTempo,
             ]);
 
-            // Update user
+            // Perbarui Pengguna (Update User)
             $orderUser = User::find($transaksi->id_user);
             if ($orderUser) {
                 $orderUser->update([
@@ -296,13 +296,13 @@ class OrderController extends Controller
                 }
             }
 
-            // Update kamar
+            // Perbarui Kamar (Update Kamar)
             $kamar = Kamar::find($transaksi->id_kamar);
             if ($kamar) {
                 $kamar->update(['status' => 'terisi']);
             }
 
-            // Reject any other pending orders for this kamar
+            // Tolak pesanan tertunda lainnya untuk kamar ini
             Transaksi::where('id_kamar', $transaksi->id_kamar)
                 ->where('status', 'pending')
                 ->where('id', '!=', $transaksi->id)
@@ -310,7 +310,7 @@ class OrderController extends Controller
 
             \DB::commit();
 
-            // Notify Tenant (Queued for speed)
+            // Beri tahu Penyewa (Antrean/Queued untuk kecepatan)
             $orderUser = User::find($transaksi->id_user);
             if ($orderUser) {
                 $orderUser->notify(new OrderVerifiedNotification([
@@ -329,7 +329,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Reject an order.
+     * Tolak pesanan (Reject order).
      */
     public function rejectOrder($id)
     {
@@ -342,7 +342,7 @@ class OrderController extends Controller
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
-        // Ensure this order belongs to admin's kos
+        // Pastikan pesanan ini milik kos admin
         if (!$kos || $transaksi->kode_kos != $kos->kode_kos) {
             return back()->with('error', 'Order tidak valid.');
         }
@@ -353,7 +353,7 @@ class OrderController extends Controller
                 'status' => 'rejected',
             ]);
 
-            // RELEASE THE ROOM
+            // LEPASKAN KAMAR (RELEASE THE ROOM)
             $kamar = Kamar::find($transaksi->id_kamar);
             if ($kamar) {
                 $kamar->update(['status' => 'tersedia']);
@@ -361,7 +361,7 @@ class OrderController extends Controller
 
             \DB::commit();
 
-            // Notify Tenant (Queued for speed)
+            // Beri tahu Penyewa (Antrean/Queued untuk kecepatan)
             $orderUser = User::find($transaksi->id_user);
             if ($orderUser) {
                 $orderUser->notify(new OrderVerifiedNotification([
@@ -380,7 +380,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Verify a new tenant registration (PendingUser).
+     * Verifikasi pendaftaran penyewa baru (PendingUser).
      */
     public function verifyPenyewa($id)
     {
@@ -388,41 +388,41 @@ class OrderController extends Controller
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
-        // Security check: ensure this pending user is for this kos
+        // Pemeriksaan keamanan: pastikan pengguna tertunda (pending user) ini untuk kos ini
         if (!$kos || $pendingUser->kode_kos !== $kos->kode_kos) {
             return back()->with('error', 'Akses ditolak.');
         }
 
         \DB::beginTransaction();
         try {
-            // Check if user already exists
+            // Periksa apakah pengguna sudah ada
             $userRecord = User::where('email', $pendingUser->email)->first();
 
             if (!$userRecord) {
                 $userRecord = new User();
                 $userRecord->name = $pendingUser->name;
                 $userRecord->email = $pendingUser->email;
-                $userRecord->password = $pendingUser->password; // Already hashed in PendingUser if registered normally
+                $userRecord->password = $pendingUser->password; // Sudah di-hash di PendingUser jika terdaftar normal
                 $userRecord->nik = $pendingUser->nik;
                 $userRecord->nomor_wa = $pendingUser->nomor_wa;
                 $userRecord->alamat = $pendingUser->alamat;
             }
 
-            // Assign Anak Kos role and details
+            // Berikan peran Anak Kos dan detailnya
             $userRecord->id_plans = 1; // Anak Kos
             $userRecord->id_kos = $kos->id;
             $userRecord->status = 'active';
             $userRecord->save();
 
-            // Sync role
+            // Sinkronisasi peran (Sync role)
             $userRecord->assignRole('users');
 
-            // Update pending status
+            // Perbarui status tertunda (Update pending status)
             $pendingUser->update(['status' => 'verified']);
 
             \DB::commit();
 
-            // Notify Tenant (Queued for speed)
+            // Beri tahu Penyewa (Antrean/Queued untuk kecepatan)
             $userRecord->notify(new OrderVerifiedNotification([
                 'status' => 'verified',
                 'nama_kos' => $kos->nama_kos,
@@ -438,7 +438,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Reject a new tenant registration.
+     * Tolak pendaftaran penyewa baru.
      */
     public function rejectPenyewa($id)
     {
@@ -446,14 +446,14 @@ class OrderController extends Controller
         $user = auth()->user();
         $kos = Kos::where('id_user', $user->id)->first();
 
-        // Security Check: ensure this pending user is for this kos
+        // Pemeriksaan Keamanan: pastikan pengguna tertunda ini untuk kos ini
         if (!$kos || $pendingUser->kode_kos !== $kos->kode_kos) {
             return back()->with('error', 'Akses ditolak.');
         }
 
         $pendingUser->update(['status' => 'rejected']);
 
-        // Notify Tenant (Queued for speed)
+        // Beri tahu Penyewa (Antrean/Queued untuk kecepatan)
         $notifiable = new \App\Models\User([
             'name' => $pendingUser->name,
             'email' => $pendingUser->email,
